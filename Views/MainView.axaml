@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ReceiptPDFBuilder.Views.MainView"
+             xmlns:helpers="clr-namespace:ReceiptPDFBuilder.Helpers"
              xmlns:models="clr-namespace:ReceiptPDFBuilder.Models"
              xmlns:vm="clr-namespace:ReceiptPDFBuilder.ViewModels"
              xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
@@ -35,6 +36,7 @@
                       Margin="10,20,0,0"/>
     </StackPanel>
     <DataGrid x:Name="FilesGrid"
+              Classes="DragAndDrop ItemsDragAndDrop"
               Grid.Row="2"
               Grid.Column="0"
               Grid.ColumnSpan="2"
@@ -50,6 +52,7 @@
               VerticalScrollBarVisibility="Visible"
               HorizontalScrollBarVisibility="Disabled"
               ScrollViewer.AllowAutoHide="False"
+              HeadersVisibility="All"
               BorderBrush="Gray">
         <DataGrid.Styles>
             <Style Selector="TextBlock">
@@ -91,19 +94,31 @@
                                     Width="*">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="Up"
-                                    Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).MoveItemUp}"
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="4">
+                            <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).MoveItemUp}"
                                     CommandParameter="{Binding}"
-                                    IsEnabled="True"/>
+                                    IsEnabled="{Binding IsMoveUpEnabled}">
+                                <Button.Content>
+                                    <Label Content="&#xf062;" FontFamily="{StaticResource FontAwesomeSolid}" />
+                                </Button.Content>
+                            </Button>
                             <Button Content="Down"
                                     Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).MoveItemDown}"
                                     CommandParameter="{Binding}"
-                                    IsEnabled="True"/>
+                                    IsEnabled="{Binding IsMoveDownEnabled}">
+                                <Button.Content>
+                                    <Label Content="&#xf063;" FontFamily="{StaticResource FontAwesomeSolid}" />
+                                </Button.Content>
+                            </Button>
                             <Button Content="Byebye"
                                     Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).RemoveFile}"
                                     CommandParameter="{Binding}"
-                                    IsEnabled="True"/>
+                                    IsEnabled="True">
+                                <Button.Content>
+                                    <Label Content="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}" />
+                                </Button.Content>
+                            </Button>
                         </StackPanel>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>

@@ -6,6 +6,9 @@ namespace ReceiptPDFBuilder.Models;
 
 class ReportFile : ChangeNotifier
 {
+    private bool _isMoveUpEnabled = false;
+    private bool _isMoveDownEnabled = false;
+
     private string _title;
     private DateOnly _date;
     private DateTime _dateTime;
@@ -74,5 +77,17 @@ class ReportFile : ChangeNotifier
     public string FileName
     {
         get => Path.GetFileName(_filePath);
+    }
+
+    public bool IsMoveUpEnabled
+    {
+        get => _isMoveUpEnabled;
+        set { _isMoveUpEnabled = value; NotifyPropertyChanged(); }
+    }
+
+    public bool IsMoveDownEnabled
+    {
+        get => _isMoveDownEnabled;
+        set { _isMoveDownEnabled = value; NotifyPropertyChanged(); }
     }
 }

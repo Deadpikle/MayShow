@@ -4,8 +4,11 @@ using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
+using Avalonia.Themes.Fluent;
+using DialogHostAvalonia;
 using ImageMagick;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.Rendering;
@@ -91,12 +94,24 @@ class MainViewModel : BaseViewModel, IFontResolver
                                 Title = Path.GetFileName(filePath),
                                 Date = DateOnly.FromDateTime(File.GetCreationTime(filePath)),
                                 Notes = "",
-                                FilePath = filePath
+                                FilePath = filePath,
+                                IsMoveDownEnabled = true,
+                                IsMoveUpEnabled = true,
                             });
                         }
                     }
+                    UpdateMoveEnabled();
                 }
             }
+        }
+    }
+
+    private void UpdateMoveEnabled()
+    {
+        for (var i = 0; i < ReportFiles.Count; i++)
+        {
+            ReportFiles[i].IsMoveUpEnabled = i != 0;
+            ReportFiles[i].IsMoveDownEnabled = i != ReportFiles.Count - 1;
         }
     }
 
@@ -112,6 +127,7 @@ class MainViewModel : BaseViewModel, IFontResolver
             // So, remove and insert.
             ReportFiles.RemoveAt(idx);
             ReportFiles.Insert(idx - 1, file);
+            UpdateMoveEnabled();
         }
     }
 
@@ -122,15 +138,21 @@ class MainViewModel : BaseViewModel, IFontResolver
         {
             ReportFiles.RemoveAt(idx);
             ReportFiles.Insert(idx + 1, file);
+            UpdateMoveEnabled();
         }
     }
 
-    public void RemoveFile(ReportFile file)
+    public async void RemoveFile(ReportFile file)
     {
-        var idx = ReportFiles.IndexOf(file);
-        if (idx != -1)
+        var result = await DialogHost.Show(new WarningDeleteItemModel(file));
+        if (result != null && (bool)result)
         {
-            ReportFiles.RemoveAt(idx);
+            var idx = ReportFiles.IndexOf(file);
+            if (idx != -1)
+            {
+                ReportFiles.RemoveAt(idx);
+                UpdateMoveEnabled();
+            }
         }
     }
 
