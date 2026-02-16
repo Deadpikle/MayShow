@@ -292,6 +292,7 @@ class MainViewModel : BaseViewModel, IFontResolver
                         LogInfo(e.InnerException.StackTrace);
                     }
                 }
+                LogInfo("Please report this error to a programmer or fix the issue listed above.");
             }
         }
     }
