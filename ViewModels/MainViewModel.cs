@@ -440,6 +440,10 @@ class MainViewModel : BaseViewModel, IFontResolver
             var file = ReportFiles[i];
             var fileName = file.FileName;
             var filePath = file.FilePath;
+            if (!File.Exists(filePath))
+            {
+                LogInfo("ERROR: File {0} does not exist at path {1}. Please remove it from the report or re-add it using the Add Item button if you still want it to be in this report.", file.Title, file.FilePath);
+            }
             if (fileName == ".DS_Store" || fileName == outputFileName)
             {
                 continue;
