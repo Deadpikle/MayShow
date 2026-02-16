@@ -27,6 +27,7 @@ class MainViewModel : BaseViewModel, IFontResolver
     private string _createPDFLog;
     private string _workingFolder;
 
+    private string _reportTitle;
     private ObservableCollection<ReportFile> _reportFiles;
 
     public MainViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
@@ -37,6 +38,18 @@ class MainViewModel : BaseViewModel, IFontResolver
         _workingFolder = "";
         _reportFiles = new ObservableCollection<ReportFile>();
         _reportFiles.CollectionChanged += ( sender, e ) => { NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); };
+        _reportTitle = "";
+    }
+
+    public string ReportTitle
+    {
+        get => _reportTitle;
+        set { _reportTitle = value; NotifyPropertyChanged(); NotifyPropertyChanged(nameof(IsTitleBoxVisible)); }
+    }
+
+    public bool IsTitleBoxVisible
+    {
+        get => !string.IsNullOrWhiteSpace(_workingFolder);
     }
 
     public bool IsCreatingPDF
@@ -86,6 +99,7 @@ class MainViewModel : BaseViewModel, IFontResolver
                 if (Directory.Exists(folder.Path.LocalPath))
                 {
                     _workingFolder = folder.Path.LocalPath;
+                    NotifyPropertyChanged(nameof(IsTitleBoxVisible));
                     // TODO: Scan folder for saved info from previous reports and reload if needed
                     // Scan folder for files and display in DataGrid
                     var filePaths = Directory.GetFiles(_workingFolder);
@@ -137,7 +151,7 @@ class MainViewModel : BaseViewModel, IFontResolver
     {
         try
         {
-            // TODO: use already found files
+            // TODO: use already found files and information
             await Task.Run(() => CreatePDF(_workingFolder));
         } catch (Exception e)
         {
