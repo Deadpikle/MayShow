@@ -219,11 +219,11 @@ class MainViewModel : BaseViewModel, IFontResolver
     {
         if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath) && !filePath.EndsWith(".DS_Store"))
         {
-            // TODO: if date in file name, pull out that date instead
+            var date = Utilities.CheckValidDateInString(filePath);
             ReportFiles.Add(new ReportFile()
             {
                 Title = Path.GetFileName(filePath),
-                ReceiptDateTime = File.GetCreationTime(filePath),
+                ReceiptDateTime = date.HasValue ? date.Value.ToDateTime(TimeOnly.MinValue) : File.GetCreationTime(filePath),
                 Notes = "",
                 FilePath = filePath,
             });
