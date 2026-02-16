@@ -46,5 +46,7 @@
     <PackageReference Include="PDFsharp-MigraDoc" Version="6.2.3" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.10.2" />
     <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.10.11-preview20251127001" />
+    <PackageReference Include="DialogHost.Avalonia" Version="0.10.4" />
+    <PackageReference Include="Xaml.Behaviors.Interactions.DragAndDrop.DataGrid" Version="11.3.9.5" />
   </ItemGroup>
 </Project>
