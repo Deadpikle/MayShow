@@ -214,7 +214,7 @@ class MainViewModel : BaseViewModel, IFontResolver
                         MimeTypes = [ "image/heic" ]
                     },
                     FilePickerFileTypes.Pdf,
-                ]
+                ],
             });
             if (files.Count > 0)
             {
@@ -257,6 +257,29 @@ class MainViewModel : BaseViewModel, IFontResolver
                     FilePath = filePath,
                 });
             }
+        }
+    }
+
+    public void OpenFile(ReportFile file)
+    {
+        var topLevel = TopLevelGrabber?.GetTopLevel();
+        if (topLevel is not null)
+        {
+            Console.WriteLine(file.FilePath);
+            var launcher = topLevel.Launcher;
+            launcher.LaunchUriAsync(new Uri(file.FilePath));
+        }
+    }
+
+    public void OpenFileLocation(ReportFile file)
+    {
+        var topLevel = TopLevelGrabber?.GetTopLevel();
+        var dirName = Path.GetDirectoryName(file.FilePath);
+        if (topLevel is not null && dirName != null)
+        {
+            Console.WriteLine(file.FilePath);
+            var launcher = topLevel.Launcher;
+            launcher.LaunchUriAsync(new Uri(dirName));
         }
     }
 
