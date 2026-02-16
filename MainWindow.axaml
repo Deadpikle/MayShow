@@ -6,10 +6,18 @@
         x:Class="ReceiptPDFBuilder.MainWindow"
         Title="Receipt PDF Builder"
         xmlns:vm="clr-namespace:ReceiptPDFBuilder.ViewModels"
+        xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
         x:DataType="vm:MainWindowViewModel"
         Width="800"
         MinWidth="400"
         Height="600"
         MinHeight="400">
-    <ContentControl Content="{Binding CurrentViewModel}"/>
+    <dialogHost:DialogHost CloseOnClickAway="True" 
+                           Identifier="DialogHost">
+        <dialogHost:DialogHost.DialogContent>
+            <StackPanel/>
+        </dialogHost:DialogHost.DialogContent>
+        <!-- put the content over which the dialog is shown here (e.g. your main window grid)-->
+        <ContentControl Content="{Binding CurrentViewModel}"/>
+    </dialogHost:DialogHost>
 </Window>
