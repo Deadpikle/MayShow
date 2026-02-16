@@ -122,7 +122,6 @@ class MainViewModel : BaseViewModel, IFontResolver
         {
             _workingFolder = path;
             NotifyPropertyChanged(nameof(IsTitleBoxVisible));
-            // TODO: Scan folder for saved info from previous reports and reload that first
             var reportFilePath = Path.Combine(path, GetReportSavedDataFileName());
             var successfullyLoadedPriorReport = false;
             if (File.Exists(reportFilePath))
