@@ -154,6 +154,11 @@ class MainViewModel : BaseViewModel, IFontResolver
             }
         }
     }
+    
+    public void ShowAbout()
+    {
+        DialogHost.Show(new AboutViewModel());
+    }
 
     public void RemoveFile(object f) => RemoveFileImpl((ReportFile)f);
 
@@ -567,6 +572,5 @@ class MainViewModel : BaseViewModel, IFontResolver
         LogInfo("Saved PDF output to: " + outputPDFFileName);
         await CreateAndSaveReportObjectAfterReportCreation();
         IsCreatingPDF = false;
-        return;
     }
 }
