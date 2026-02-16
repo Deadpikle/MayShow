@@ -27,7 +27,7 @@
               Grid.Column="0"
               Grid.ColumnSpan="2"
               Margin="2"
-              ItemsSource="{Binding ReportFiles, Mode=TwoWay}" 
+              ItemsSource="{Binding ReportFiles}"
               AutoGenerateColumns="False"
               IsReadOnly="False"
               GridLinesVisibility="All"
@@ -92,6 +92,13 @@
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
         </DataGrid.Columns>
+        <DataGrid.RowDetailsTemplate>
+            <DataTemplate x:DataType="models:ReportFile">
+                <TextBlock TextWrapping="Wrap" Margin="4,4,4,0">
+                    <Run FontWeight="Bold" Text="Notes"/>: <Run Text="{Binding Notes}"/>
+                </TextBlock>
+            </DataTemplate>
+        </DataGrid.RowDetailsTemplate>
     </DataGrid>
     <StackPanel Orientation="Vertical"
                 HorizontalAlignment="Center"
