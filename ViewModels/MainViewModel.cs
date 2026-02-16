@@ -293,6 +293,7 @@ class MainViewModel : BaseViewModel, IFontResolver
                     }
                 }
                 LogInfo("Please report this error to a programmer or fix the issue listed above.");
+                IsCreatingPDF = false;
             }
         }
     }
@@ -442,7 +443,9 @@ class MainViewModel : BaseViewModel, IFontResolver
             var filePath = file.FilePath;
             if (!File.Exists(filePath))
             {
-                LogInfo("ERROR: File {0} does not exist at path {1}. Please remove it from the report or re-add it using the Add Item button if you still want it to be in this report.", file.Title, file.FilePath);
+                LogInfo("ERROR: File \"{0}\" does not exist at path \"{1}\". Please remove it from the report or re-add it using the Add Item button if you still want it to be in this report.", file.Title, file.FilePath);
+                IsCreatingPDF = false;
+                return;
             }
             if (fileName == ".DS_Store" || fileName == outputFileName)
             {

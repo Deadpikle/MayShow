@@ -113,7 +113,7 @@
         <DataGrid.RowDetailsTemplate>
             <DataTemplate x:DataType="models:ReportFile">
                 <TextBlock TextWrapping="Wrap" Margin="4,4,4,0">
-                    <Run FontWeight="Bold" Text="File Name"/>: <Run Text="{Binding FileName}"/>
+                    <Run FontWeight="Bold" Text="File Path"/>: <Run Text="{Binding FilePath}"/>
                     <LineBreak/>
                     <Run FontWeight="Bold" Text="Notes"/>: <Run Text="{Binding Notes}"/>
                 </TextBlock>
