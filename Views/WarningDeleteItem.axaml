@@ -8,14 +8,22 @@
              xmlns:vm="clr-namespace:ReceiptPDFBuilder.ViewModels"
              xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:DataType="vm:WarningDeleteItemModel">
-    <StackPanel>
+    <StackPanel HorizontalAlignment="Center"
+                Margin="6"
+                Spacing="8">
         <TextBlock TextAlignment="Center"
-                   FontWeight="Bold">Are you sure you want to remove this item?</TextBlock>
-        <StackPanel Orientation="Horizontal">
-            <Button Command="{Binding KeepItem}">
+                   FontWeight="Bold"
+                   TextWrapping="Wrap"
+                   MaxWidth="350">Are you sure you want to remove the item "<Run Text="{Binding File.Title}"/>"?</TextBlock>
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Spacing="8">
+            <Button Command="{Binding KeepItem}"
+                    Classes="accent">
                 <TextBlock><Run Text="&#xf02e;" FontFamily="{StaticResource FontAwesomeSolid}"/> Keep Item</TextBlock>
             </Button>
-            <Button Command="{Binding RemoveItem}">
+            <Button Command="{Binding RemoveItem}"
+                    Classes="Danger">
                 <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove Item</TextBlock>
             </Button>
         </StackPanel>

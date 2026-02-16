@@ -68,24 +68,10 @@
                                 Binding="{Binding Title}"
                                 IsReadOnly="True"
                                 Width="*"/>
-            <DataGridTemplateColumn Header="Receipt Date"
-                                    IsReadOnly="True"
-                                    Width="*">
-                <DataGridTemplateColumn.CellTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Date}" />
-                    </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-                <DataGridTemplateColumn.CellEditingTemplate>
-                    <DataTemplate DataType="models:ReportFile">
-                        <!-- <DatePicker DayFormat="ddd dd"
-                                    SelectedDate="{Binding DateTime}"/> -->
-                        <Calendar SelectionMode="SingleDate"
-                                  SelectedDate="{Binding DateTime}"
-                                  DisplayDate="{Binding DateTime}"/>
-                    </DataTemplate>
-                </DataGridTemplateColumn.CellEditingTemplate>
-            </DataGridTemplateColumn>
+            <DataGridTextColumn Header="Receipt Date"  
+                                Binding="{Binding Date}"
+                                IsReadOnly="True"
+                                Width="*"/>
             <DataGridTextColumn Header="File Name" 
                                 Binding="{Binding FileName}"
                                 IsReadOnly="True"
@@ -99,6 +85,7 @@
                                     Spacing="4">
                             <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).RemoveFile}"
                                     CommandParameter="{Binding}"
+                                    Classes="Danger"
                                     Margin="2"
                                     IsEnabled="True">
                                 <Button.Content>

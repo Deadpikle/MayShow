@@ -106,7 +106,6 @@ class MainViewModel : BaseViewModel, IFontResolver
     public void MoveItemUp(ReportFile file)
     {
         var idx = ReportFiles.IndexOf(file);
-        Console.WriteLine("{0} at idx {1}", file.Title, idx);
         if (idx != 0)
         {
             // .Move() is not observed -_-

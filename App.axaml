@@ -71,6 +71,18 @@
                 </BehaviorCollectionTemplate>
             </Setter>
         </Style>
+        <Style Selector="Button.Danger">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#d90202"/>
+            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="#b70000"/>
+            </Style>
+            <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="#9a0000"/>
+            </Style>
+        </Style>
     </Application.Styles>
     <Application.DataTemplates>
         <DataTemplate DataType="{x:Type viewModels:MainViewModel}">
