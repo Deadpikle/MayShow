@@ -245,7 +245,6 @@ class MainViewModel : BaseViewModel, IFontResolver
         {
             try
             {
-                // TODO: use already found files and information
                 await Task.Run(() => CreatePDF(_workingFolder));
             } catch (Exception e)
             {
@@ -394,15 +393,14 @@ class MainViewModel : BaseViewModel, IFontResolver
         footerPar.AddText("Report generated on " + DateTime.Now.ToString("f"));
         section.Footers.Primary.Add(footerPar);
         //
-        var files = Directory.GetFiles(folderPath);
-        files.Sort();
         GlobalFontSettings.FontResolver = this;
         GlobalFontSettings.FallbackFontResolver = new FailsafeFontResolver();
         var hasAddedData = false;
-        for (var i = 0; i < files.Length; i++)
+        for (var i = 0; i < ReportFiles.Count; i++)
         {
-            var file = files[i];
-            var fileName = Path.GetFileName(file);
+            var file = ReportFiles[i];
+            var fileName = file.FileName;
+            var filePath = file.FilePath;
             if (fileName == ".DS_Store" || fileName == outputFileName)
             {
                 continue;
@@ -416,39 +414,53 @@ class MainViewModel : BaseViewModel, IFontResolver
             imageTitlePar.Format.Font.Size = 12;
             imageTitlePar.Format.Font.Bold = true;
             imageTitlePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
-            imageTitlePar.AddText(fileName);
+            imageTitlePar.AddText(file.Title);
+            if (!string.IsNullOrWhiteSpace(file.Notes))
+            {
+                var imageNotesPar = section.AddParagraph();
+                imageNotesPar.Format.Alignment = ParagraphAlignment.Center;
+                imageNotesPar.Format.Font.Size = 10;
+                imageNotesPar.Format.Font.Bold = false;
+                imageNotesPar.Format.Font.Name = "Noto Sans JP";
+                imageNotesPar.AddText(file.Notes);
+            }
             section.AddParagraph(); // add empty line for spacing
             // now add the image
             var isPDF = fileName.EndsWith(".pdf");
-            var isHEIC = fileName.EndsWith(".HEIC") || fileName.EndsWith(".heic");
-            if (isHEIC)
+            // convert heic, webp, or png to JPEG for size and ease of use
+            // (and probably compat reasons too, though I haven't tested that...)
+            var lowerName = fileName.ToLower();
+            var isHEIC = lowerName.EndsWith(".heic");
+            var isWebp = lowerName.EndsWith(".webp");
+            var isPNG = lowerName.EndsWith(".png");
+            if (isHEIC || isWebp || isPNG)
             {
                 var convertedDir = Path.Combine(folderPath, "converted");
                 if (!Directory.Exists(convertedDir))
                 {
                     Directory.CreateDirectory(convertedDir);
                 }
-                var info = new FileInfo(file);
+                var info = new FileInfo(file.FilePath);
                 using var mImage = new MagickImage(info.FullName);
                 // Save frame as jpg
                 var outputPath = Path.Combine(convertedDir, info.Name + ".jpg");
                 mImage.Quality = 80;
                 mImage.Scale((uint)Math.Floor(mImage.Width * 0.5), (uint)Math.Floor(mImage.Height * 0.5));
                 await mImage.WriteAsync(outputPath);
-                fileName = Path.Combine("Converted", info.Name + ".jpg");
-                LogInfo(string.Format("Converted HEIC image to JPEG; fileName is now {0}", fileName));
+                filePath = Path.Combine("Converted", info.Name + ".jpg");
+                LogInfo(string.Format("Converted image to JPEG; fileName is now {0}", file.FilePath));
             }
             var paragraph = section.AddParagraph();
             paragraph.Format.Alignment = ParagraphAlignment.Center;
-            var image = paragraph.AddImage(fileName);
+            var image = paragraph.AddImage(filePath);
             image.LockAspectRatio = true;
             image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
-            LogInfo(string.Format("Added image: {0}", fileName));
+            LogInfo(string.Format("Added image: {0} ({1})", file.Title, filePath));
             if (isPDF)
             {
                 // add other PDF pages
                 // see: https://stackoverflow.com/a/65091204/3938401
-                var pdfFileToAdd = PdfReader.Open(file);
+                var pdfFileToAdd = PdfReader.Open(filePath);
                 imageTitlePar.AddText(string.Format(" (PDF with {0} page{1}) ", 
                     pdfFileToAdd.PageCount, 
                     pdfFileToAdd.PageCount == 1 ? "" : "s"));
