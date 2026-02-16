@@ -11,7 +11,7 @@
     <SelfContained>true</SelfContained>
     <PublishTrimmed>true</PublishTrimmed>
     <PublishAot>true</PublishAot>
-    <AssemblyName>Receipt PDF Builder</AssemblyName>
+    <AssemblyName>ReceiptPDFBuilder</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <TrimmerRootAssembly Include="PdfSharp" />
