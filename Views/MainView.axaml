@@ -9,22 +9,23 @@
              xmlns:vm="clr-namespace:ReceiptPDFBuilder.ViewModels"
              xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
              x:DataType="vm:MainViewModel">
-  <Grid ColumnDefinitions="Auto, *"
-        RowDefinitions="Auto, Auto, *, *">
-    <Label Content="Easy Receipt Folder -> PDF Builder"
-           FontSize="16"
-           Grid.Row="0"
-           Grid.ColumnSpan="2"
-           FontWeight="Bold"
-           HorizontalAlignment="Center"/>
+  <Grid ColumnDefinitions="*"
+        RowDefinitions="Auto, 2*, Auto, *">
+    <StackPanel Orientation="Vertical"
+                Spacing="4">
+        <Label Content="Easy Receipt Folder -> PDF Builder"
+               FontSize="20"
+               FontWeight="Bold"
+               HorizontalAlignment="Center"/>
+      <Button Content="Choose Receipt Folder"
+              Command="{Binding ChooseFolder}"
+              IsEnabled="{Binding !IsCreatingPDF}" />
+    </StackPanel>
     <StackPanel Orientation="Vertical"
                 Spacing="2"
                 Grid.Column="0"
                 Grid.Row="1"
                 Margin="2">
-      <Button Content="Choose Receipt Folder"
-              Command="{Binding ChooseFolder}"
-              IsEnabled="{Binding !IsCreatingPDF}" />
       <Label Content="Creating PDF..."
             IsVisible="{Binding IsCreatingPDF}"/>
       <progRing:ProgressRing Width="80" 
@@ -37,7 +38,7 @@
     </StackPanel>
     <DataGrid x:Name="FilesGrid"
               Classes="DragAndDrop ItemsDragAndDrop"
-              Grid.Row="2"
+              Grid.Row="1"
               Grid.Column="0"
               Grid.ColumnSpan="2"
               Margin="2"
@@ -66,7 +67,7 @@
         <DataGrid.Columns>
             <DataGridTextColumn Header="Title"  
                                 Binding="{Binding Title}"
-                                IsReadOnly="True"
+                                IsReadOnly="False"
                                 Width="*"/>
             <DataGridTextColumn Header="Receipt Date"  
                                 Binding="{Binding Date}"
@@ -83,13 +84,22 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal"
                                     Spacing="4">
+                            <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).EditFileProperties}"
+                                    CommandParameter="{Binding}"
+                                    Classes="accent"
+                                    Margin="2"
+                                    IsEnabled="True">
+                                <Button.Content>
+                                    <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Edit</TextBlock>
+                                </Button.Content>
+                            </Button>
                             <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).RemoveFile}"
                                     CommandParameter="{Binding}"
                                     Classes="Danger"
                                     Margin="2"
                                     IsEnabled="True">
                                 <Button.Content>
-                                    <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove Item</TextBlock>
+                                    <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove</TextBlock>
                                 </Button.Content>
                             </Button>
                         </StackPanel>
@@ -98,9 +108,9 @@
             </DataGridTemplateColumn>
         </DataGrid.Columns>
     </DataGrid>
-    <ScrollViewer Grid.Column="0"
-                  Grid.ColumnSpan="2"
-                  Margin="2"
+    <GridSplitter Grid.Row="2"
+                  Background="LightGray"/>
+    <ScrollViewer Margin="2"
                   Grid.Row="3"
                   x:Name="LogScrollView">
       <SelectableTextBlock Text="{Binding CreatePDFLog}"

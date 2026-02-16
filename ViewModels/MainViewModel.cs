@@ -103,30 +103,6 @@ class MainViewModel : BaseViewModel, IFontResolver
         }
     }
 
-    public void MoveItemUp(ReportFile file)
-    {
-        var idx = ReportFiles.IndexOf(file);
-        if (idx != 0)
-        {
-            // .Move() is not observed -_-
-            // https://github.com/AvaloniaUI/Avalonia.Controls.DataGrid/issues/74
-            // ReportFiles.Move(idx, idx - 1);
-            // So, remove and insert.
-            ReportFiles.RemoveAt(idx);
-            ReportFiles.Insert(idx - 1, file);
-        }
-    }
-
-    public void MoveItemDown(ReportFile file)
-    {
-        var idx = ReportFiles.IndexOf(file);
-        if (idx != ReportFiles.Count - 1)
-        {
-            ReportFiles.RemoveAt(idx);
-            ReportFiles.Insert(idx + 1, file);
-        }
-    }
-
     public async void RemoveFile(ReportFile file)
     {
         var result = await DialogHost.Show(new WarningDeleteItemModel(file));
@@ -138,6 +114,11 @@ class MainViewModel : BaseViewModel, IFontResolver
                 ReportFiles.RemoveAt(idx);
             }
         }
+    }
+
+    public async void EditFileProperties(ReportFile file)
+    {
+        var result = await DialogHost.Show(new EditFileViewModel(file, ViewModelChanger));
     }
 
     private async void BuildPDF()
