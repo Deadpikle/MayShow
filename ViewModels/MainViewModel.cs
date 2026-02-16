@@ -490,10 +490,10 @@ class MainViewModel : BaseViewModel, IFontResolver
         };
         LogInfo("Rendering document...");
         pdfRenderer.RenderDocument();
-        string filename = Path.Join(folderPath, outputFileName);
+        string outputPDFFileName = Path.Join(folderPath, outputFileName);
         LogInfo("Saving document to disk...");
-        pdfRenderer.PdfDocument.Save(filename);
-        LogInfo("Saved PDF output to: " + filename);
+        pdfRenderer.PdfDocument.Save(outputPDFFileName);
+        LogInfo("Saved PDF output to: " + outputPDFFileName);
         await CreateAndSaveReportObjectAfterReportCreation();
         IsCreatingPDF = false;
         return;
