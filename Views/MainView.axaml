@@ -66,9 +66,10 @@
         <DataGrid.Columns>
             <DataGridTextColumn Header="Title"  
                                 Binding="{Binding Title}"
+                                IsReadOnly="True"
                                 Width="*"/>
             <DataGridTemplateColumn Header="Receipt Date"
-                                    IsReadOnly="False"
+                                    IsReadOnly="True"
                                     Width="*">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -96,27 +97,12 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal"
                                     Spacing="4">
-                            <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).MoveItemUp}"
+                            <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).RemoveFile}"
                                     CommandParameter="{Binding}"
-                                    IsEnabled="{Binding IsMoveUpEnabled}">
-                                <Button.Content>
-                                    <Label Content="&#xf062;" FontFamily="{StaticResource FontAwesomeSolid}" />
-                                </Button.Content>
-                            </Button>
-                            <Button Content="Down"
-                                    Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).MoveItemDown}"
-                                    CommandParameter="{Binding}"
-                                    IsEnabled="{Binding IsMoveDownEnabled}">
-                                <Button.Content>
-                                    <Label Content="&#xf063;" FontFamily="{StaticResource FontAwesomeSolid}" />
-                                </Button.Content>
-                            </Button>
-                            <Button Content="Byebye"
-                                    Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).RemoveFile}"
-                                    CommandParameter="{Binding}"
+                                    Margin="2"
                                     IsEnabled="True">
                                 <Button.Content>
-                                    <Label Content="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}" />
+                                    <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove Item</TextBlock>
                                 </Button.Content>
                             </Button>
                         </StackPanel>

@@ -95,23 +95,11 @@ class MainViewModel : BaseViewModel, IFontResolver
                                 Date = DateOnly.FromDateTime(File.GetCreationTime(filePath)),
                                 Notes = "",
                                 FilePath = filePath,
-                                IsMoveDownEnabled = true,
-                                IsMoveUpEnabled = true,
                             });
                         }
                     }
-                    UpdateMoveEnabled();
                 }
             }
-        }
-    }
-
-    private void UpdateMoveEnabled()
-    {
-        for (var i = 0; i < ReportFiles.Count; i++)
-        {
-            ReportFiles[i].IsMoveUpEnabled = i != 0;
-            ReportFiles[i].IsMoveDownEnabled = i != ReportFiles.Count - 1;
         }
     }
 
@@ -127,7 +115,6 @@ class MainViewModel : BaseViewModel, IFontResolver
             // So, remove and insert.
             ReportFiles.RemoveAt(idx);
             ReportFiles.Insert(idx - 1, file);
-            UpdateMoveEnabled();
         }
     }
 
@@ -138,7 +125,6 @@ class MainViewModel : BaseViewModel, IFontResolver
         {
             ReportFiles.RemoveAt(idx);
             ReportFiles.Insert(idx + 1, file);
-            UpdateMoveEnabled();
         }
     }
 
@@ -151,7 +137,6 @@ class MainViewModel : BaseViewModel, IFontResolver
             if (idx != -1)
             {
                 ReportFiles.RemoveAt(idx);
-                UpdateMoveEnabled();
             }
         }
     }
