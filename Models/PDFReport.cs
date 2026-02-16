@@ -12,14 +12,18 @@ namespace ReceiptPDFBuilder.Models;
 class PDFReport : ChangeNotifier
 {
     private string _baseFolder;
-    private string _name;
+    private string _title;
     private List<ReportFile> _files;
+    private DateTime _lastSaved;
+    private DateTime? _lastGenerated;
 
     public PDFReport()
     {
         _baseFolder = "";
-        _name = "";
+        _title = "";
         _files = [];
+        _lastSaved = DateTime.Now;
+        _lastGenerated = null;
     }
 
     public string BaseFolder
@@ -28,15 +32,27 @@ class PDFReport : ChangeNotifier
         set { _baseFolder = value; NotifyPropertyChanged(); }
     }
 
-    public string Name
+    public string Title
     {
-        get => _name;
-        set { _name = value; NotifyPropertyChanged(); }
+        get => _title;
+        set { _title = value; NotifyPropertyChanged(); }
     }
 
     public List<ReportFile> Files
     {
         get => _files;
         set { _files = value; NotifyPropertyChanged(); }
+    }
+
+    public DateTime LastSaved
+    {
+        get => _lastSaved;
+        set { _lastSaved = value; NotifyPropertyChanged(); }
+    }
+
+    public DateTime? LastGenerated
+    {
+        get => _lastGenerated;
+        set { _lastGenerated = value; NotifyPropertyChanged(); }
     }
 }

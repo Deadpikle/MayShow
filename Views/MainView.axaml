@@ -129,6 +129,10 @@
               IsEnabled="{Binding IsTitleBoxVisible}">
         <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item</TextBlock>
       </Button>
+      <Button Command="{Binding SaveInterimReportInfo}"
+              IsEnabled="{Binding IsTitleBoxVisible}">
+        <TextBlock><Run Text="&#xf0c7;" FontFamily="{StaticResource FontAwesomeSolid}"/> Save Report Info</TextBlock>
+      </Button>
       <Button Content="Create Report PDF"
               Command="{Binding BuildPDF}"
               Classes="accent"

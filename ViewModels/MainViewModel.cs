@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using Avalonia.Themes.Fluent;
@@ -15,32 +16,36 @@ using MigraDoc.Rendering;
 using PdfSharp.Fonts;
 using PdfSharp.Pdf.IO;
 using PdfSharp.Snippets.Font;
+using ReceiptPDFBuilder.Helpers;
 using ReceiptPDFBuilder.Interfaces;
 using ReceiptPDFBuilder.Models;
+using ReceiptPDFBuilders.Helpers;
 
 namespace ReceiptPDFBuilder.ViewModels;
 
 class MainViewModel : BaseViewModel, IFontResolver
 {
-    private string _baseDir;
+    private string _processDir;
     private bool _isCreatingPDF;
     private string _createPDFLog;
     private string _workingFolder;
 
     private string _reportTitle;
     private ObservableCollection<ReportFile> _reportFiles;
+    private DateTime? _lastGeneratedTime;
 
     private Settings _settings;
 
     public MainViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
-        _baseDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
+        _processDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
         _isCreatingPDF = false;
         _createPDFLog = "Ready to create PDF! Choose a folder to begin...";
         _workingFolder = "";
         _reportFiles = new ObservableCollection<ReportFile>();
         _reportFiles.CollectionChanged += ( sender, e ) => { NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); };
         _reportTitle = "";
+        _lastGeneratedTime = null;
         _settings = Settings.LoadSettings();
         if (!string.IsNullOrWhiteSpace(_settings.LastUsedPath))
         {
@@ -118,12 +123,33 @@ class MainViewModel : BaseViewModel, IFontResolver
             _workingFolder = path;
             NotifyPropertyChanged(nameof(IsTitleBoxVisible));
             // TODO: Scan folder for saved info from previous reports and reload that first
-            // Scan folder for files and display in DataGrid
-            var filePaths = Directory.GetFiles(_workingFolder);
-            filePaths.Sort();
-            foreach (var filePath in filePaths)
+            var reportFilePath = Path.Combine(path, GetReportSavedDataFileName());
+            var successfullyLoadedPriorReport = false;
+            if (File.Exists(reportFilePath))
             {
-                AddFileBasedOnPath(filePath);
+                // load prior report
+                var json = File.ReadAllText(reportFilePath);
+                var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
+                var report = JsonSerializer.Deserialize<PDFReport>(json, jsonContext.PDFReport);
+                if (report != null && report.Files.Count > 0)
+                {
+                    ReportFiles = new ObservableCollection<ReportFile>(report.Files);
+                    ReportTitle = report.Title;
+                    _workingFolder = report.BaseFolder;
+                    _lastGeneratedTime = report.LastGenerated ?? null;
+                    LogInfo("Reloaded report last saved at {0}", report.LastSaved);
+                    successfullyLoadedPriorReport = true;
+                }
+            }
+            if (!successfullyLoadedPriorReport)
+            {
+                // Scan folder for files and display in DataGrid
+                var filePaths = Directory.GetFiles(_workingFolder);
+                filePaths.Sort();
+                foreach (var filePath in filePaths)
+                {
+                    AddFileBasedOnPath(filePath);
+                }
             }
         }
     }
@@ -235,26 +261,71 @@ class MainViewModel : BaseViewModel, IFontResolver
         }
     }
 
+    public async void SaveInterimReportInfo()
+    {
+        var report = new PDFReport()
+        {
+            Title = ReportTitle,
+            Files = ReportFiles.ToList(),
+            BaseFolder = _workingFolder,
+            LastSaved = DateTime.Now,
+            LastGenerated = _lastGeneratedTime,
+        };
+        await SavePDFReportDataToDisk(report);
+    }
+
+    private async Task SavePDFReportDataToDisk(PDFReport report)
+    {
+        var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
+        using var memoryStream = new MemoryStream();
+        await JsonSerializer.SerializeAsync(memoryStream, report, jsonContext.PDFReport);
+        memoryStream.Position = 0;
+        using var reader = new StreamReader(memoryStream);
+        var json = await reader.ReadToEndAsync();
+        var savePath = Path.Combine(_workingFolder, GetReportSavedDataFileName());
+        await File.WriteAllTextAsync(savePath, json);
+        LogInfo("Saved report information to {0} (baseDir is {1})", savePath, _workingFolder);
+    }
+
+    private async Task CreateAndSaveReportObjectAfterReportCreation()
+    {
+        var report = new PDFReport()
+        {
+            Title = ReportTitle,
+            Files = ReportFiles.ToList(),
+            BaseFolder = _workingFolder,
+            LastSaved = DateTime.Now,
+            LastGenerated = DateTime.Now,
+        };
+        _lastGeneratedTime = DateTime.Now;
+        await SavePDFReportDataToDisk(report);
+    }
+
+    private string GetReportSavedDataFileName()
+    {
+        return "report_data.json";
+    }
+
     public byte[]? GetFont(string faceName)
     {
         LogInfo(string.Format("Loading font {0}", faceName));
         if (faceName == "Noto Sans JP")
         {
-            var path = Path.Combine(_baseDir, "Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf");
+            var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf");
             if (!File.Exists(path))
             {
-                path = Path.Combine(_baseDir, "../Resources/Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf");
+                path = Path.Combine(_processDir, "../Resources/Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf");
             }
             return File.ReadAllBytes(path);
         }
         if (faceName == "Noto Sans JP Bold")
         {
-            var path = Path.Combine(_baseDir, "Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-SemiBold.ttf");
+            var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-SemiBold.ttf");
             if (!File.Exists(path))
             {
-                path = Path.Combine(_baseDir, "../Resources/Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-SemiBold.ttf");
+                path = Path.Combine(_processDir, "../Resources/Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-SemiBold.ttf");
             }
-            return File.ReadAllBytes(Path.Combine(_baseDir, "Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-SemiBold.ttf"));
+            return File.ReadAllBytes(Path.Combine(_processDir, "Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-SemiBold.ttf"));
         }
         return null;
     }
@@ -399,6 +470,7 @@ class MainViewModel : BaseViewModel, IFontResolver
         LogInfo("Saving document to disk...");
         pdfRenderer.PdfDocument.Save(filename);
         LogInfo("Saved PDF output to: " + filename);
+        await CreateAndSaveReportObjectAfterReportCreation();
         IsCreatingPDF = false;
         return;
     }
