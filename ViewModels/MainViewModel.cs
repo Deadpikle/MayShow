@@ -34,14 +34,20 @@ class MainViewModel : BaseViewModel, IFontResolver
         _baseDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
         _isCreatingPDF = false;
         _createPDFLog = "Ready to create PDF! Choose a folder to begin...";
-        _reportFiles = new ObservableCollection<ReportFile>();
         _workingFolder = "";
+        _reportFiles = new ObservableCollection<ReportFile>();
+        _reportFiles.CollectionChanged += ( sender, e ) => { NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); };
     }
 
     public bool IsCreatingPDF
     {
         get => _isCreatingPDF;
-        set { _isCreatingPDF = value; NotifyPropertyChanged(); }
+        set { _isCreatingPDF = value; NotifyPropertyChanged(); NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); }
+    }
+
+    public bool IsCreatePDFButtonEnabled
+    {
+        get => !_isCreatingPDF && _reportFiles.Count > 0;
     }
 
     public string CreatePDFLog
@@ -121,10 +127,11 @@ class MainViewModel : BaseViewModel, IFontResolver
         var result = await DialogHost.Show(new EditFileViewModel(file, ViewModelChanger));
     }
 
-    private async void BuildPDF()
+    public async void BuildPDF()
     {
         try
         {
+            // TODO: use already found files
             await Task.Run(() => CreatePDF(_workingFolder));
         } catch (Exception e)
         {
