@@ -19,4 +19,9 @@
         <FontFamily x:Key="NotoSans">avares://ReceiptPDFBuilder/Assets/Fonts/Noto_Sans/static#Noto Sans</FontFamily>
         <FontFamily x:Key="NotoSansJP">avares://ReceiptPDFBuilder/Assets/Fonts/Noto_Sans_JP/static#Noto Sans JP</FontFamily>
     </Application.Resources>
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="About ReceiptBuilder" Click="AboutOnClick" />
+        </NativeMenu>
+    </NativeMenu.Menu>
 </Application>

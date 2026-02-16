@@ -1,5 +1,7 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using ReceiptPDFBuilder;
 
@@ -20,5 +22,10 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    public void AboutOnClick(object? sender, EventArgs args)
+    {
+        new AboutWindow().Show();
     }
 }
