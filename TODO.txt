@@ -1,2 +1,16 @@
+*-add more items
+*-save last opened folder to settings somewhere
+
+---Features---
+*-save report to disk
+*-separate save button to come back to things later
+*-add resort by date option
+*-when scanning files don't add kinds we cannot read/use
+*-Fix buttons not enabling/disabling appropritely
+*-if files not found show user error
+*-add preview or open button or something to each item
+    https://gitflic.ru/project/jackhammer/pdf-forge-net/file?commit=7bdce6132a70ab12664a8f2482003836c7af2ab6
+
+---Publishing---
 -Published app has unneeded .DSYM file
 -Published app has Assets folder already copied to it; don't want that in output macOS folder but it's being copied there anyway
