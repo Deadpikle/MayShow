@@ -137,7 +137,7 @@
             </Button>
             <Button Command="{Binding ResortPDFItemsByDate}"
                     IsEnabled="{Binding IsCreatePDFButtonEnabled}">
-                <TextBlock><Run Text="&#xf162;" FontFamily="{StaticResource FontAwesomeSolid}"/> Resort PDF Items</TextBlock>
+                <TextBlock><Run Text="&#xf162;" FontFamily="{StaticResource FontAwesomeSolid}"/> Re-sort PDF Items</TextBlock>
             </Button>
             <Button Command="{Binding BuildPDF}"
                     Classes="accent"
