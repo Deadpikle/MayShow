@@ -12,6 +12,7 @@
     <PublishTrimmed>true</PublishTrimmed>
     <PublishAot>true</PublishAot>
     <AssemblyName>ReceiptPDFBuilder</AssemblyName>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <TrimmerRootAssembly Include="PdfSharp" />
