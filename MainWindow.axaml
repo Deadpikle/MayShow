@@ -10,9 +10,9 @@
         x:DataType="vm:MainWindowViewModel"
         Width="800"
         MinWidth="400"
-        Height="600"
-        MinHeight="400">
-    <dialogHost:DialogHost CloseOnClickAway="True" 
+        Height="650"
+        MinHeight="450">
+    <dialogHost:DialogHost CloseOnClickAway="False" 
                            Identifier="DialogHost">
         <dialogHost:DialogHost.DialogContent>
             <StackPanel/>

@@ -98,7 +98,7 @@ class MainViewModel : BaseViewModel, IFontResolver
                             ReportFiles.Add(new ReportFile()
                             {
                                 Title = Path.GetFileName(filePath),
-                                Date = DateOnly.FromDateTime(File.GetCreationTime(filePath)),
+                                ReceiptDateTime = File.GetCreationTime(filePath),
                                 Notes = "TEST NOTES",
                                 FilePath = filePath,
                             });
@@ -125,6 +125,12 @@ class MainViewModel : BaseViewModel, IFontResolver
     public async void EditFileProperties(ReportFile file)
     {
         var result = await DialogHost.Show(new EditFileViewModel(file, ViewModelChanger));
+        if (result != null && result is ReportFile updatedData)
+        {
+            file.Title = updatedData.Title;
+            file.ReceiptDateTime = updatedData.ReceiptDateTime;
+            file.Notes = updatedData.Notes;
+        }
     }
 
     public async void BuildPDF()

@@ -22,10 +22,32 @@ namespace ReceiptPDFBuilder.ViewModels;
 
 class EditFileViewModel : BaseViewModel
 {
-    ReportFile _file;
+    ReportFile _clonedFile;
+    ReportFile _originalFile;
     
     public EditFileViewModel(ReportFile file, IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
-        _file = file;
+        _clonedFile = new ReportFile(file);
+        _originalFile = file;
+    }
+
+    public ReportFile OriginalFile
+    {
+        get => _originalFile;
+    }
+
+    public ReportFile ClonedFile
+    {
+        get => _clonedFile;
+    }
+
+    public void Cancel()
+    {
+        DialogHost.Close("DialogHost", null);
+    }
+
+    public void Save()
+    {
+        DialogHost.Close("DialogHost", ClonedFile);
     }
 }

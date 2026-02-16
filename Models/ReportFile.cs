@@ -7,18 +7,24 @@ namespace ReceiptPDFBuilder.Models;
 class ReportFile : ChangeNotifier
 {
     private string _title;
-    private DateOnly _date;
-    private DateTime _dateTime;
-    private DateTimeOffset _dto;
+    private DateTime _receiptDateTime;
     private string _notes;
     private string _filePath;
 
     public ReportFile()
     {
         _title = "";
-        _date = DateOnly.FromDateTime(DateTime.Now);
+        _receiptDateTime = DateTime.Now;
         _notes = "";
         _filePath = "";
+    }
+
+    public ReportFile(ReportFile other)
+    {
+        Title = _title = other.Title;
+        ReceiptDateTime = _receiptDateTime = other.ReceiptDateTime;
+        Notes = _notes = other.Notes;
+        FilePath = _filePath = other.FilePath;
     }
 
     public string Title
@@ -27,36 +33,20 @@ class ReportFile : ChangeNotifier
         set { _title = value; NotifyPropertyChanged(); }
     }
 
-    public DateOnly Date
+    public DateTime ReceiptDateTime
     {
-        get => _date;
+        get => _receiptDateTime;
         set 
         { 
-            _date = value; 
-            DateTime = value.ToDateTime(TimeOnly.MinValue);
-            DTO = new DateTimeOffset(value.ToDateTime(TimeOnly.MinValue)); 
+            _receiptDateTime = value; 
             NotifyPropertyChanged(); 
+            NotifyPropertyChanged(nameof(ReceiptDate));
         }
     }
 
-    public DateTime DateTime
+    public DateOnly ReceiptDate
     {
-        get => _dateTime;
-        set 
-        { 
-            _dateTime = value; 
-            NotifyPropertyChanged(); 
-        }
-    }
-
-    public DateTimeOffset DTO
-    {
-        get => _dto;
-        set 
-        { 
-            _dto = value; 
-            NotifyPropertyChanged(); 
-        }
+        get => DateOnly.FromDateTime(_receiptDateTime);
     }
 
     public string Notes
