@@ -4,11 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ReceiptPDFBuilder.Views.MainView"
+             xmlns:models="clr-namespace:ReceiptPDFBuilder.Models"
              xmlns:vm="clr-namespace:ReceiptPDFBuilder.ViewModels"
              xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
              x:DataType="vm:MainViewModel">
   <Grid ColumnDefinitions="Auto, *"
-        RowDefinitions="Auto, *">
+        RowDefinitions="Auto, Auto, *, *">
     <Label Content="Easy Receipt Folder -> PDF Builder"
            FontSize="16"
            Grid.Row="0"
@@ -33,9 +34,86 @@
                       Foreground="LightBlue"
                       Margin="10,20,0,0"/>
     </StackPanel>
-    <ScrollViewer Grid.Column="1"
+    <DataGrid x:Name="FilesGrid"
+              Grid.Row="2"
+              Grid.Column="0"
+              Grid.ColumnSpan="2"
+              Margin="2"
+              ItemsSource="{Binding ReportFiles, Mode=TwoWay}" 
+              AutoGenerateColumns="False"
+              IsReadOnly="False"
+              GridLinesVisibility="All"
+              CanUserReorderColumns="False"
+              CanUserResizeColumns="True"
+              CanUserSortColumns="False"
+              BorderThickness="1"
+              VerticalScrollBarVisibility="Visible"
+              HorizontalScrollBarVisibility="Disabled"
+              ScrollViewer.AllowAutoHide="False"
+              BorderBrush="Gray">
+        <DataGrid.Styles>
+            <Style Selector="TextBlock">
+                <Setter Property="TextWrapping" Value="NoWrap" />
+                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            </Style>
+            <Style Selector="TextBox">
+                <Setter Property="TextWrapping" Value="NoWrap" />
+            </Style>
+        </DataGrid.Styles>
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="Title"  
+                                Binding="{Binding Title}"
+                                Width="*"/>
+            <DataGridTemplateColumn Header="Receipt Date"
+                                    IsReadOnly="False"
+                                    Width="*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Date}" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+                <DataGridTemplateColumn.CellEditingTemplate>
+                    <DataTemplate DataType="models:ReportFile">
+                        <!-- <DatePicker DayFormat="ddd dd"
+                                    SelectedDate="{Binding DateTime}"/> -->
+                        <Calendar SelectionMode="SingleDate"
+                                  SelectedDate="{Binding DateTime}"
+                                  DisplayDate="{Binding DateTime}"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellEditingTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTextColumn Header="File Name" 
+                                Binding="{Binding FileName}"
+                                IsReadOnly="True"
+                                Width="*" />
+            <DataGridTemplateColumn Header=""
+                                    IsReadOnly="True"
+                                    Width="*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Up"
+                                    Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).MoveItemUp}"
+                                    CommandParameter="{Binding}"
+                                    IsEnabled="True"/>
+                            <Button Content="Down"
+                                    Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).MoveItemDown}"
+                                    CommandParameter="{Binding}"
+                                    IsEnabled="True"/>
+                            <Button Content="Byebye"
+                                    Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).RemoveFile}"
+                                    CommandParameter="{Binding}"
+                                    IsEnabled="True"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+        </DataGrid.Columns>
+    </DataGrid>
+    <ScrollViewer Grid.Column="0"
+                  Grid.ColumnSpan="2"
                   Margin="2"
-                  Grid.Row="1"
+                  Grid.Row="3"
                   x:Name="LogScrollView">
       <SelectableTextBlock Text="{Binding CreatePDFLog}"
                            Margin="2"

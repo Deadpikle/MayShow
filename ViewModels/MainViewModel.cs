@@ -1,4 +1,7 @@
+#nullable enable
+
 using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,6 +13,7 @@ using PdfSharp.Fonts;
 using PdfSharp.Pdf.IO;
 using PdfSharp.Snippets.Font;
 using ReceiptPDFBuilder.Interfaces;
+using ReceiptPDFBuilder.Models;
 
 namespace ReceiptPDFBuilder.ViewModels;
 
@@ -18,12 +22,17 @@ class MainViewModel : BaseViewModel, IFontResolver
     private string _baseDir;
     private bool _isCreatingPDF;
     private string _createPDFLog;
+    private string _workingFolder;
+
+    private ObservableCollection<ReportFile> _reportFiles;
 
     public MainViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
         _baseDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
         _isCreatingPDF = false;
-        _createPDFLog = "Ready to create PDF!";
+        _createPDFLog = "Ready to create PDF! Choose a folder to begin...";
+        _reportFiles = new ObservableCollection<ReportFile>();
+        _workingFolder = "";
     }
 
     public bool IsCreatingPDF
@@ -38,10 +47,17 @@ class MainViewModel : BaseViewModel, IFontResolver
         set { _createPDFLog = value; NotifyPropertyChanged(); }
     }
 
-    private void LogInfo(string log)
+    public ObservableCollection<ReportFile> ReportFiles
     {
-        Console.WriteLine(log);
-        CreatePDFLog += Environment.NewLine + log;
+        get => _reportFiles;
+        set { _reportFiles = value; NotifyPropertyChanged(); }
+    }
+
+    private void LogInfo(string message, params object[]? arguments)
+    {
+        var timestamp = string.Format("[{0:s}]", DateTime.Now);
+        Console.WriteLine(timestamp + " " + message, arguments);
+        CreatePDFLog += Environment.NewLine + string.Format(message, arguments ?? []);
     }
 
     public async void ChooseFolder()
@@ -60,25 +76,82 @@ class MainViewModel : BaseViewModel, IFontResolver
                 LogInfo("Chosen folder: " + folder.Path.LocalPath);
                 if (Directory.Exists(folder.Path.LocalPath))
                 {
-                    try
+                    _workingFolder = folder.Path.LocalPath;
+                    // TODO: Scan folder for saved info from previous reports and reload if needed
+                    // Scan folder for files and display in DataGrid
+                    var filePaths = Directory.GetFiles(_workingFolder);
+                    filePaths.Sort();
+                    foreach (var filePath in filePaths)
                     {
-                        await Task.Run(() => CreatePDF(folder.Path.LocalPath));
-                    } catch (Exception e)
-                    {
-                        LogInfo("PDF process failed! Reason: " + e.Message);
-                        if (e.StackTrace != null)
+                        if (!filePath.Contains(".DS_Store"))
                         {
-                            LogInfo(e.StackTrace);
-                        }
-                        if (e.InnerException != null)
-                        {
-                            LogInfo("Inner exception: " + e.InnerException.Message);
-                            if (e.InnerException.StackTrace != null)
+                            // TODO: if date in file name, pull out that date instead
+                            ReportFiles.Add(new ReportFile()
                             {
-                                LogInfo(e.InnerException.StackTrace);
-                            }
+                                Title = Path.GetFileName(filePath),
+                                Date = DateOnly.FromDateTime(File.GetCreationTime(filePath)),
+                                Notes = "",
+                                FilePath = filePath
+                            });
                         }
                     }
+                }
+            }
+        }
+    }
+
+    public void MoveItemUp(ReportFile file)
+    {
+        var idx = ReportFiles.IndexOf(file);
+        Console.WriteLine("{0} at idx {1}", file.Title, idx);
+        if (idx != 0)
+        {
+            // .Move() is not observed -_-
+            // https://github.com/AvaloniaUI/Avalonia.Controls.DataGrid/issues/74
+            // ReportFiles.Move(idx, idx - 1);
+            // So, remove and insert.
+            ReportFiles.RemoveAt(idx);
+            ReportFiles.Insert(idx - 1, file);
+        }
+    }
+
+    public void MoveItemDown(ReportFile file)
+    {
+        var idx = ReportFiles.IndexOf(file);
+        if (idx != ReportFiles.Count - 1)
+        {
+            ReportFiles.RemoveAt(idx);
+            ReportFiles.Insert(idx + 1, file);
+        }
+    }
+
+    public void RemoveFile(ReportFile file)
+    {
+        var idx = ReportFiles.IndexOf(file);
+        if (idx != -1)
+        {
+            ReportFiles.RemoveAt(idx);
+        }
+    }
+
+    private async void BuildPDF()
+    {
+        try
+        {
+            await Task.Run(() => CreatePDF(_workingFolder));
+        } catch (Exception e)
+        {
+            LogInfo("PDF process failed! Reason: " + e.Message);
+            if (e.StackTrace != null)
+            {
+                LogInfo(e.StackTrace);
+            }
+            if (e.InnerException != null)
+            {
+                LogInfo("Inner exception: " + e.InnerException.Message);
+                if (e.InnerException.StackTrace != null)
+                {
+                    LogInfo(e.InnerException.StackTrace);
                 }
             }
         }
