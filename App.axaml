@@ -81,13 +81,23 @@
         </DataTemplate>
     </Application.DataTemplates>
     <Application.Resources>
-        <helpers:DataGridDropHandler x:Key="DataGridDropHandler" />
-        <!-- IconGrabber, MIT License, author: Primer, taken from: https://www.svgrepo.com/svg/347759/grabber -->
-        <PathGeometry x:Key="IconGrabberGeometry">M15 18a1 1 0 100-2 1 1 0 000 2zm1-6a1 1 0 11-2 0 1 1 0 012 0zm-7 6a1 1 0 100-2 1 1 0 000 2zm0-5a1 1 0 100-2 1 1 0 000 2zm7-6a1 1 0 11-2 0 1 1 0 012 0zM9 8a1 1 0 100-2 1 1 0 000 2z</PathGeometry>
-        <GeometryDrawing x:Key="IconGrabber" Brush="#969696" Geometry="{StaticResource IconGrabberGeometry}" />
+        <ResourceDictionary>
+            <helpers:DataGridDropHandler x:Key="DataGridDropHandler" />
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key='Light'>
+                    <SolidColorBrush x:Key='DragDropBrush'>Black</SolidColorBrush>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key='Dark'>
+                    <SolidColorBrush x:Key='DragDropBrush'>White</SolidColorBrush>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+            <PathGeometry x:Key="IconGrabberGeometry">M15 18a1 1 0 100-2 1 1 0 000 2zm1-6a1 1 0 11-2 0 1 1 0 012 0zm-7 6a1 1 0 100-2 1 1 0 000 2zm0-5a1 1 0 100-2 1 1 0 000 2zm7-6a1 1 0 11-2 0 1 1 0 012 0zM9 8a1 1 0 100-2 1 1 0 000 2z</PathGeometry>
+            <GeometryDrawing x:Key="IconGrabber" Brush="{DynamicResource DragDropBrush}" Geometry="{StaticResource IconGrabberGeometry}" />
 
-        <FontFamily x:Key="FontAwesomeRegular">avares://ReceiptPDFBuilder/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Regular-400.otf#Font Awesome 7 Free Regular</FontFamily>
-        <FontFamily x:Key="FontAwesomeSolid">avares://ReceiptPDFBuilder/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Solid-900.otf#Font Awesome 7 Free Solid</FontFamily>
+            <FontFamily x:Key="FontAwesomeRegular">avares://ReceiptPDFBuilder/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Regular-400.otf#Font Awesome 7 Free Regular</FontFamily>
+            <FontFamily x:Key="FontAwesomeSolid">avares://ReceiptPDFBuilder/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Solid-900.otf#Font Awesome 7 Free Solid</FontFamily>
+        </ResourceDictionary>
+        <!-- IconGrabber, MIT License, author: Primer, taken from: https://www.svgrepo.com/svg/347759/grabber -->
     </Application.Resources>
     <NativeMenu.Menu>
         <NativeMenu>
