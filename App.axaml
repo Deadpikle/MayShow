@@ -73,14 +73,14 @@
         </Style>
         <Style Selector="Button.Danger">
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="#d90202"/>
+            <Setter Property="Background" Value="#b00202"/>
             <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
                 <Setter Property="Foreground" Value="White"/>
-                <Setter Property="Background" Value="#b70000"/>
+                <Setter Property="Background" Value="#bd0000"/>
             </Style>
             <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
                 <Setter Property="Foreground" Value="White"/>
-                <Setter Property="Background" Value="#9a0000"/>
+                <Setter Property="Background" Value="#820202"/>
             </Style>
         </Style>
     </Application.Styles>
@@ -90,6 +90,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:WarningDeleteItemModel}">
             <views:WarningDeleteItem/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:EditFileViewModel}">
+            <views:EditFile/>
         </DataTemplate>
     </Application.DataTemplates>
     <Application.Resources>

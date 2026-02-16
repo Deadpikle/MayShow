@@ -1,0 +1,20 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ReceiptPDFBuilder.Views.EditFile"
+             xmlns:models="clr-namespace:ReceiptPDFBuilder.Models"
+             xmlns:vm="clr-namespace:ReceiptPDFBuilder.ViewModels"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             x:DataType="vm:EditFileViewModel">
+    <StackPanel HorizontalAlignment="Stretch"
+                Margin="6"
+                Spacing="8">
+        <Label Content="Edit File" 
+               HorizontalAlignment="Center"
+               FontSize="16"
+               FontWeight="Bold"/>
+        
+    </StackPanel>
+</UserControl>
