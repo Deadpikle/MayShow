@@ -3,21 +3,91 @@
              x:Class="ReceiptPDFBuilder.App"
              xmlns:viewModels="clr-namespace:ReceiptPDFBuilder.ViewModels"
              xmlns:views="clr-namespace:ReceiptPDFBuilder.Views"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:behaviors="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:helpers="clr-namespace:ReceiptPDFBuilder.Helpers"
              RequestedThemeVariant="Default"
              Name="Receipt PDF Builder">
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <dialogHostAvalonia:DialogHostStyles />
+        <StyleInclude Source="avares://Xaml.Behaviors.Interactions.DragAndDrop/Styles.axaml" />
+        <StyleInclude Source="avares://Xaml.Behaviors.Interactions.DragAndDrop.DataGrid/Styles.axaml" />
+
+        <Style Selector="DataGrid.DragAndDrop">
+            <Style.Resources>
+                <helpers:DataGridDropHandler x:Key="DataGridDropHandler" />
+            </Style.Resources>
+            <Setter
+                Property="RowHeaderWidth"
+                Value="24" />
+            <Setter Property="(Interaction.Behaviors)">
+                <BehaviorCollectionTemplate>
+                <BehaviorCollection>
+                    <ContextDropBehavior Handler="{StaticResource DataGridDropHandler}" />
+                </BehaviorCollection>
+                </BehaviorCollectionTemplate>
+            </Setter>
+        </Style>
+
+        <!-- This makes only the DataGridRowHeader available for dragging, instead of making the entire row draggable -->
+        <!-- Which prevents a conflict between text selection in a cell and drag-and-drop -->
+        <Style Selector="DataGrid.DragAndDrop DataGridRowHeader">
+            <Setter Property="(Interaction.Behaviors)">
+                <BehaviorCollectionTemplate>
+                <BehaviorCollection>
+                    <ContextDragBehavior HorizontalDragThreshold="3" VerticalDragThreshold="3" />
+                </BehaviorCollection>
+                </BehaviorCollectionTemplate>
+            </Setter>
+            <Setter Property="Content">
+                <Template>
+                <Image
+                    Margin="12,0,12,0"
+                    Width="12"
+                    Height="12"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                    <Image.Source>
+                    <!-- Use your own image here, I used this: https://www.svgrepo.com/svg/347759/grabber -->
+                    <DrawingImage Drawing="{StaticResource IconGrabber}" />
+                    </Image.Source>
+                </Image>
+                </Template>
+            </Setter>
+        </Style>
+
+        <Style Selector="DataGrid.ItemsDragAndDrop">
+            <Style.Resources>
+                <helpers:DataGridDropHandler x:Key="DataGridDropHandler" />
+            </Style.Resources>
+            <Setter Property="(Interaction.Behaviors)">
+                <BehaviorCollectionTemplate>
+                <BehaviorCollection>
+                    <ContextDropBehavior Handler="{StaticResource DataGridDropHandler}" />
+                </BehaviorCollection>
+                </BehaviorCollectionTemplate>
+            </Setter>
+        </Style>
     </Application.Styles>
     <Application.DataTemplates>
         <DataTemplate DataType="{x:Type viewModels:MainViewModel}">
             <views:MainView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:WarningDeleteItemModel}">
+            <views:WarningDeleteItem/>
+        </DataTemplate>
     </Application.DataTemplates>
     <Application.Resources>
-        <FontFamily x:Key="NotoSans">avares://ReceiptPDFBuilder/Assets/Fonts/Noto_Sans/static#Noto Sans</FontFamily>
-        <FontFamily x:Key="NotoSansJP">avares://ReceiptPDFBuilder/Assets/Fonts/Noto_Sans_JP/static#Noto Sans JP</FontFamily>
+        <helpers:DataGridDropHandler x:Key="DataGridDropHandler" />
+        <!-- IconGrabber, MIT License, author: Primer, taken from: https://www.svgrepo.com/svg/347759/grabber -->
+        <PathGeometry x:Key="IconGrabberGeometry">M15 18a1 1 0 100-2 1 1 0 000 2zm1-6a1 1 0 11-2 0 1 1 0 012 0zm-7 6a1 1 0 100-2 1 1 0 000 2zm0-5a1 1 0 100-2 1 1 0 000 2zm7-6a1 1 0 11-2 0 1 1 0 012 0zM9 8a1 1 0 100-2 1 1 0 000 2z</PathGeometry>
+        <GeometryDrawing x:Key="IconGrabber" Brush="#969696" Geometry="{StaticResource IconGrabberGeometry}" />
+
+        <FontFamily x:Key="FontAwesomeRegular">avares://ReceiptPDFBuilder/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Regular-400.otf#Font Awesome 7 Free Regular</FontFamily>
+        <FontFamily x:Key="FontAwesomeSolid">avares://ReceiptPDFBuilder/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Solid-900.otf#Font Awesome 7 Free Solid</FontFamily>
     </Application.Resources>
     <NativeMenu.Menu>
         <NativeMenu>
