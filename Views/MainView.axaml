@@ -125,6 +125,10 @@
                 Spacing="4"
                 Grid.Row="2"
                 Margin="4">
+      <Button Command="{Binding AddItem}"
+              IsEnabled="{Binding IsTitleBoxVisible}">
+        <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item</TextBlock>
+      </Button>
       <Button Content="Create Report PDF"
               Command="{Binding BuildPDF}"
               Classes="accent"

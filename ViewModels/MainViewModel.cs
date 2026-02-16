@@ -100,23 +100,13 @@ class MainViewModel : BaseViewModel, IFontResolver
                 {
                     _workingFolder = folder.Path.LocalPath;
                     NotifyPropertyChanged(nameof(IsTitleBoxVisible));
-                    // TODO: Scan folder for saved info from previous reports and reload if needed
+                    // TODO: Scan folder for saved info from previous reports and reload that first
                     // Scan folder for files and display in DataGrid
                     var filePaths = Directory.GetFiles(_workingFolder);
                     filePaths.Sort();
                     foreach (var filePath in filePaths)
                     {
-                        if (!filePath.Contains(".DS_Store"))
-                        {
-                            // TODO: if date in file name, pull out that date instead
-                            ReportFiles.Add(new ReportFile()
-                            {
-                                Title = Path.GetFileName(filePath),
-                                ReceiptDateTime = File.GetCreationTime(filePath),
-                                Notes = "",
-                                FilePath = filePath,
-                            });
-                        }
+                        AddFileBasedOnPath(filePath);
                     }
                 }
             }
@@ -144,6 +134,58 @@ class MainViewModel : BaseViewModel, IFontResolver
             file.Title = updatedData.Title;
             file.ReceiptDateTime = updatedData.ReceiptDateTime;
             file.Notes = updatedData.Notes;
+        }
+    }
+
+    public async void AddItem()
+    {
+        var topLevel = TopLevelGrabber?.GetTopLevel();
+        if (topLevel is not null)
+        {
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
+            {
+                Title = "Choose image or PDF files...",
+                AllowMultiple = true,
+                FileTypeFilter = [
+                    new FilePickerFileType("All Types")
+                    {
+                        Patterns = [ "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp", "*.pdf", "*.heic", ],
+                        AppleUniformTypeIdentifiers = [ "public.image", "com.adobe.pdf", "public.heic" ],
+                        MimeTypes = [ "image/*", "application/pdf", "image/heic" ]
+                    },
+                    FilePickerFileTypes.ImageAll, 
+                    FilePickerFileTypes.Pdf,
+                    new FilePickerFileType("HEIC Images")
+                    {
+                        Patterns = [ "*.heic" ],
+                        AppleUniformTypeIdentifiers = [ "public.heic" ],
+                        MimeTypes = [ "image/heic" ]
+                    }
+                ]
+            });
+            if (files.Count > 0)
+            {
+                foreach (var file in files)
+                {
+                    var filePath = file.TryGetLocalPath();
+                    AddFileBasedOnPath(filePath);
+                }
+            }
+        }
+    }
+
+    private void AddFileBasedOnPath(string? filePath)
+    {
+        if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath) && !filePath.EndsWith(".DS_Store"))
+        {
+            // TODO: if date in file name, pull out that date instead
+            ReportFiles.Add(new ReportFile()
+            {
+                Title = Path.GetFileName(filePath),
+                ReceiptDateTime = File.GetCreationTime(filePath),
+                Notes = "",
+                FilePath = filePath,
+            });
         }
     }
 
