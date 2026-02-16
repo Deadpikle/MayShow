@@ -97,6 +97,9 @@
         <DataTemplate DataType="{x:Type viewModels:AboutViewModel}">
             <views:AboutView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:WarningViewModel}">
+            <views:WarningView/>
+        </DataTemplate>
     </Application.DataTemplates>
     <Application.Resources>
         <ResourceDictionary>

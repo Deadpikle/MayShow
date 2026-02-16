@@ -12,14 +12,18 @@
                 Spacing="4">
         <TextBlock TextAlignment="Center"
                    FontWeight="Bold"
+                   FontSize="18"
+                   Text="Error!"/>
+        <TextBlock TextAlignment="Center"
+                   FontWeight="Bold"
                    TextWrapping="Wrap"
-                   FontSize="16"
+                   FontSize="14"
                    MaxWidth="350"
                    Text="{Binding Error}"/>
         <Button Command="{Binding Close}"
                 Classes="accent"
                 Content="Close"
                 HorizontalAlignment="Right"
-                Margin="0,0,4,4"/>
+                Margin="0,4,4,4"/>
     </StackPanel>
 </UserControl>

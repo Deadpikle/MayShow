@@ -206,23 +206,30 @@ class MainViewModel : BaseViewModel, IFontResolver
 
     public async void BuildPDF()
     {
-        try
+        if (string.IsNullOrWhiteSpace(ReportTitle))
         {
-            // TODO: use already found files and information
-            await Task.Run(() => CreatePDF(_workingFolder));
-        } catch (Exception e)
+            await DialogHost.Show(new WarningViewModel("You must provide a report title!"));
+        }
+        else
         {
-            LogInfo("PDF process failed! Reason: " + e.Message);
-            if (e.StackTrace != null)
+            try
             {
-                LogInfo(e.StackTrace);
-            }
-            if (e.InnerException != null)
+                // TODO: use already found files and information
+                await Task.Run(() => CreatePDF(_workingFolder));
+            } catch (Exception e)
             {
-                LogInfo("Inner exception: " + e.InnerException.Message);
-                if (e.InnerException.StackTrace != null)
+                LogInfo("PDF process failed! Reason: " + e.Message);
+                if (e.StackTrace != null)
                 {
-                    LogInfo(e.InnerException.StackTrace);
+                    LogInfo(e.StackTrace);
+                }
+                if (e.InnerException != null)
+                {
+                    LogInfo("Inner exception: " + e.InnerException.Message);
+                    if (e.InnerException.StackTrace != null)
+                    {
+                        LogInfo(e.InnerException.StackTrace);
+                    }
                 }
             }
         }
