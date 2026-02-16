@@ -392,6 +392,13 @@ class MainViewModel : BaseViewModel, IFontResolver
         footerPar.AddLineBreak();
         footerPar.AddText("Report generated on " + DateTime.Now.ToString("f"));
         section.Footers.Primary.Add(footerPar);
+        // add report title
+        var reportTitlePar = section.AddParagraph();
+        reportTitlePar.Format.Alignment = ParagraphAlignment.Center;
+        reportTitlePar.Format.Font.Size = 16;
+        reportTitlePar.Format.Font.Bold = true;
+        reportTitlePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
+        reportTitlePar.AddText(ReportTitle);
         //
         GlobalFontSettings.FontResolver = this;
         GlobalFontSettings.FallbackFontResolver = new FailsafeFontResolver();
@@ -469,7 +476,7 @@ class MainViewModel : BaseViewModel, IFontResolver
                     section.AddPageBreak();
                     paragraph = section.AddParagraph();
                     paragraph.Format.Alignment = ParagraphAlignment.Center;
-                    image = paragraph.AddImage(file + "#" + j);
+                    image = paragraph.AddImage(filePath + "#" + j);
                     image.LockAspectRatio = true;
                     image.Width = imageWidth;
                 }
