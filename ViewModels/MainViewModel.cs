@@ -155,7 +155,9 @@ class MainViewModel : BaseViewModel, IFontResolver
         }
     }
 
-    public async void RemoveFile(ReportFile file)
+    public void RemoveFile(object f) => RemoveFileImpl((ReportFile)f);
+
+    public async void RemoveFileImpl(ReportFile file)
     {
         var result = await DialogHost.Show(new WarningDeleteItemModel(file));
         if (result != null && (bool)result)
@@ -168,7 +170,10 @@ class MainViewModel : BaseViewModel, IFontResolver
         }
     }
 
-    public async void EditFileProperties(ReportFile file)
+    // https://github.com/AvaloniaUI/Avalonia/issues/10075
+    public void EditFileProperties(object f) => EditFilePropertiesImpl((ReportFile)f);
+
+    public async void EditFilePropertiesImpl(ReportFile file)
     {
         var result = await DialogHost.Show(new EditFileViewModel(file, ViewModelChanger));
         if (result != null && result is ReportFile updatedData)
@@ -260,7 +265,9 @@ class MainViewModel : BaseViewModel, IFontResolver
         }
     }
 
-    public void OpenFile(ReportFile file)
+    // https://github.com/AvaloniaUI/Avalonia/issues/10075
+    public void OpenFile(object f) => OpenFileImpl((ReportFile)f);
+    public void OpenFileImpl(ReportFile file)
     {
         var topLevel = TopLevelGrabber?.GetTopLevel();
         if (topLevel is not null)
@@ -271,7 +278,9 @@ class MainViewModel : BaseViewModel, IFontResolver
         }
     }
 
-    public void OpenFileLocation(ReportFile file)
+    public void OpenFileLocation(object f) => OpenFileLocationImpl((ReportFile)f);
+
+    private void OpenFileLocationImpl(ReportFile file)
     {
         var topLevel = TopLevelGrabber?.GetTopLevel();
         var dirName = Path.GetDirectoryName(file.FilePath);

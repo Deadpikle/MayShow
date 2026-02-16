@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <TrimmerRootAssembly Include="PdfSharp" />
+    <TrimmerRootAssembly Include="Avalonia.Controls.DataGrid" />
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
