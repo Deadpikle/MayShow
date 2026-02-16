@@ -3,7 +3,9 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using DialogHostAvalonia;
 using ReceiptPDFBuilder;
+using ReceiptPDFBuilder.ViewModels;
 
 namespace ReceiptPDFBuilder;
 
@@ -26,6 +28,6 @@ public partial class App : Application
 
     public void AboutOnClick(object? sender, EventArgs args)
     {
-        new AboutWindow().Show();
+        DialogHost.Show(new AboutViewModel());
     }
 }

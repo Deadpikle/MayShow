@@ -30,6 +30,8 @@ class MainViewModel : BaseViewModel, IFontResolver
     private string _reportTitle;
     private ObservableCollection<ReportFile> _reportFiles;
 
+    private Settings _settings;
+
     public MainViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
         _baseDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
@@ -39,6 +41,12 @@ class MainViewModel : BaseViewModel, IFontResolver
         _reportFiles = new ObservableCollection<ReportFile>();
         _reportFiles.CollectionChanged += ( sender, e ) => { NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); };
         _reportTitle = "";
+        _settings = Settings.LoadSettings();
+        if (!string.IsNullOrWhiteSpace(_settings.LastUsedPath))
+        {
+            LogInfo("Loading data at last used path of {0}", _settings.LastUsedPath);
+            ScanFolder(_settings.LastUsedPath);
+        }
     }
 
     public string ReportTitle
@@ -95,20 +103,27 @@ class MainViewModel : BaseViewModel, IFontResolver
             if (folders.Count == 1)
             {
                 var folder = folders[0];
-                LogInfo("Chosen folder: " + folder.Path.LocalPath);
-                if (Directory.Exists(folder.Path.LocalPath))
-                {
-                    _workingFolder = folder.Path.LocalPath;
-                    NotifyPropertyChanged(nameof(IsTitleBoxVisible));
-                    // TODO: Scan folder for saved info from previous reports and reload that first
-                    // Scan folder for files and display in DataGrid
-                    var filePaths = Directory.GetFiles(_workingFolder);
-                    filePaths.Sort();
-                    foreach (var filePath in filePaths)
-                    {
-                        AddFileBasedOnPath(filePath);
-                    }
-                }
+                LogInfo("Loading items in folder: " + folder.Path.LocalPath);
+                ScanFolder(folder.Path.LocalPath);
+                _settings.LastUsedPath = folder.Path.LocalPath;
+                await _settings.SaveSettingsAsync();
+            }
+        }
+    }
+
+    private void ScanFolder(string path)
+    {
+        if (Directory.Exists(path))
+        {
+            _workingFolder = path;
+            NotifyPropertyChanged(nameof(IsTitleBoxVisible));
+            // TODO: Scan folder for saved info from previous reports and reload that first
+            // Scan folder for files and display in DataGrid
+            var filePaths = Directory.GetFiles(_workingFolder);
+            filePaths.Sort();
+            foreach (var filePath in filePaths)
+            {
+                AddFileBasedOnPath(filePath);
             }
         }
     }

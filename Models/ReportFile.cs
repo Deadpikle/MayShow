@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.Json.Serialization;
 using ReceiptPDFBuilder.Helpers;
 
 namespace ReceiptPDFBuilder.Models;
@@ -44,6 +45,7 @@ class ReportFile : ChangeNotifier
         }
     }
 
+    [JsonIgnore]
     public DateOnly ReceiptDate
     {
         get => DateOnly.FromDateTime(_receiptDateTime);
@@ -61,6 +63,7 @@ class ReportFile : ChangeNotifier
         set { _filePath = value; NotifyPropertyChanged(); }
     }
 
+    [JsonIgnore]
     public string FileName
     {
         get => Path.GetFileName(_filePath);
