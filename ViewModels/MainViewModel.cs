@@ -108,10 +108,12 @@ class MainViewModel : BaseViewModel, IFontResolver
             if (folders.Count == 1)
             {
                 var folder = folders[0];
-                LogInfo("Loading items in folder: " + folder.Path.LocalPath);
+                LogInfo("Clearing existing list and loading items in folder: " + folder.Path.LocalPath);
+                ReportFiles.Clear();
                 ScanFolder(folder.Path.LocalPath);
                 _settings.LastUsedPath = folder.Path.LocalPath;
                 await _settings.SaveSettingsAsync();
+                ResortPDFItemsByDate();
             }
         }
     }
@@ -144,11 +146,11 @@ class MainViewModel : BaseViewModel, IFontResolver
             {
                 // Scan folder for files and display in DataGrid
                 var filePaths = Directory.GetFiles(_workingFolder);
-                filePaths.Sort();
                 foreach (var filePath in filePaths)
                 {
                     AddFileBasedOnPath(filePath);
                 }
+                ResortPDFItemsByDate();
             }
         }
     }
@@ -177,6 +179,17 @@ class MainViewModel : BaseViewModel, IFontResolver
         }
     }
 
+    private string[] GetAllowedFileExtensionPatterns()
+    {
+        return [ "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp", "*.pdf", "*.heic", ];
+    }
+
+    private string[] GetAllowedFileExtensionPatternsWithoutStar()
+    {
+        var list = GetAllowedFileExtensionPatterns();
+        return list.Select(x => x.Replace("*.", "")).ToArray();
+    }
+
     public async void AddItem()
     {
         var topLevel = TopLevelGrabber?.GetTopLevel();
@@ -189,18 +202,18 @@ class MainViewModel : BaseViewModel, IFontResolver
                 FileTypeFilter = [
                     new FilePickerFileType("All Types")
                     {
-                        Patterns = [ "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp", "*.pdf", "*.heic", ],
+                        Patterns = GetAllowedFileExtensionPatterns(),
                         AppleUniformTypeIdentifiers = [ "public.image", "com.adobe.pdf", "public.heic" ],
                         MimeTypes = [ "image/*", "application/pdf", "image/heic" ]
                     },
                     FilePickerFileTypes.ImageAll, 
-                    FilePickerFileTypes.Pdf,
                     new FilePickerFileType("HEIC Images")
                     {
                         Patterns = [ "*.heic" ],
                         AppleUniformTypeIdentifiers = [ "public.heic" ],
                         MimeTypes = [ "image/heic" ]
-                    }
+                    },
+                    FilePickerFileTypes.Pdf,
                 ]
             });
             if (files.Count > 0)
@@ -218,19 +231,38 @@ class MainViewModel : BaseViewModel, IFontResolver
     {
         if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath) && !filePath.EndsWith(".DS_Store"))
         {
-            var date = Utilities.CheckValidDateInString(filePath);
-            ReportFiles.Add(new ReportFile()
+            // make sure extensions are OK
+            var fileExtensions = GetAllowedFileExtensionPatternsWithoutStar();
+            var didMatch = false;
+            foreach (var fileExtension in fileExtensions)
             {
-                Title = Path.GetFileName(filePath),
-                ReceiptDateTime = date.HasValue ? date.Value.ToDateTime(TimeOnly.MinValue) : File.GetCreationTime(filePath),
-                Notes = "",
-                FilePath = filePath,
-            });
+                if (filePath.EndsWith("." + fileExtension))
+                {
+                    didMatch = true;
+                    break;
+                }
+            }
+            if (!didMatch)
+            {
+                LogInfo("File {0} did not match allowed file extension types, so it was not added.", filePath);
+            }
+            else
+            {
+                var date = Utilities.CheckValidDateInString(filePath);
+                ReportFiles.Add(new ReportFile()
+                {
+                    Title = Path.GetFileName(filePath),
+                    ReceiptDateTime = date.HasValue ? date.Value.ToDateTime(TimeOnly.MinValue) : File.GetCreationTime(filePath),
+                    Notes = "",
+                    FilePath = filePath,
+                });
+            }
         }
     }
 
     public void ResortPDFItemsByDate()
     {
+        LogInfo("Sorting report files list...");
         ReportFiles = new ObservableCollection<ReportFile>(ReportFiles.OrderBy(x => x.ReceiptDateTime));
     }
 
@@ -354,7 +386,7 @@ class MainViewModel : BaseViewModel, IFontResolver
         // TODO: resize (non-HEIC) images for smaller size...?
         IsCreatingPDF = true;
         var pdfDoc = new Document();
-        var outputFileName = "MyReceipts.pdf";
+        var outputFileName = ReportTitle + ".pdf";
         var folderName = new DirectoryInfo(folderPath).Name;
         const int imageWidth = 425;
         if (folderName.Contains('-'))
