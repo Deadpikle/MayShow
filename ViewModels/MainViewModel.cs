@@ -230,6 +230,11 @@ class MainViewModel : BaseViewModel, IFontResolver
         }
     }
 
+    public void ResortPDFItemsByDate()
+    {
+        ReportFiles = new ObservableCollection<ReportFile>(ReportFiles.OrderBy(x => x.ReceiptDateTime));
+    }
+
     public async void BuildPDF()
     {
         if (string.IsNullOrWhiteSpace(ReportTitle))
@@ -284,7 +289,7 @@ class MainViewModel : BaseViewModel, IFontResolver
         var json = await reader.ReadToEndAsync();
         var savePath = Path.Combine(_workingFolder, GetReportSavedDataFileName());
         await File.WriteAllTextAsync(savePath, json);
-        LogInfo("Saved report information to {0} (baseDir is {1})", savePath, _workingFolder);
+        LogInfo("Saved report information to {0}", savePath);
     }
 
     private async Task CreateAndSaveReportObjectAfterReportCreation()
