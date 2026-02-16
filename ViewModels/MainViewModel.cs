@@ -99,7 +99,7 @@ class MainViewModel : BaseViewModel, IFontResolver
                             {
                                 Title = Path.GetFileName(filePath),
                                 ReceiptDateTime = File.GetCreationTime(filePath),
-                                Notes = "TEST NOTES",
+                                Notes = "",
                                 FilePath = filePath,
                             });
                         }
