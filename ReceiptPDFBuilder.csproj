@@ -13,6 +13,7 @@
     <PublishAot>true</PublishAot>
     <AssemblyName>ReceiptPDFBuilder</AssemblyName>
     <AssemblyVersion>1.0.0</AssemblyVersion> <!-- Also update Constants version -->
+    <ApplicationIcon>ReceiptPDFBuilder-icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <TrimmerRootAssembly Include="PdfSharp" />
