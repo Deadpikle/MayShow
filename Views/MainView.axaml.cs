@@ -1,6 +1,7 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
 namespace ReceiptPDFBuilder.Views
@@ -19,6 +20,12 @@ namespace ReceiptPDFBuilder.Views
             {
                 LogScrollView.ScrollToEnd();
             }
+        }
+
+        public void UnfocusTextbox()
+        {
+            var topLevel = TopLevel.GetTopLevel(this);
+            topLevel?.FocusManager?.ClearFocus();
         }
     }
 }
