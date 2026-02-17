@@ -60,12 +60,23 @@ class ReportFile : ChangeNotifier
     public string FilePath
     {
         get => _filePath;
-        set { _filePath = value; NotifyPropertyChanged(); }
+        set 
+        { 
+            _filePath = value;
+            NotifyPropertyChanged();
+            NotifyPropertyChanged(nameof(FileName));
+            NotifyPropertyChanged(nameof(IsFileFoundOnDisk));
+        }
     }
 
     [JsonIgnore]
     public string FileName
     {
         get => Path.GetFileName(_filePath);
+    }
+
+    public bool IsFileFoundOnDisk
+    {
+        get => File.Exists(FilePath);
     }
 }
