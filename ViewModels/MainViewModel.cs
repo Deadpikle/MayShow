@@ -306,7 +306,6 @@ class MainViewModel : BaseViewModel, IFontResolver
             launcher.LaunchUriAsync(new Uri(dirName));
         }
     }
-    }
 
     public void ResortPDFItemsByDate()
     {
