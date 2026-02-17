@@ -10,7 +10,16 @@
              x:DataType="vm:AboutViewModel">
     <StackPanel Orientation="Vertical"
                 Spacing="4">
+        <TextBlock Text="Receipt PDF Builder"
+                   HorizontalAlignment="Center"
+                   TextWrapping="Wrap"
+                   FontSize="18"
+                   FontWeight="Bold"/>
         <TextBlock Text="Receipt PDF Builder was built by MB for A in 2026. May the quacking of ducks always be in your favor. Thanks for using!"
+                   MaxWidth="300"
+                   TextWrapping="Wrap"
+                   FontSize="14"/>
+        <TextBlock Text="App icon made using https://gauger.me/fonticon/ with FontAwesome icon 'file-invoice-dollar' and the macOS software Icon Composer."
                    MaxWidth="300"
                    TextWrapping="Wrap"
                    FontSize="14"/>
