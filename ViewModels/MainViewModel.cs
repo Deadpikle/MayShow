@@ -40,7 +40,13 @@ class MainViewModel : BaseViewModel, IFontResolver
     {
         _processDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
         _isCreatingPDF = false;
-        _createPDFLog = "Ready to create PDF! Choose a folder to begin...";
+        var quotes = Constants.GetQuotes();
+        Random random = new Random();
+        var quoteIndex = random.Next(0, quotes.Length);
+        _createPDFLog = "----- Receipt PDF Builder ------" + Environment.NewLine;
+        _createPDFLog += quotes[quoteIndex] + Environment.NewLine;
+        _createPDFLog += "--------------------------------" + Environment.NewLine;
+        _createPDFLog += "Ready to create PDF! Choose a folder to begin...";
         _workingFolder = "";
         _reportFiles = new ObservableCollection<ReportFile>();
         _reportFiles.CollectionChanged += ( sender, e ) => { NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); };
