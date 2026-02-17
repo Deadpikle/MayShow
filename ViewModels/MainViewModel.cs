@@ -188,6 +188,8 @@ class MainViewModel : BaseViewModel, IFontResolver
             if (!successfullyLoadedPriorReport)
             {
                 // Scan folder for files and display in DataGrid
+                ReportFiles.Clear();
+                ReportTitle = "";
                 var filePaths = Directory.GetFiles(_workingFolder);
                 foreach (var filePath in filePaths)
                 {
