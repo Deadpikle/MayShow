@@ -508,6 +508,12 @@ class MainViewModel : BaseViewModel, IFontResolver
             imageTitlePar.Format.Font.Bold = true;
             imageTitlePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
             imageTitlePar.AddText(file.Title);
+            var receiptDatePar = section.AddParagraph();
+            receiptDatePar.Format.Alignment = ParagraphAlignment.Center;
+            receiptDatePar.Format.Font.Size = 12;
+            receiptDatePar.Format.Font.Bold = true;
+            receiptDatePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
+            receiptDatePar.AddText(file.ReceiptDate.ToString("yyyy-MM-dd"));
             if (!string.IsNullOrWhiteSpace(file.Notes))
             {
                 var imageNotesPar = section.AddParagraph();
