@@ -12,5 +12,6 @@
     https://gitflic.ru/project/jackhammer/pdf-forge-net/file?commit=7bdce6132a70ab12664a8f2482003836c7af2ab6
 
 ---Publishing---
--Published app has unneeded .DSYM file
--Published app has Assets folder already copied to it; don't want that in output macOS folder but it's being copied there anyway
+*-Published app has unneeded .DSYM file (fixed via .app builder)
+*-Published app has Assets folder already copied to it; don't want that in output macOS folder but it's being copied there anyway (fixed via .app builder)
+-macOS x64 build
