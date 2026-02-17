@@ -34,6 +34,7 @@
                  IsVisible="{Binding IsTitleBoxVisible}"
                  Watermark="Receipts December 2024"
                  Margin="2,0,2,4"
+                 Classes="clearButton"
                  Name="TitleTextBox">
             <TextBox.KeyBindings>
                 <KeyBinding Command="{Binding $parent[views:MainView].UnfocusTextbox}" Gesture="Enter" />
@@ -69,10 +70,28 @@
             </Style>
         </DataGrid.Styles>
         <DataGrid.Columns>
-            <DataGridTextColumn Header="Title"  
-                                Binding="{Binding Title}"
-                                IsReadOnly="False"
-                                Width="*"/>
+            <DataGridTemplateColumn Header="Title"
+                                    IsReadOnly="False"
+                                    Width="*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding Title}" 
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+                <DataGridTemplateColumn.CellEditingTemplate>
+                    <DataTemplate DataType="models:ReportFile">
+                        <TextBox Text="{Binding Title}"
+                                 Watermark="Title"
+                                 Classes="clearButton">
+                            <TextBox.KeyBindings>
+                                <KeyBinding Command="{Binding $parent[views:MainView].UnfocusTextbox}" Gesture="Enter" />
+                            </TextBox.KeyBindings>
+                        </TextBox>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellEditingTemplate>
+            </DataGridTemplateColumn>
             <DataGridTemplateColumn Header="Receipt Date"
                                     IsReadOnly="False"
                                     Width="125">
