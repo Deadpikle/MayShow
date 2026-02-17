@@ -196,6 +196,10 @@ class MainViewModel : BaseViewModel, IFontResolver
                 ResortPDFItemsByDate();
             }
         }
+        else
+        {
+            LogInfo("Error: The directory {0} does not exist. Please select another folder.", path);
+        }
         NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
     }
     
