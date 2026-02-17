@@ -75,12 +75,40 @@ class MainViewModel : BaseViewModel, IFontResolver
     public bool IsCreatingPDF
     {
         get => _isCreatingPDF;
-        set { _isCreatingPDF = value; NotifyPropertyChanged(); NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); }
+        set 
+        { 
+            _isCreatingPDF = value; 
+            NotifyPropertyChanged();
+            NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); 
+            NotifyPropertyChanged(nameof(HasWorkingFolderAndNotMakingPDF));
+        }
     }
 
     public bool IsCreatePDFButtonEnabled
     {
         get => !_isCreatingPDF && _reportFiles.Count > 0;
+    }
+
+    public bool HasWorkingFolder
+    {
+        get => !string.IsNullOrWhiteSpace(_workingFolder) && Directory.Exists(_workingFolder);
+    }
+
+    public bool HasWorkingFolderAndNotMakingPDF
+    {
+        get => !string.IsNullOrWhiteSpace(_workingFolder) && Directory.Exists(_workingFolder) && !_isCreatingPDF;
+    }
+
+    public string WorkingFolder
+    {
+        get => _workingFolder;
+        set
+        {
+            _workingFolder = value;
+            NotifyPropertyChanged();
+            NotifyPropertyChanged(nameof(HasWorkingFolder));
+            NotifyPropertyChanged(nameof(HasWorkingFolderAndNotMakingPDF));
+        }
     }
 
     public string CreatePDFLog
@@ -137,7 +165,7 @@ class MainViewModel : BaseViewModel, IFontResolver
     {
         if (Directory.Exists(path))
         {
-            _workingFolder = path;
+            WorkingFolder = path;
             NotifyPropertyChanged(nameof(IsTitleBoxVisible));
             var reportFilePath = Path.Combine(path, GetReportSavedDataFileName());
             var successfullyLoadedPriorReport = false;
@@ -151,7 +179,7 @@ class MainViewModel : BaseViewModel, IFontResolver
                 {
                     ReportFiles = new ObservableCollection<ReportFile>(report.Files);
                     ReportTitle = report.Title;
-                    _workingFolder = report.BaseFolder;
+                    WorkingFolder = report.BaseFolder;
                     _lastGeneratedTime = report.LastGenerated ?? null;
                     LogInfo("Reloaded report last saved at {0}", report.LastSaved);
                     successfullyLoadedPriorReport = true;

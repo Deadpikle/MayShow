@@ -25,9 +25,19 @@
                FontSize="20"
                FontWeight="Bold"
                HorizontalAlignment="Center"/>
-        <Button Content="Choose Receipt Folder"
-                Command="{Binding ChooseFolder}"
-                IsEnabled="{Binding !IsCreatingPDF}" />
+        <Grid ColumnDefinitions="Auto, *"
+              Margin="4,0,0,0">
+            <Button Content="Choose Receipt Folder"
+                    Command="{Binding ChooseFolder}"
+                    IsEnabled="{Binding !IsCreatingPDF}"
+                    Grid.Column="0" />
+            <TextBlock Text="{Binding WorkingFolder}"
+                       VerticalAlignment="Center"
+                       TextWrapping="NoWrap"
+                       Margin="4,0,4,0"
+                       TextTrimming="PrefixCharacterEllipsis"
+                       Grid.Column="1"/>
+        </Grid>
         <Label Content="Report Title"
                IsVisible="{Binding IsTitleBoxVisible}" />
         <TextBox Text="{Binding ReportTitle}"
@@ -198,7 +208,7 @@
                 <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item</TextBlock>
             </Button>
             <Button Command="{Binding SaveInterimReportInfo}"
-                    IsEnabled="{Binding IsCreatePDFButtonEnabled}">
+                    IsEnabled="{Binding HasWorkingFolderAndNotMakingPDF}">
                 <TextBlock><Run Text="&#xf0c7;" FontFamily="{StaticResource FontAwesomeSolid}"/> Save Report Info</TextBlock>
             </Button>
             <Button Command="{Binding ResortPDFItemsByDate}"
