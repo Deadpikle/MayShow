@@ -262,7 +262,7 @@ class MainViewModel : BaseViewModel, IFontResolver
             var didMatch = false;
             foreach (var fileExtension in fileExtensions)
             {
-                if (filePath.EndsWith("." + fileExtension))
+                if (filePath.ToLower().EndsWith("." + fileExtension.ToLower()))
                 {
                     didMatch = true;
                     break;
