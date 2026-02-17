@@ -15,7 +15,7 @@
                    TextWrapping="Wrap"
                    FontSize="18"
                    FontWeight="Bold"/>
-        <TextBlock Text="MayShow (An intentional mispelling of 明証, pronounced may-shō, a Japanese word meaning proof, evidence, or corroboration) is a image/PDF to PDF report tool, and it was built by MB for A in 2026. May the quacking of ducks always be in your favor. Thanks for using!"
+        <TextBlock Text="MayShow (An intentional mispelling of 明証, pronounced may-shō, a Japanese word meaning proof, evidence, or corroboration) is a PDF report creation tool. It was built by MB for A in 2026. May the quacking of ducks always be in your favor. Thanks for using our software!"
                    MaxWidth="300"
                    TextWrapping="Wrap"
                    FontSize="14"/>
@@ -23,6 +23,12 @@
                    MaxWidth="300"
                    TextWrapping="Wrap"
                    FontSize="14"/>
+        <TextBlock Text="Copyright 2026 Quickity Quack Productions"
+                   MaxWidth="300"
+                   TextWrapping="Wrap"
+                   HorizontalAlignment="Center"
+                   Margin="0,4,0,4"
+                   FontSize="12"/>
         <Button Command="{Binding Close}"
                 Classes="accent"
                 Content="Close"
