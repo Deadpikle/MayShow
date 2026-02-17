@@ -78,6 +78,9 @@
             <Style Selector="TextBox">
                 <Setter Property="TextWrapping" Value="NoWrap" />
             </Style>
+            <Style Selector="ToolTip">
+                <Setter Property="MaxWidth" Value="1000" />
+            </Style>
         </DataGrid.Styles>
         <DataGrid.Columns>
             <DataGridTemplateColumn Header="Title"
@@ -100,6 +103,7 @@
                             <TextBlock Text="{Binding Title}" 
                                        TextTrimming="CharacterEllipsis"
                                        TextWrapping="NoWrap"
+                                       ToolTip.Tip="{Binding Title}"
                                        Grid.Column="1"
                                        Margin="8,0,4,0"
                                        VerticalAlignment="Center"/>
@@ -110,6 +114,7 @@
                     <DataTemplate DataType="models:ReportFile">
                         <TextBox Text="{Binding Title}"
                                  Watermark="Title"
+                                 ToolTip.Tip="{Binding Title}"
                                  Classes="clearButton">
                             <TextBox.KeyBindings>
                                 <KeyBinding Command="{Binding $parent[views:MainView].UnfocusTextbox}" Gesture="Enter" />
@@ -136,10 +141,19 @@
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>
             </DataGridTemplateColumn>
-            <DataGridTextColumn Header="File Name" 
-                                Binding="{Binding FileName}"
-                                IsReadOnly="True"
-                                Width="*" />
+            <DataGridTemplateColumn Header="File Name"
+                                    IsReadOnly="True"
+                                    Width="*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding FileName}" 
+                                   VerticalAlignment="Center"
+                                   ToolTip.Tip="{Binding FileName}"
+                                   Margin="8,0,8,0"
+                                   HorizontalAlignment="Left"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
             <DataGridTemplateColumn Header=""
                                     IsReadOnly="True"
                                     Width="*">
