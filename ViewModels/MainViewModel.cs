@@ -601,38 +601,58 @@ class MainViewModel : BaseViewModel, IFontResolver
             }
             section.AddParagraph(); // add empty line for spacing
             // now add the image
-            var isPDF = fileName.EndsWith(".pdf");
+            var lowerName = fileName.ToLower();
+            var isPDF = lowerName.EndsWith(".pdf");
             // convert heic, webp, or png to JPEG for size and ease of use
             // (and probably compat reasons too, though I haven't tested that...)
-            var lowerName = fileName.ToLower();
             var isHEIC = lowerName.EndsWith(".heic");
             var isWebp = lowerName.EndsWith(".webp");
             var isPNG = lowerName.EndsWith(".png");
+            var info = new FileInfo(file.FilePath);
+            uint loadedImageWidth = 0;
+            uint loadedImageHeight = 0;
             if (isHEIC || isWebp || isPNG)
             {
+                // Save image as jpg
                 var convertedDir = Path.Combine(folderPath, "converted");
                 if (!Directory.Exists(convertedDir))
                 {
                     Directory.CreateDirectory(convertedDir);
                 }
-                var info = new FileInfo(file.FilePath);
-                using var mImage = new MagickImage(info.FullName);
-                // Save frame as jpg
                 var outputPath = Path.Combine(convertedDir, info.Name + ".jpg");
+                using var mImage = new MagickImage(info.FullName);
+                loadedImageWidth = mImage.Width;
+                loadedImageHeight = mImage.Height;
                 mImage.Quality = 80;
                 if (mImage.Width >= 400 || mImage.Height >= 400)
                 {
-                    mImage.Scale((uint)Math.Floor(mImage.Width * 0.5), (uint)Math.Floor(mImage.Height * 0.5));
+                    loadedImageWidth = (uint)Math.Floor(mImage.Width * 0.5);
+                    loadedImageHeight = (uint)Math.Floor(mImage.Height * 0.5);
+                    mImage.Scale(loadedImageWidth, loadedImageHeight);
                 }
                 await mImage.WriteAsync(outputPath);
                 filePath = Path.Combine("Converted", info.Name + ".jpg");
                 LogInfo(string.Format("Converted image to JPEG; fileName is now {0}", file.FilePath));
             }
+            else if (!isPDF)
+            {
+                // load height/width
+                using var mImage = new MagickImage(info.FullName);
+                loadedImageWidth = mImage.Width;
+                loadedImageHeight = mImage.Height;
+            }
             var paragraph = section.AddParagraph();
             paragraph.Format.Alignment = ParagraphAlignment.Center;
             var image = paragraph.AddImage(filePath);
             image.LockAspectRatio = true;
-            image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
+            if (!isPDF && loadedImageHeight > 600)
+            {
+                image.Height = 550; // make sure it will fit on one page
+            }
+            else
+            {
+                image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
+            }
             LogInfo(string.Format("Added image: {0} ({1})", file.Title, filePath));
             if (isPDF)
             {
