@@ -151,7 +151,7 @@
         <StackPanel Orientation="Horizontal"
                     Spacing="4">
             <Button Command="{Binding AddItem}"
-                    IsEnabled="{Binding IsCreatePDFButtonEnabled}">
+                    IsEnabled="{Binding !IsCreatingPDF}">
                 <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item</TextBlock>
             </Button>
             <Button Command="{Binding SaveInterimReportInfo}"

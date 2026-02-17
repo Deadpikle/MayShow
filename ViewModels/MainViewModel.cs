@@ -92,7 +92,15 @@ class MainViewModel : BaseViewModel, IFontResolver
     public ObservableCollection<ReportFile> ReportFiles
     {
         get => _reportFiles;
-        set { _reportFiles = value; NotifyPropertyChanged(); }
+        set 
+        { 
+            _reportFiles = value;
+            NotifyPropertyChanged(); 
+            _reportFiles.CollectionChanged += ( sender, e ) => 
+            { 
+                NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); 
+            };
+        }
     }
 
     private void LogInfo(string message, params object[]? arguments)
@@ -160,6 +168,7 @@ class MainViewModel : BaseViewModel, IFontResolver
                 ResortPDFItemsByDate();
             }
         }
+        NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
     }
     
     public void ShowAbout()
