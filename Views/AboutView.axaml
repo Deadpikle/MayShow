@@ -23,7 +23,7 @@
                    MaxWidth="300"
                    TextWrapping="Wrap"
                    FontSize="14"/>
-        <TextBlock Text="Copyright 2026 Quickity Quack Productions"
+        <TextBlock Text="Copyright 2026 - Quickity Quack Productions"
                    MaxWidth="300"
                    TextWrapping="Wrap"
                    HorizontalAlignment="Center"
