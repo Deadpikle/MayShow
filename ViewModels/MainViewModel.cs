@@ -620,7 +620,10 @@ class MainViewModel : BaseViewModel, IFontResolver
                 // Save frame as jpg
                 var outputPath = Path.Combine(convertedDir, info.Name + ".jpg");
                 mImage.Quality = 80;
-                mImage.Scale((uint)Math.Floor(mImage.Width * 0.5), (uint)Math.Floor(mImage.Height * 0.5));
+                if (mImage.Width >= 400 || mImage.Height >= 400)
+                {
+                    mImage.Scale((uint)Math.Floor(mImage.Width * 0.5), (uint)Math.Floor(mImage.Height * 0.5));
+                }
                 await mImage.WriteAsync(outputPath);
                 filePath = Path.Combine("Converted", info.Name + ".jpg");
                 LogInfo(string.Format("Converted image to JPEG; fileName is now {0}", file.FilePath));
