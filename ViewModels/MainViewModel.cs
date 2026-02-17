@@ -44,7 +44,7 @@ class MainViewModel : BaseViewModel, IFontResolver
         var quotes = Constants.GetQuotes();
         Random random = new Random();
         var quoteIndex = random.Next(0, quotes.Length);
-        _createPDFLog = "----- Receipt PDF Builder v" + Constants.AppVersion + "------" + Environment.NewLine;
+        _createPDFLog = "----- MayShow v" + Constants.AppVersion + "------" + Environment.NewLine;
         _createPDFLog += quotes[quoteIndex] + Environment.NewLine;
         _createPDFLog += "---------------------------------------" + Environment.NewLine;
         _createPDFLog += "Ready to create PDF!";

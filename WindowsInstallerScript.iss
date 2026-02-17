@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 ; Non-commercial use only
 
-#define MyAppName "Receipt PDF Builder"
+#define MyAppName "MayShow"
 #define MyAppVersion "1.1.0"
 #define MyAppPublisher "Quickity Quack Productions"
-#define MyAppExeName "ReceiptPDFBuilder.exe"
+#define MyAppExeName "MayShow.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.

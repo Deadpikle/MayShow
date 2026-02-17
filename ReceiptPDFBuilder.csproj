@@ -11,7 +11,7 @@
     <SelfContained>true</SelfContained>
     <PublishTrimmed>true</PublishTrimmed>
     <PublishAot>true</PublishAot>
-    <AssemblyName>ReceiptPDFBuilder</AssemblyName>
+    <AssemblyName>MayShow</AssemblyName>
     <AssemblyVersion>1.1.0</AssemblyVersion> <!-- Also update Constants version -->
     <ApplicationIcon>ReceiptPDFBuilder-icon.ico</ApplicationIcon>
   </PropertyGroup>

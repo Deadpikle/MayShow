@@ -4,14 +4,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="ReceiptPDFBuilder.MainWindow"
-        Title="Receipt PDF Builder"
+        Title="MayShow"
         xmlns:vm="clr-namespace:ReceiptPDFBuilder.ViewModels"
         xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
         x:DataType="vm:MainWindowViewModel"
         Width="800"
-        MinWidth="500"
+        MinWidth="550"
         Height="650"
-        MinHeight="500">
+        MinHeight="550">
     <dialogHost:DialogHost CloseOnClickAway="False" 
                            Identifier="DialogHost">
         <dialogHost:DialogHost.DialogContent>

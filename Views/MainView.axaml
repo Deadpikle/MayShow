@@ -21,7 +21,7 @@
     </Button>
     <StackPanel Orientation="Vertical"
                 Spacing="2">
-        <Label Content="Easy Receipt Folder -> PDF Builder"
+        <Label Content="MayShow: Report Builder"
                FontSize="20"
                FontWeight="Bold"
                HorizontalAlignment="Center"/>

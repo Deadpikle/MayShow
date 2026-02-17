@@ -7,7 +7,7 @@
              xmlns:behaviors="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:helpers="clr-namespace:ReceiptPDFBuilder.Helpers"
              RequestedThemeVariant="Default"
-             Name="Receipt PDF Builder">
+             Name="MayShow">
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
@@ -116,8 +116,8 @@
             <PathGeometry x:Key="IconGrabberGeometry">M15 18a1 1 0 100-2 1 1 0 000 2zm1-6a1 1 0 11-2 0 1 1 0 012 0zm-7 6a1 1 0 100-2 1 1 0 000 2zm0-5a1 1 0 100-2 1 1 0 000 2zm7-6a1 1 0 11-2 0 1 1 0 012 0zM9 8a1 1 0 100-2 1 1 0 000 2z</PathGeometry>
             <GeometryDrawing x:Key="IconGrabber" Brush="{DynamicResource DragDropBrush}" Geometry="{StaticResource IconGrabberGeometry}" />
 
-            <FontFamily x:Key="FontAwesomeRegular">avares://ReceiptPDFBuilder/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Regular-400.otf#Font Awesome 7 Free Regular</FontFamily>
-            <FontFamily x:Key="FontAwesomeSolid">avares://ReceiptPDFBuilder/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Solid-900.otf#Font Awesome 7 Free Solid</FontFamily>
+            <FontFamily x:Key="FontAwesomeRegular">avares://MayShow/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Regular-400.otf#Font Awesome 7 Free Regular</FontFamily>
+            <FontFamily x:Key="FontAwesomeSolid">avares://MayShow/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Solid-900.otf#Font Awesome 7 Free Solid</FontFamily>
         </ResourceDictionary>
     </Application.Resources>
     <NativeMenu.Menu>
