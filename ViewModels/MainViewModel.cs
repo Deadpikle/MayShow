@@ -286,6 +286,41 @@ class MainViewModel : BaseViewModel, IFontResolver
         }
     }
 
+    public void LocateFile(object f) => LocateFileImpl((ReportFile) f);
+    public async void LocateFileImpl(ReportFile reportFile)
+    {
+        var topLevel = TopLevelGrabber?.GetTopLevel();
+        if (topLevel is not null)
+        {
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
+            {
+                Title = "Choose image or PDF file...",
+                AllowMultiple = false,
+                FileTypeFilter = [
+                    new FilePickerFileType("All Types")
+                    {
+                        Patterns = GetAllowedFileExtensionPatterns(),
+                        AppleUniformTypeIdentifiers = [ "public.image", "com.adobe.pdf", "public.heic" ],
+                        MimeTypes = [ "image/*", "application/pdf", "image/heic" ]
+                    },
+                    FilePickerFileTypes.ImageAll, 
+                    new FilePickerFileType("HEIC Images")
+                    {
+                        Patterns = [ "*.heic" ],
+                        AppleUniformTypeIdentifiers = [ "public.heic" ],
+                        MimeTypes = [ "image/heic" ]
+                    },
+                    FilePickerFileTypes.Pdf,
+                ],
+            });
+            if (files.Count > 0)
+            {
+                var file = files[0];
+                reportFile.FilePath = file.Path.LocalPath;
+            }
+        }
+    }
+
     // https://github.com/AvaloniaUI/Avalonia/issues/10075
     public void OpenFile(object f) => OpenFileImpl((ReportFile)f);
     public void OpenFileImpl(ReportFile file)

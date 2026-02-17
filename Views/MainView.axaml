@@ -75,9 +75,25 @@
                                     Width="*">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <Label Content="{Binding Title}" 
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Left"/>
+                        <Grid ColumnDefinitions="Auto, *">
+                            <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).LocateFile}"
+                                    CommandParameter="{Binding}"
+                                    IsVisible="{Binding !IsFileFoundOnDisk}"
+                                    Margin="2"
+                                    Content="&#xf071;"
+                                    VerticalContentAlignment="Center"
+                                    Background="Transparent"
+                                    Grid.Column="0"
+                                    FontFamily="{StaticResource FontAwesomeSolid}"
+                                    ToolTip.Tip="File not found; click to locate..."
+                                    IsEnabled="{Binding !$parent[DataGrid].((vm:MainViewModel)DataContext).IsCreatingPDF}"/>
+                            <TextBlock Text="{Binding Title}" 
+                                       TextTrimming="CharacterEllipsis"
+                                       TextWrapping="NoWrap"
+                                       Grid.Column="1"
+                                       Margin="8,0,4,0"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
                 <DataGridTemplateColumn.CellEditingTemplate>
@@ -99,7 +115,8 @@
                     <DataTemplate>
                         <Label Content="{Binding ReceiptDate}" 
                                VerticalAlignment="Center"
-                               HorizontalAlignment="Center"/>
+                               Margin="8,0,8,0"
+                               HorizontalAlignment="Left"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
                 <DataGridTemplateColumn.CellEditingTemplate>
