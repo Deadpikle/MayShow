@@ -17,7 +17,7 @@ class Constants
         return [
             "When in the crucible of life, always remember to take your friends with you.",
             "What do you call a paper airplane that won't fly? Stationary.",
-            "I used to be addicted to Dad jokes, but now I'm all groan up.",
+            "I used to be addicted to dad jokes, but now I'm all groan up.",
             "I used to have a phobia about speed bumps. But I'm slowly getting over it.",
             "Be careful trusting stairs. They're always up to something.",
             "What do you call a fish with no eye? A fsh",
