@@ -3,7 +3,7 @@
 ; Non-commercial use only
 
 #define MyAppName "Receipt PDF Builder"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "Quickity Quack Productions"
 #define MyAppExeName "ReceiptPDFBuilder.exe"
 

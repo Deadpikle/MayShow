@@ -5,7 +5,7 @@ namespace ReceiptPDFBuilder.Helpers;
 
 class Constants
 {
-    public static string AppVersion = "1.0.0";
+    public static string AppVersion = "1.1.0";
 
     public static string[] GetQuotes()
     {
