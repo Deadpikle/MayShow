@@ -9,9 +9,9 @@
         xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
         x:DataType="vm:MainWindowViewModel"
         Width="800"
-        MinWidth="400"
+        MinWidth="500"
         Height="650"
-        MinHeight="450">
+        MinHeight="500">
     <dialogHost:DialogHost CloseOnClickAway="False" 
                            Identifier="DialogHost">
         <dialogHost:DialogHost.DialogContent>
