@@ -1,6 +1,6 @@
 # MayShow
 
-MayShow (an intentional mispelling of 明証, pronounced may-shō, a Japanese word meaning proof, evidence, or corroboration) is a PDF report creation tool.
+MayShow (an intentional misspelling of 明証, pronounced may-shō, a Japanese word meaning proof, evidence, or corroboration) is a PDF report creation tool.
 
 Throws a folder of images and PDFs into a single PDF. Simple tool for my own use, really, but maybe helpful to someone else.
 
