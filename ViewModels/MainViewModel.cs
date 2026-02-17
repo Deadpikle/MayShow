@@ -39,6 +39,7 @@ class MainViewModel : BaseViewModel, IFontResolver
     public MainViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
         _processDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
+        Console.WriteLine("Process is running from: {0}", _processDir);
         _isCreatingPDF = false;
         var quotes = Constants.GetQuotes();
         Random random = new Random();
