@@ -14,7 +14,9 @@
 *-check if last remembered dir exists on auto-load!
 *-show working directory
 *-set DMG title in publish
--Get linux publish command working and zip up/publish
+*-Get linux publish command working and zip up/publish
+    dotnet publish -c Release -r linux-x64 -p:StripSymbols=False -p:PublishAot=False
+    dotnet publish -c Release -r linux-arm64 -p:StripSymbols=False -p:PublishAot=False
 
 ---Publishing---
 *-Published app has unneeded .DSYM file (fixed via .app builder)
