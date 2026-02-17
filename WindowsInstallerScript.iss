@@ -42,6 +42,10 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "bin\Release\net10.0\win-x64\publish\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\Release\net10.0\win-x64\publish\av_libglesv2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\Release\net10.0\win-x64\publish\libHarfBuzzSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\Release\net10.0\win-x64\publish\libSkiaSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\Release\net10.0\win-x64\publish\Magick.Native-Q16-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\Release\net10.0\win-x64\publish\Assets\*"; DestDir: "{app}\Assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
