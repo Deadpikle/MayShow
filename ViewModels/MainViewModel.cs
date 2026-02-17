@@ -284,7 +284,6 @@ class MainViewModel : BaseViewModel, IFontResolver
         var topLevel = TopLevelGrabber?.GetTopLevel();
         if (topLevel is not null)
         {
-            Console.WriteLine(file.FilePath);
             var launcher = topLevel.Launcher;
             launcher.LaunchUriAsync(new Uri(file.FilePath));
         }
@@ -294,14 +293,19 @@ class MainViewModel : BaseViewModel, IFontResolver
 
     private void OpenFileLocationImpl(ReportFile file)
     {
+        OpenFolderForFileInFileViewer(file.FilePath);
+    }
+
+    private void OpenFolderForFileInFileViewer(string fullPathToFile)
+    {
         var topLevel = TopLevelGrabber?.GetTopLevel();
-        var dirName = Path.GetDirectoryName(file.FilePath);
+        var dirName = Path.GetDirectoryName(fullPathToFile);
         if (topLevel is not null && dirName != null)
         {
-            Console.WriteLine(file.FilePath);
             var launcher = topLevel.Launcher;
             launcher.LaunchUriAsync(new Uri(dirName));
         }
+    }
     }
 
     public void ResortPDFItemsByDate()
@@ -578,6 +582,7 @@ class MainViewModel : BaseViewModel, IFontResolver
         pdfRenderer.PdfDocument.Save(outputPDFFileName);
         LogInfo("Saved PDF output to: " + outputPDFFileName);
         await CreateAndSaveReportObjectAfterReportCreation();
+        OpenFolderForFileInFileViewer(outputPDFFileName);
         IsCreatingPDF = false;
     }
 }
