@@ -43,10 +43,10 @@ class MainViewModel : BaseViewModel, IFontResolver
         var quotes = Constants.GetQuotes();
         Random random = new Random();
         var quoteIndex = random.Next(0, quotes.Length);
-        _createPDFLog = "----- Receipt PDF Builder ------" + Environment.NewLine;
+        _createPDFLog = "----- Receipt PDF Builder v1.0.0 ------" + Environment.NewLine;
         _createPDFLog += quotes[quoteIndex] + Environment.NewLine;
-        _createPDFLog += "--------------------------------" + Environment.NewLine;
-        _createPDFLog += "Ready to create PDF! Choose a folder to begin...";
+        _createPDFLog += "---------------------------------------" + Environment.NewLine;
+        _createPDFLog += "Ready to create PDF!";
         _workingFolder = "";
         _reportFiles = new ObservableCollection<ReportFile>();
         _reportFiles.CollectionChanged += ( sender, e ) => { NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); };
