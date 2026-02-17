@@ -14,4 +14,4 @@
 ---Publishing---
 *-Published app has unneeded .DSYM file (fixed via .app builder)
 *-Published app has Assets folder already copied to it; don't want that in output macOS folder but it's being copied there anyway (fixed via .app builder)
--macOS x64 build
+*-macOS x64 build
