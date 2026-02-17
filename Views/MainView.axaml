@@ -186,11 +186,18 @@
         </DataGrid.Columns>
         <DataGrid.RowDetailsTemplate>
             <DataTemplate x:DataType="models:ReportFile">
-                <TextBlock TextWrapping="Wrap" Margin="4,4,4,0">
-                    <Run FontWeight="Bold" Text="File Path"/>: <Run Text="{Binding FilePath}"/>
-                    <LineBreak/>
+                <Grid ColumnDefinitions="*"
+                      RowDefinitions="Auto, Auto, Auto">
+                    <TextBlock TextWrapping="Wrap" Margin="4" Grid.Row="0">
+                        <Run FontWeight="Bold" Text="File Path"/>: <Run Text="{Binding FilePath}"/>
+                    </TextBlock>
+                    <TextBlock TextWrapping="Wrap" Margin="4" Grid.Row="1">
+                        <Run FontWeight="Bold" Text="Notes"/>: <Run Text="{Binding Notes}"/>
+                    </TextBlock>
                     <StackPanel Orientation="Horizontal"
-                                Spacing="8">
+                                Spacing="8"
+                                Margin="4"
+                                Grid.Row="2">
                         <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).OpenFileLocation}" 
                                 CommandParameter="{Binding}">
                             <Button.Content>
@@ -204,9 +211,7 @@
                             </Button.Content>
                         </Button>
                     </StackPanel>
-                    <LineBreak/>
-                    <Run FontWeight="Bold" Text="Notes"/>: <Run Text="{Binding Notes}"/>
-                </TextBlock>
+                </Grid>
             </DataTemplate>
         </DataGrid.RowDetailsTemplate>
     </DataGrid>
