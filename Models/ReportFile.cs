@@ -75,6 +75,7 @@ class ReportFile : ChangeNotifier
         get => Path.GetFileName(_filePath);
     }
 
+    [JsonIgnore]
     public bool IsFileFoundOnDisk
     {
         get => File.Exists(FilePath);

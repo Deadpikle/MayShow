@@ -68,12 +68,13 @@
                                 IsReadOnly="False"
                                 Width="*"/>
             <DataGridTemplateColumn Header="Receipt Date"
-                                IsReadOnly="False"
-                                Width="*">
+                                    IsReadOnly="False"
+                                    Width="125">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Label Content="{Binding ReceiptDate}" 
-                               VerticalAlignment="Center"/>
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
                 <DataGridTemplateColumn.CellEditingTemplate>
