@@ -26,7 +26,7 @@
                HorizontalAlignment="Center"/>
         <Button Content="Choose Receipt Folder"
                 Command="{Binding ChooseFolder}"
-                IsEnabled="{Binding IsCreatePDFButtonEnabled}" />
+                IsEnabled="{Binding !IsCreatingPDF}" />
         <Label Content="Report Title"
                IsVisible="{Binding IsTitleBoxVisible}" />
         <TextBox Text="{Binding ReportTitle}"
@@ -98,7 +98,7 @@
                                     CommandParameter="{Binding}"
                                     Classes="accent"
                                     Margin="2"
-                                    IsEnabled="True">
+                                    IsEnabled="{Binding !$parent[DataGrid].((vm:MainViewModel)DataContext).IsCreatingPDF}">
                                 <Button.Content>
                                     <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Edit</TextBlock>
                                 </Button.Content>
@@ -107,7 +107,7 @@
                                     CommandParameter="{Binding}"
                                     Classes="Danger"
                                     Margin="2"
-                                    IsEnabled="True">
+                                    IsEnabled="{Binding !$parent[DataGrid].((vm:MainViewModel)DataContext).IsCreatingPDF}">
                                 <Button.Content>
                                     <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove</TextBlock>
                                 </Button.Content>
