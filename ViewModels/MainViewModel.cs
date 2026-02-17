@@ -405,7 +405,7 @@ class MainViewModel : BaseViewModel, IFontResolver
             {
                 path = Path.Combine(_processDir, "../Resources/Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-SemiBold.ttf");
             }
-            return File.ReadAllBytes(Path.Combine(_processDir, "Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-SemiBold.ttf"));
+            return File.ReadAllBytes(path);
         }
         return null;
     }
