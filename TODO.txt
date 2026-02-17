@@ -11,6 +11,11 @@
 *-add preview or open button or something to each item
     https://gitflic.ru/project/jackhammer/pdf-forge-net/file?commit=7bdce6132a70ab12664a8f2482003836c7af2ab6
 
+*-check if last remembered dir exists on auto-load!
+*-show working directory
+*-set DMG title in publish
+-Get linux publish command working and zip up/publish
+
 ---Publishing---
 *-Published app has unneeded .DSYM file (fixed via .app builder)
 *-Published app has Assets folder already copied to it; don't want that in output macOS folder but it's being copied there anyway (fixed via .app builder)
