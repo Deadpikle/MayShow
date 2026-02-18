@@ -224,7 +224,7 @@
                     Spacing="4">
             <Button Command="{Binding AddItem}"
                     IsEnabled="{Binding !IsCreatingPDF}">
-                <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item</TextBlock>
+                <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item(s)</TextBlock>
             </Button>
             <Button Command="{Binding SaveInterimReportInfo}"
                     IsEnabled="{Binding HasWorkingFolderAndNotMakingPDF}">
