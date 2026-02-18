@@ -31,8 +31,8 @@ DisableProgramGroupPage=yes
 OutputBaseFilename=Install {#MyAppName} {#MyAppVersion}
 SolidCompression=yes
 WizardStyle=modern dynamic
-SetupIconFile=ReceiptPDFBuilder-icon.ico
-OutputDir=bin
+SetupIconFile=../src/MayShow-icon.ico
+OutputDir=..\src\bin
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -41,12 +41,12 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "bin\Release\net10.0\win-x64\publish\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "bin\Release\net10.0\win-x64\publish\av_libglesv2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "bin\Release\net10.0\win-x64\publish\libHarfBuzzSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "bin\Release\net10.0\win-x64\publish\libSkiaSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "bin\Release\net10.0\win-x64\publish\Magick.Native-Q16-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "bin\Release\net10.0\win-x64\publish\Assets\*"; DestDir: "{app}\Assets"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\src\bin\Release\net10.0\win-x64\publish\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\bin\Release\net10.0\win-x64\publish\av_libglesv2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\bin\Release\net10.0\win-x64\publish\libHarfBuzzSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\bin\Release\net10.0\win-x64\publish\libSkiaSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\bin\Release\net10.0\win-x64\publish\Magick.Native-Q16-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\bin\Release\net10.0\win-x64\publish\Assets\*"; DestDir: "{app}\Assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

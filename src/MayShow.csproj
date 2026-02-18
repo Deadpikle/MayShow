@@ -13,7 +13,7 @@
     <PublishAot>true</PublishAot>
     <AssemblyName>MayShow</AssemblyName>
     <AssemblyVersion>1.1.0</AssemblyVersion> <!-- Also update Constants version -->
-    <ApplicationIcon>ReceiptPDFBuilder-icon.ico</ApplicationIcon>
+    <ApplicationIcon>MayShow-icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <TrimmerRootAssembly Include="PdfSharp" />

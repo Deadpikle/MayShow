@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/ReceiptPDFBuilder.csproj",
+                "${workspaceFolder}/src/MayShow.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/src/ReceiptPDFBuilder.csproj",
+                "${workspaceFolder}/src/MayShow.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/src/ReceiptPDFBuilder.csproj"
+                "${workspaceFolder}/src/MayShow.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
