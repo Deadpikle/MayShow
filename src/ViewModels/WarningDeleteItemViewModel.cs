@@ -4,11 +4,11 @@ using MayShow.Models;
 
 namespace MayShow.ViewModels
 {
-    class WarningDeleteItemModel : ChangeNotifier
+    class WarningDeleteItemViewModel : ChangeNotifier
     {
         ReportFile _file;
 
-        public WarningDeleteItemModel(ReportFile file)
+        public WarningDeleteItemViewModel(ReportFile file)
         {
             _file = file;
         }

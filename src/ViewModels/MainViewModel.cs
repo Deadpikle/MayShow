@@ -214,7 +214,7 @@ class MainViewModel : BaseViewModel, IFontResolver
 
     public async void RemoveFileImpl(ReportFile file)
     {
-        var result = await DialogHost.Show(new WarningDeleteItemModel(file));
+        var result = await DialogHost.Show(new WarningDeleteItemViewModel(file));
         if (result != null && (bool)result)
         {
             var idx = ReportFiles.IndexOf(file);

@@ -88,7 +88,7 @@
         <DataTemplate DataType="{x:Type viewModels:MainViewModel}">
             <views:MainView/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:WarningDeleteItemModel}">
+        <DataTemplate DataType="{x:Type viewModels:WarningDeleteItemViewModel}">
             <views:WarningDeleteItem/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:EditFileViewModel}">
