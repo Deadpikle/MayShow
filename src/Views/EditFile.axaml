@@ -5,9 +5,9 @@
              mc:Ignorable="d"
              d:DesignWidth="800"
              d:DesignHeight="450"
-             x:Class="ReceiptPDFBuilder.Views.EditFile"
-             xmlns:models="clr-namespace:ReceiptPDFBuilder.Models"
-             xmlns:vm="clr-namespace:ReceiptPDFBuilder.ViewModels"
+             x:Class="MayShow.Views.EditFile"
+             xmlns:models="clr-namespace:MayShow.Models"
+             xmlns:vm="clr-namespace:MayShow.ViewModels"
              xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:DataType="vm:EditFileViewModel">
     <ScrollViewer AllowAutoHide="False">

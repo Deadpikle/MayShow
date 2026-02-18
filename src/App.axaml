@@ -1,11 +1,11 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="ReceiptPDFBuilder.App"
-             xmlns:viewModels="clr-namespace:ReceiptPDFBuilder.ViewModels"
-             xmlns:views="clr-namespace:ReceiptPDFBuilder.Views"
+             x:Class="MayShow.App"
+             xmlns:viewModels="clr-namespace:MayShow.ViewModels"
+             xmlns:views="clr-namespace:MayShow.Views"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:behaviors="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
-             xmlns:helpers="clr-namespace:ReceiptPDFBuilder.Helpers"
+             xmlns:helpers="clr-namespace:MayShow.Helpers"
              RequestedThemeVariant="Default"
              Name="MayShow">
     <Application.Styles>

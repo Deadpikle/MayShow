@@ -1,11 +1,11 @@
 ﻿using Avalonia.Controls;
-using ReceiptPDFBuilder.Helpers;
-using ReceiptPDFBuilder.Interfaces;
+using MayShow.Helpers;
+using MayShow.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ReceiptPDFBuilder.ViewModels
+namespace MayShow.ViewModels
 {
     class BaseViewModel : ChangeNotifier
     {

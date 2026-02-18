@@ -4,10 +4,10 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using ReceiptPDFBuilder.Helpers;
-using ReceiptPDFBuilders.Helpers;
+using MayShow.Helpers;
+using MayShows.Helpers;
 
-namespace ReceiptPDFBuilder.Models;
+namespace MayShow.Models;
 
 class Settings : ChangeNotifier
 {
@@ -34,7 +34,7 @@ class Settings : ChangeNotifier
     {
         var path = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "ReceiptPDFBuilder"
+            "ReceiptPDFBuilder" // legacy name for existing settings prior to app name change
         );
         if (!Directory.Exists(path))
         {

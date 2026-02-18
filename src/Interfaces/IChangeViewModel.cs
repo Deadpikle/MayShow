@@ -1,6 +1,6 @@
-﻿using ReceiptPDFBuilder.ViewModels;
+﻿using MayShow.ViewModels;
 
-namespace ReceiptPDFBuilder.Interfaces
+namespace MayShow.Interfaces
 {
     interface IChangeViewModel
     {

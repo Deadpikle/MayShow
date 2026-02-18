@@ -1,8 +1,8 @@
 ﻿using DialogHostAvalonia;
-using ReceiptPDFBuilder.Helpers;
-using ReceiptPDFBuilder.Models;
+using MayShow.Helpers;
+using MayShow.Models;
 
-namespace ReceiptPDFBuilder.ViewModels
+namespace MayShow.ViewModels
 {
     class WarningDeleteItemModel : ChangeNotifier
     {

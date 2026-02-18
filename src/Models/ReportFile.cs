@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Text.Json.Serialization;
-using ReceiptPDFBuilder.Helpers;
+using MayShow.Helpers;
 
-namespace ReceiptPDFBuilder.Models;
+namespace MayShow.Models;
 
 class ReportFile : ChangeNotifier
 {

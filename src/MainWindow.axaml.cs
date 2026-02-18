@@ -1,8 +1,8 @@
 using Avalonia.Controls;
-using ReceiptPDFBuilder.Interfaces;
-using ReceiptPDFBuilder.ViewModels;
+using MayShow.Interfaces;
+using MayShow.ViewModels;
 
-namespace ReceiptPDFBuilder;
+namespace MayShow;
 
 public partial class MainWindow : Window, ITopLevelGrabber
 {

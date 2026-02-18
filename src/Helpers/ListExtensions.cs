@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace ReceiptPDFBuilders.Helpers;
+namespace MayShows.Helpers;
 
 public static class ThreadSafeRandom
 {

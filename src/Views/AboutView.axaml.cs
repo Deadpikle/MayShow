@@ -3,7 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace ReceiptPDFBuilder.Views
+namespace MayShow.Views
 {
     public partial class AboutView : UserControl
     {

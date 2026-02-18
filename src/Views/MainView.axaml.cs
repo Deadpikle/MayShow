@@ -4,7 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 
-namespace ReceiptPDFBuilder.Views
+namespace MayShow.Views
 {
     public partial class MainView : UserControl
     {

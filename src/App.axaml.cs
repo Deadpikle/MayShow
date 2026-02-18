@@ -4,10 +4,10 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using DialogHostAvalonia;
-using ReceiptPDFBuilder;
-using ReceiptPDFBuilder.ViewModels;
+using MayShow;
+using MayShow.ViewModels;
 
-namespace ReceiptPDFBuilder;
+namespace MayShow;
 
 public partial class App : Application
 {

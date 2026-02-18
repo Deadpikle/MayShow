@@ -1,7 +1,7 @@
 
 using System;
 
-namespace ReceiptPDFBuilder.Helpers;
+namespace MayShow.Helpers;
 
 class Constants
 {

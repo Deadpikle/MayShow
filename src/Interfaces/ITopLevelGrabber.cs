@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 
-namespace ReceiptPDFBuilder.Interfaces
+namespace MayShow.Interfaces
 {
     interface ITopLevelGrabber
     {

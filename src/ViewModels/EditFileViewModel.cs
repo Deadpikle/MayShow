@@ -15,10 +15,10 @@ using MigraDoc.Rendering;
 using PdfSharp.Fonts;
 using PdfSharp.Pdf.IO;
 using PdfSharp.Snippets.Font;
-using ReceiptPDFBuilder.Interfaces;
-using ReceiptPDFBuilder.Models;
+using MayShow.Interfaces;
+using MayShow.Models;
 
-namespace ReceiptPDFBuilder.ViewModels;
+namespace MayShow.ViewModels;
 
 class EditFileViewModel : BaseViewModel
 {

@@ -3,10 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.VisualTree;
 using Avalonia.Xaml.Interactions.DragAndDrop;
-using ReceiptPDFBuilder.Models;
-using ReceiptPDFBuilder.ViewModels;
+using MayShow.Models;
+using MayShow.ViewModels;
 
-namespace ReceiptPDFBuilder.Helpers;
+namespace MayShow.Helpers;
 
 class DataGridDropHandler : BaseDataGridDropHandler<ReportFile>
 {

@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace ReceiptPDFBuilder;
+namespace MayShow;
 
 class Program
 {

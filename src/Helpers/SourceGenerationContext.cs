@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using ReceiptPDFBuilder.Models;
+using MayShow.Models;
 
-namespace ReceiptPDFBuilder.Helpers;
+namespace MayShow.Helpers;
 
 [JsonSerializable(typeof(Settings))]
 [JsonSerializable(typeof(ReportFile))]

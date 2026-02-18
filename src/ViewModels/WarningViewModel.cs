@@ -2,7 +2,7 @@
 
 using DialogHostAvalonia;
 
-namespace ReceiptPDFBuilder.ViewModels;
+namespace MayShow.ViewModels;
 
 class WarningViewModel
 {
