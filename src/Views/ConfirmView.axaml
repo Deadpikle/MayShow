@@ -1,0 +1,35 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MayShow.Views.ConfirmView"
+             xmlns:models="clr-namespace:MayShow.Models"
+             xmlns:vm="clr-namespace:MayShow.ViewModels"
+             x:DataType="vm:ConfirmViewModel">
+    <StackPanel Orientation="Vertical"
+                Spacing="4">
+        <TextBlock TextAlignment="Center"
+                   FontWeight="Bold"
+                   FontSize="18"
+                   Text="{Binding Title}"/>
+        <TextBlock TextAlignment="Center"
+                   FontWeight="Bold"
+                   TextWrapping="Wrap"
+                   FontSize="14"
+                   MaxWidth="350"
+                   Text="{Binding Message}"/>
+        <StackPanel Orientation="Horizontal"
+                    Spacing="12"
+                    HorizontalAlignment="Right"
+                    Margin="4">
+            <Button Command="{Binding Decline}"
+                    Content="{Binding DeclineTitle}"
+                    HorizontalAlignment="Right"/>
+            <Button Command="{Binding Confirm}"
+                    Classes="accent"
+                    Content="{Binding ConfirmTitle}"
+                    HorizontalAlignment="Right"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

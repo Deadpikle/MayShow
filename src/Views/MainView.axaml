@@ -226,24 +226,28 @@
                     IsEnabled="{Binding CanAddItem}">
                 <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item(s)</TextBlock>
             </Button>
-            <Button Command="{Binding SaveInterimReportInfo}"
-                    IsEnabled="{Binding HasWorkingFolderAndNotMakingPDF}">
-                <TextBlock><Run Text="&#xf0c7;" FontFamily="{StaticResource FontAwesomeSolid}"/> Save Report Info</TextBlock>
+            <Button Command="{Binding RemoveAllItems}"
+                    IsEnabled="{Binding IsCreatePDFButtonEnabled}"
+                    Classes="Danger">
+                <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove All Items</TextBlock>
             </Button>
             <Button Command="{Binding ResortPDFItemsByDate}"
                     IsEnabled="{Binding IsCreatePDFButtonEnabled}">
                 <TextBlock><Run Text="&#xf162;" FontFamily="{StaticResource FontAwesomeSolid}"/> Re-sort PDF Items</TextBlock>
             </Button>
-            <Button Command="{Binding BuildPDF}"
-                    Classes="accent"
-                    IsEnabled="{Binding IsCreatePDFButtonEnabled}">
-                <TextBlock><Run Text="&#xf1c1;" FontFamily="{StaticResource FontAwesomeSolid}"/> Create Report PDF</TextBlock>
+            <Button Command="{Binding SaveInterimReportInfo}"
+                    IsEnabled="{Binding HasWorkingFolderAndNotMakingPDF}">
+                <TextBlock><Run Text="&#xf0c7;" FontFamily="{StaticResource FontAwesomeSolid}"/> Save Report Info</TextBlock>
             </Button>
         </StackPanel>
       <StackPanel Orientation="Horizontal"
-                  IsVisible="{Binding IsCreatingPDF}"
                   Spacing="6"
                   HorizontalAlignment="Center">
+        <Button Command="{Binding BuildPDF}"
+                Classes="accent"
+                IsEnabled="{Binding IsCreatePDFButtonEnabled}">
+            <TextBlock><Run Text="&#xf1c1;" FontFamily="{StaticResource FontAwesomeSolid}"/> Create Report PDF</TextBlock>
+        </Button>
         <Label Content="Creating PDF..."
                IsVisible="{Binding IsCreatingPDF}"
                VerticalAlignment="Center"/>

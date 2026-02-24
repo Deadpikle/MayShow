@@ -103,6 +103,9 @@
         <DataTemplate DataType="{x:Type viewModels:ShutdownCheckViewModel}">
             <views:ShutdownCheckView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ConfirmViewModel}">
+            <views:ConfirmView/>
+        </DataTemplate>
     </Application.DataTemplates>
     <Application.Resources>
         <ResourceDictionary>

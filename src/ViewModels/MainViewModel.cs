@@ -366,6 +366,17 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         }
     }
 
+    public async void RemoveAllItems()
+    {
+        var result = await DialogHost.Show(new ConfirmViewModel("Warning!", "Are you sure you want to remove all items from this report?", "Remove All Items", "Cancel"));
+        if (result != null && (bool)result)
+        {
+            ReportFiles.Clear();
+            HasUnsavedWork = true;
+            NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
+        }
+    }
+
     public void LocateFile(object f) => LocateFileImpl((ReportFile) f);
     public async void LocateFileImpl(ReportFile reportFile)
     {
