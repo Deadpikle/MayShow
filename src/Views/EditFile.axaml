@@ -33,7 +33,8 @@
             <Label Content="Receipt Date" />
             <Calendar SelectionMode="SingleDate"
                         SelectedDate="{Binding ClonedFile.ReceiptDateTime}" 
-                        DisplayDate="{Binding ClonedFile.ReceiptDateTime}" />
+                        DisplayDate="{Binding ClonedFile.ReceiptDateTime}"
+                        IsTodayHighlighted="False" />
             <StackPanel Orientation="Horizontal"
                         Spacing="12"
                         Margin="0,4,0,0"
