@@ -5,7 +5,7 @@ namespace MayShow.Helpers;
 
 class Constants
 {
-    public static string AppVersion = "1.1.0";
+    public static string AppVersion = "1.2.0";
 
     public static string[] GetQuotes()
     {

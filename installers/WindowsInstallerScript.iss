@@ -3,7 +3,7 @@
 ; Non-commercial use only
 
 #define MyAppName "MayShow"
-#define MyAppVersion "1.1.0"
+#define MyAppVersion "1.2.0"
 #define MyAppPublisher "Quickity Quack Productions"
 #define MyAppExeName "MayShow.exe"
 
