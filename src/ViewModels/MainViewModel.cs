@@ -280,18 +280,6 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         }
     }
 
-    private string[] GetAllowedFileExtensionPatterns()
-    {
-        // update GetAllowedFileExtensionPatternsWithoutStar if this is edited
-        return [ "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp", "*.pdf", "*.heic", ];
-    }
-
-    private string[] GetAllowedFileExtensionPatternsWithoutStar()
-    {
-        // update GetAllowedFileExtensionPatterns if this is edited
-        return [ "png", "jpg", "jpeg", "gif", "bmp", "webp", "pdf", "heic", ];
-    }
-
     public async void AddItem()
     {
         var topLevel = TopLevelGrabber?.GetTopLevel();
@@ -304,7 +292,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 FileTypeFilter = [
                     new FilePickerFileType("All Types")
                     {
-                        Patterns = GetAllowedFileExtensionPatterns(),
+                        Patterns = Constants.AllowedFileExtensionPatterns,
                         AppleUniformTypeIdentifiers = [ "public.image", "com.adobe.pdf", "public.heic" ],
                         MimeTypes = [ "image/*", "application/pdf", "image/heic" ]
                     },
@@ -334,7 +322,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath) && !filePath.EndsWith(".DS_Store"))
         {
             // make sure extensions are OK
-            var fileExtensions = GetAllowedFileExtensionPatternsWithoutStar();
+            var fileExtensions = Constants.AllowedFileExtensionsNoStar;
             var didMatch = false;
             foreach (var fileExtension in fileExtensions)
             {
@@ -390,7 +378,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 FileTypeFilter = [
                     new FilePickerFileType("All Types")
                     {
-                        Patterns = GetAllowedFileExtensionPatterns(),
+                        Patterns = Constants.AllowedFileExtensionPatterns,
                         AppleUniformTypeIdentifiers = [ "public.image", "com.adobe.pdf", "public.heic" ],
                         MimeTypes = [ "image/*", "application/pdf", "image/heic" ]
                     },
