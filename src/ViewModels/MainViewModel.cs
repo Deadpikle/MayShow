@@ -606,6 +606,12 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         reportTitlePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
         reportTitlePar.AddText(ReportTitle);
         //
+        var convertedDir = Path.Combine(folderPath, "converted");
+        if (!Directory.Exists(convertedDir))
+        {
+            Directory.CreateDirectory(convertedDir);
+        }
+        //
         GlobalFontSettings.FontResolver = this;
         GlobalFontSettings.FallbackFontResolver = new FailsafeFontResolver();
         var hasAddedData = false;
@@ -661,35 +667,47 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             var info = new FileInfo(file.FilePath);
             uint loadedImageWidth = 0;
             uint loadedImageHeight = 0;
-            if (isHEIC || isWebp || isPNG || (!isPDF && info.Length > 2.5 * 1024 * 1024 /* 2.5 MB */))
+            if (!isPDF)
             {
-                // Save image as jpg
-                var convertedDir = Path.Combine(folderPath, "converted");
-                if (!Directory.Exists(convertedDir))
-                {
-                    Directory.CreateDirectory(convertedDir);
-                }
-                var outputPath = Path.Combine(convertedDir, info.Name + ".jpg");
                 using var mImage = new MagickImage(info.FullName);
-                loadedImageWidth = mImage.Width;
-                loadedImageHeight = mImage.Height;
-                mImage.Quality = 80;
-                if (mImage.Width >= 400 || mImage.Height >= 400)
+                var convertedOutputPath = Path.Combine(convertedDir, info.Name + ".jpg");
+                var didAdjust = false;
+                LogInfo("Image orientation of {0} is {1}", fileName, mImage.Orientation);
+                if (mImage.Orientation != OrientationType.TopLeft)
                 {
-                    loadedImageWidth = (uint)Math.Floor(mImage.Width * 0.5);
-                    loadedImageHeight = (uint)Math.Floor(mImage.Height * 0.5);
-                    mImage.Scale(loadedImageWidth, loadedImageHeight);
+                    LogInfo("Auto-adjusted image orientation of {0}", fileName);
+                    mImage.AutoOrient();
+                    didAdjust = true;
                 }
-                await mImage.WriteAsync(outputPath);
-                filePath = Path.Combine("Converted", info.Name + ".jpg");
-                LogInfo(string.Format("Converted image to JPEG; fileName is now {0}", file.FilePath));
-            }
-            else if (!isPDF)
-            {
-                // load height/width
-                using var mImage = new MagickImage(info.FullName);
-                loadedImageWidth = mImage.Width;
-                loadedImageHeight = mImage.Height;
+                // perform needed image manipulations
+                if (isHEIC || isWebp || isPNG || (!isPDF && info.Length > 2.5 * 1024 * 1024 /* 2.5 MB */))
+                {
+                    // Save image as jpg
+                    loadedImageWidth = mImage.Width;
+                    loadedImageHeight = mImage.Height;
+                    mImage.Quality = 80;
+                    if (mImage.Width >= 400 || mImage.Height >= 400)
+                    {
+                        loadedImageWidth = (uint)Math.Floor(mImage.Width * 0.5);
+                        loadedImageHeight = (uint)Math.Floor(mImage.Height * 0.5);
+                        mImage.Scale(loadedImageWidth, loadedImageHeight);
+                        LogInfo("Image {2} scaled to {0}x{1}", loadedImageWidth, loadedImageHeight, fileName);
+                    }
+                    didAdjust = true;
+                    LogInfo("Converted image {0} to JPEG", fileName);
+                }
+                else
+                {
+                    // load height/width
+                    loadedImageWidth = mImage.Width;
+                    loadedImageHeight = mImage.Height;
+                }
+                if (didAdjust)
+                {
+                    await mImage.WriteAsync(convertedOutputPath);
+                    filePath = Path.Combine("Converted", info.Name + ".jpg");
+                    LogInfo(string.Format("Saved adjusted image to JPEG; fileName is now {0}", file.FilePath));                    
+                }
             }
             var paragraph = section.AddParagraph();
             paragraph.Format.Alignment = ParagraphAlignment.Center;
