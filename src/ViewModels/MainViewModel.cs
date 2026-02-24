@@ -346,7 +346,10 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             }
             if (!didMatch)
             {
-                LogInfo("File {0} did not match allowed file extension types, so it was not added.", filePath);
+                if (!filePath.EndsWith(GetReportSavedDataFileName()))
+                {
+                    LogInfo("File {0} did not match allowed file extension types, so it was not added.", filePath);
+                }
             }
             else
             {
