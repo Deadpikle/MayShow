@@ -661,7 +661,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             var info = new FileInfo(file.FilePath);
             uint loadedImageWidth = 0;
             uint loadedImageHeight = 0;
-            if (isHEIC || isWebp || isPNG)
+            if (isHEIC || isWebp || isPNG || (!isPDF && info.Length > 2.5 * 1024 * 1024 /* 2.5 MB */))
             {
                 // Save image as jpg
                 var convertedDir = Path.Combine(folderPath, "converted");
