@@ -51,7 +51,8 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         _createPDFLog = "----- MayShow v" + Constants.AppVersion + " ------" + Environment.NewLine;
         _createPDFLog += quotes[quoteIndex] + Environment.NewLine;
         _createPDFLog += "---------------------------------------" + Environment.NewLine;
-        _createPDFLog += "Loaded and ready to create report!";
+        _createPDFLog += "Loaded and ready to create report!" + Environment.NewLine;
+        _createPDFLog += "Please copy and send this Program Log when reporting any issues with the software.";
         _workingFolder = "";
         ReportFiles = _reportFiles = new ObservableCollection<ReportFile>();
         _reportTitle = "";
