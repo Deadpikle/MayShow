@@ -53,8 +53,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         _createPDFLog += "---------------------------------------" + Environment.NewLine;
         _createPDFLog += "Loaded and ready to create report!";
         _workingFolder = "";
-        _reportFiles = new ObservableCollection<ReportFile>();
-        _reportFiles.CollectionChanged += ( sender, e ) => { NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); };
+        ReportFiles = _reportFiles = new ObservableCollection<ReportFile>();
         _reportTitle = "";
         _lastGeneratedTime = null;
         _settings = Settings.LoadSettings();
@@ -158,7 +157,8 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             NotifyPropertyChanged(); 
             _reportFiles.CollectionChanged += ( sender, e ) => 
             { 
-                NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); 
+                NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
+                HasUnsavedWork = true;
             };
         }
     }
