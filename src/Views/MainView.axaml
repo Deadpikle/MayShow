@@ -167,7 +167,7 @@
                                     Margin="2"
                                     IsEnabled="{Binding !$parent[DataGrid].((vm:MainViewModel)DataContext).IsCreatingPDF}">
                                 <Button.Content>
-                                    <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Edit</TextBlock>
+                                    <TextBlock><Run Text="&#xf044;" FontFamily="{StaticResource FontAwesomeSolid}"/> Edit</TextBlock>
                                 </Button.Content>
                             </Button>
                             <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).RemoveFile}"
