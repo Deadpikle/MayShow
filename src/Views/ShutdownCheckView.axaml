@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MayShow.Views.ShutdownCheckView"
+             xmlns:models="clr-namespace:MayShow.Models"
+             xmlns:vm="clr-namespace:MayShow.ViewModels"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             x:DataType="vm:ShutdownCheckViewModel">
+    <StackPanel Orientation="Vertical"
+                Spacing="4">
+        <TextBlock TextAlignment="Center"
+                   FontWeight="Bold"
+                   FontSize="18"
+                   Text="Warning: You have unsaved report data!"/>
+        <TextBlock TextAlignment="Center"
+                   FontWeight="Bold"
+                   TextWrapping="Wrap"
+                   FontSize="14"
+                   Text="Do you want to save your data before the program is closed?"/>
+        <StackPanel Orientation="Horizontal"
+                    Spacing="8">
+            <Button Command="{Binding SaveAndShutdown}"
+                    Classes="accent"
+                    Content="Save Data and Close"
+                    HorizontalAlignment="Right"
+                    Margin="0,4,0,4"/>
+            <Button Command="{Binding DoNotSaveAndShutdown}"
+                    Content="Do NOT Save Data and Close"
+                    HorizontalAlignment="Right"
+                    Margin="0,4,0,4"/>
+            <Button Command="{Binding CancelShutdown}"
+                    Content="Cancel Program Shutdown"
+                    HorizontalAlignment="Right"
+                    Margin="0,4,0,4"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

@@ -100,6 +100,9 @@
         <DataTemplate DataType="{x:Type viewModels:WarningViewModel}">
             <views:WarningView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ShutdownCheckViewModel}">
+            <views:ShutdownCheckView/>
+        </DataTemplate>
     </Application.DataTemplates>
     <Application.Resources>
         <ResourceDictionary>

@@ -1,10 +1,9 @@
 ﻿using MayShow.ViewModels;
 
-namespace MayShow.Interfaces
+namespace MayShow.Interfaces;
+
+interface IChangeViewModel
 {
-    interface IChangeViewModel
-    {
-        void PushViewModel(BaseViewModel model);
-        void PopViewModel();
-    }
+    void PushViewModel(BaseViewModel model);
+    void PopViewModel();
 }

@@ -34,7 +34,7 @@ class Settings : ChangeNotifier
     {
         var path = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "ReceiptPDFBuilder" // legacy name for existing settings prior to app name change
+            "MayShow"
         );
         if (!Directory.Exists(path))
         {

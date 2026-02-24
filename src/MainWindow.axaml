@@ -13,7 +13,8 @@
         Height="650"
         MinHeight="550">
     <dialogHost:DialogHost CloseOnClickAway="False" 
-                           Identifier="DialogHost">
+                           Identifier="DialogHost"
+                           x:Name="WindowDialogHost">
         <dialogHost:DialogHost.DialogContent>
             <StackPanel/>
         </dialogHost:DialogHost.DialogContent>

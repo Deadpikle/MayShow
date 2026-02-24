@@ -23,8 +23,9 @@ using MayShows.Helpers;
 
 namespace MayShow.ViewModels;
 
-class MainViewModel : BaseViewModel, IFontResolver
+class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
 {
+    private bool _isPerformingInitialLoad;
     private string _processDir;
     private bool _isCreatingPDF;
     private string _createPDFLog;
@@ -36,8 +37,11 @@ class MainViewModel : BaseViewModel, IFontResolver
 
     private Settings _settings;
 
+    private bool _hasUnsavedWork;
+
     public MainViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
+        _isPerformingInitialLoad = true;
         _processDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
         Console.WriteLine("Process is running from: {0}", _processDir);
         _isCreatingPDF = false;
@@ -47,7 +51,7 @@ class MainViewModel : BaseViewModel, IFontResolver
         _createPDFLog = "----- MayShow v" + Constants.AppVersion + " ------" + Environment.NewLine;
         _createPDFLog += quotes[quoteIndex] + Environment.NewLine;
         _createPDFLog += "---------------------------------------" + Environment.NewLine;
-        _createPDFLog += "Ready to create PDF!";
+        _createPDFLog += "Loaded and ready to create report!";
         _workingFolder = "";
         _reportFiles = new ObservableCollection<ReportFile>();
         _reportFiles.CollectionChanged += ( sender, e ) => { NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); };
@@ -59,17 +63,34 @@ class MainViewModel : BaseViewModel, IFontResolver
             LogInfo("Loading data at last used path of {0}", _settings.LastUsedPath);
             ScanFolder(_settings.LastUsedPath);
         }
+        else
+        {
+            LogInfo("Choose a receipt folder to begin...");
+        }
+        HasUnsavedWork = false;
+        _isPerformingInitialLoad = false;
     }
 
     public string ReportTitle
     {
         get => _reportTitle;
-        set { _reportTitle = value; NotifyPropertyChanged(); NotifyPropertyChanged(nameof(IsTitleBoxVisible)); }
+        set 
+        { 
+            _reportTitle = value;
+            NotifyPropertyChanged(); 
+            NotifyPropertyChanged(nameof(IsTitleBoxVisible)); 
+            NotifyPropertyChanged(nameof(CanAddItem)); 
+        }
     }
 
     public bool IsTitleBoxVisible
     {
         get => !string.IsNullOrWhiteSpace(_workingFolder);
+    }
+
+    public bool CanAddItem
+    {
+        get => IsTitleBoxVisible && !IsCreatingPDF;
     }
 
     public bool IsCreatingPDF
@@ -81,6 +102,7 @@ class MainViewModel : BaseViewModel, IFontResolver
             NotifyPropertyChanged();
             NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); 
             NotifyPropertyChanged(nameof(HasWorkingFolderAndNotMakingPDF));
+            NotifyPropertyChanged(nameof(CanAddItem)); 
         }
     }
 
@@ -115,6 +137,16 @@ class MainViewModel : BaseViewModel, IFontResolver
     {
         get => _createPDFLog;
         set { _createPDFLog = value; NotifyPropertyChanged(); }
+    }
+
+    public bool HasUnsavedWork
+    {
+        get => _hasUnsavedWork;
+        set
+        {
+            _hasUnsavedWork = value;
+            NotifyPropertyChanged();
+        }
     }
 
     public ObservableCollection<ReportFile> ReportFiles
@@ -157,6 +189,7 @@ class MainViewModel : BaseViewModel, IFontResolver
                 _settings.LastUsedPath = folder.Path.LocalPath;
                 await _settings.SaveSettingsAsync();
                 ResortPDFItemsByDate();
+                HasUnsavedWork = true;
             }
         }
     }
@@ -167,6 +200,7 @@ class MainViewModel : BaseViewModel, IFontResolver
         {
             WorkingFolder = path;
             NotifyPropertyChanged(nameof(IsTitleBoxVisible));
+            NotifyPropertyChanged(nameof(CanAddItem)); 
             var reportFilePath = Path.Combine(path, GetReportSavedDataFileName());
             var successfullyLoadedPriorReport = false;
             if (File.Exists(reportFilePath))
@@ -195,7 +229,11 @@ class MainViewModel : BaseViewModel, IFontResolver
                 {
                     AddFileBasedOnPath(filePath);
                 }
-                ResortPDFItemsByDate();
+                if (!_isPerformingInitialLoad)
+                {
+                    ResortPDFItemsByDate();
+                }
+                HasUnsavedWork = true;
             }
         }
         else
@@ -221,6 +259,7 @@ class MainViewModel : BaseViewModel, IFontResolver
             if (idx != -1)
             {
                 ReportFiles.RemoveAt(idx);
+                HasUnsavedWork = true;
             }
         }
     }
@@ -236,18 +275,20 @@ class MainViewModel : BaseViewModel, IFontResolver
             file.Title = updatedData.Title;
             file.ReceiptDateTime = updatedData.ReceiptDateTime;
             file.Notes = updatedData.Notes;
+            HasUnsavedWork = true;
         }
     }
 
     private string[] GetAllowedFileExtensionPatterns()
     {
+        // update GetAllowedFileExtensionPatternsWithoutStar if this is edited
         return [ "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp", "*.pdf", "*.heic", ];
     }
 
     private string[] GetAllowedFileExtensionPatternsWithoutStar()
     {
-        var list = GetAllowedFileExtensionPatterns();
-        return list.Select(x => x.Replace("*.", "")).ToArray();
+        // update GetAllowedFileExtensionPatterns if this is edited
+        return [ "png", "jpg", "jpeg", "gif", "bmp", "webp", "pdf", "heic", ];
     }
 
     public async void AddItem()
@@ -316,6 +357,7 @@ class MainViewModel : BaseViewModel, IFontResolver
                     Notes = "",
                     FilePath = filePath,
                 });
+                HasUnsavedWork = true;
             }
         }
     }
@@ -351,6 +393,7 @@ class MainViewModel : BaseViewModel, IFontResolver
             {
                 var file = files[0];
                 reportFile.FilePath = file.Path.LocalPath;
+                HasUnsavedWork = true;
             }
         }
     }
@@ -389,6 +432,7 @@ class MainViewModel : BaseViewModel, IFontResolver
     {
         LogInfo("Sorting report files list...");
         ReportFiles = new ObservableCollection<ReportFile>(ReportFiles.OrderBy(x => x.ReceiptDateTime));
+        HasUnsavedWork = true;
     }
 
     public async void BuildPDF()
@@ -423,7 +467,7 @@ class MainViewModel : BaseViewModel, IFontResolver
         }
     }
 
-    public async void SaveInterimReportInfo()
+    public async Task SaveInterimReportInfo()
     {
         var report = new PDFReport()
         {
@@ -447,6 +491,7 @@ class MainViewModel : BaseViewModel, IFontResolver
         var savePath = Path.Combine(_workingFolder, GetReportSavedDataFileName());
         await File.WriteAllTextAsync(savePath, json);
         LogInfo("Saved report information to {0}", savePath);
+        HasUnsavedWork = false;
     }
 
     private async Task CreateAndSaveReportObjectAfterReportCreation()
@@ -690,5 +735,34 @@ class MainViewModel : BaseViewModel, IFontResolver
         await CreateAndSaveReportObjectAfterReportCreation();
         OpenFolderForFileInFileViewer(outputPDFFileName);
         IsCreatingPDF = false;
+    }
+
+    public async Task<bool> CheckIsSafeToShutdown()
+    {
+        if (!HasUnsavedWork || string.IsNullOrWhiteSpace(WorkingFolder))
+        {
+            return true;
+        }
+        else
+        {
+            var result = await DialogHost.Show(new ShutdownCheckViewModel());
+            if (result != null && result is ShutdownCheckOptions opt)
+            {
+                if (opt == ShutdownCheckOptions.SaveAndShutdown)
+                {
+                    await SaveInterimReportInfo();
+                    return true;
+                }
+                else if (opt == ShutdownCheckOptions.NoSaveShutdown)
+                {
+                    return true;
+                }
+                else if (opt == ShutdownCheckOptions.CancelShutdown)
+                {
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 }

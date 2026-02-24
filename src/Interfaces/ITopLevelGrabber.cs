@@ -1,9 +1,8 @@
 ﻿using Avalonia.Controls;
 
-namespace MayShow.Interfaces
+namespace MayShow.Interfaces;
+
+interface ITopLevelGrabber
 {
-    interface ITopLevelGrabber
-    {
-        TopLevel GetTopLevel();
-    }
+    TopLevel GetTopLevel();
 }
