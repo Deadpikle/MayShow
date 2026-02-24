@@ -9,7 +9,8 @@
              xmlns:models="clr-namespace:MayShow.Models"
              xmlns:vm="clr-namespace:MayShow.ViewModels"
              xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
-             x:DataType="vm:EditFileViewModel">
+             x:DataType="vm:EditFileViewModel"
+             MaxWidth="350">
     <ScrollViewer AllowAutoHide="False">
         <StackPanel Orientation="Vertical"
                     Spacing="4"
