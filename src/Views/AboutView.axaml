@@ -7,7 +7,8 @@
              xmlns:models="clr-namespace:MayShow.Models"
              xmlns:vm="clr-namespace:MayShow.ViewModels"
              xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
-             x:DataType="vm:AboutViewModel">
+             x:DataType="vm:AboutViewModel"
+             MaxWidth="450">
     <StackPanel Orientation="Vertical"
                 Spacing="4">
         <TextBlock Text="MayShow"
@@ -16,15 +17,12 @@
                    FontSize="18"
                    FontWeight="Bold"/>
         <TextBlock Text="MayShow (an intentional misspelling of 明証, pronounced may-shō, a Japanese word meaning proof, evidence, or corroboration) is a PDF report creation tool. It was built by MB for A in 2026. May the quacking of ducks always be in your favor. Thanks for using our software!"
-                   MaxWidth="300"
                    TextWrapping="Wrap"
                    FontSize="14"/>
         <TextBlock Text="App icon made using https://gauger.me/fonticon/ with FontAwesome icon 'file-invoice-dollar' and the macOS software Icon Composer."
-                   MaxWidth="300"
                    TextWrapping="Wrap"
                    FontSize="14"/>
         <TextBlock Text="Copyright 2026 - Quickity Quack Productions"
-                   MaxWidth="300"
                    TextWrapping="Wrap"
                    HorizontalAlignment="Center"
                    Margin="0,4,0,4"
