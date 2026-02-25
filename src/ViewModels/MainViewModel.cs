@@ -747,12 +747,12 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             Document = pdfDoc,
             WorkingDirectory = folderPath
         };
-        LogInfo("Rendering document...");
+        LogInfo("Rendering document to PDF file...");
         pdfRenderer.RenderDocument();
         string outputPDFFileName = Path.Join(folderPath, outputFileName);
-        LogInfo("Saving document to disk...");
+        LogInfo("Saving PDF document to disk...");
         pdfRenderer.PdfDocument.Save(outputPDFFileName);
-        LogInfo("Saved PDF output to: " + outputPDFFileName);
+        LogInfo("Finished saving PDF output to: " + outputPDFFileName);
         await CreateAndSaveReportObjectAfterReportCreation();
         OpenFolderForFileInFileViewer(outputPDFFileName);
         IsCreatingPDF = false;
