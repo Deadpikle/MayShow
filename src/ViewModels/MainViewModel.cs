@@ -670,6 +670,8 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             if (!isPDF)
             {
                 using var mImage = new MagickImage(info.FullName);
+                loadedImageWidth = mImage.Width;
+                loadedImageHeight = mImage.Height;
                 var convertedOutputPath = Path.Combine(convertedDir, info.Name + ".jpg");
                 var didAdjust = false;
                 LogInfo("Image orientation of {0} is {1}", fileName, mImage.Orientation);
@@ -683,8 +685,6 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 if (isHEIC || isWebp || isPNG || (!isPDF && info.Length > 1.5 * 1024 * 1024 /* 1.5 MB */))
                 {
                     // Save image as jpg
-                    loadedImageWidth = mImage.Width;
-                    loadedImageHeight = mImage.Height;
                     mImage.Quality = 80;
                     if (mImage.Width >= 400 || mImage.Height >= 400)
                     {
