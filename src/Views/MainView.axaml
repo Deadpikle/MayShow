@@ -210,6 +210,12 @@
                                 <TextBlock FontSize="12"><Run Text="&#xf07c;" FontFamily="{StaticResource FontAwesomeSolid}"/> Open File</TextBlock>
                             </Button.Content>
                         </Button>
+                        <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).TestReceiptFinding}" 
+                                CommandParameter="{Binding}">
+                            <Button.Content>
+                                <TextBlock FontSize="12"><Run Text="&#xf07c;" FontFamily="{StaticResource FontAwesomeSolid}"/> TEST RECEIPT FIND</TextBlock>
+                            </Button.Content>
+                        </Button>
                     </StackPanel>
                 </Grid>
             </DataTemplate>

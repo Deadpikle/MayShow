@@ -20,6 +20,7 @@ using MayShow.Helpers;
 using MayShow.Interfaces;
 using MayShow.Models;
 using MayShows.Helpers;
+using OpenCvSharp;
 
 namespace MayShow.ViewModels;
 
@@ -514,6 +515,29 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     private string GetReportSavedDataFileName()
     {
         return "report_data.json";
+    }
+
+    public void TestReceiptFinding(object f) => TestReceiptFindingImpl((ReportFile)f);
+
+    private void TestReceiptFindingImpl(ReportFile file)
+    {
+        LogInfo("Running receipt edge detection...");
+        using var src = new Mat(file.FilePath, ImreadModes.Grayscale);
+        using var dst = new Mat();
+        using var blur = new Mat();
+        using var dilated = new Mat();
+        Cv2.GaussianBlur(src, blur, new OpenCvSharp.Size(5.0, 5.0), 0.0, 0.0, BorderTypes.Constant);
+        // Cv2.Threshold(dst, dst, 160, 255, ThresholdTypes.Binary & ThresholdTypes.Otsu);
+        var kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(9,9));
+        Cv2.Dilate(blur, dilated, kernel);
+        Cv2.Canny(dilated, dst, 40, 60, 3);
+        using (new OpenCvSharp.Window("src image", src))
+        using (new OpenCvSharp.Window("blur image", blur))
+        using (new OpenCvSharp.Window("dilated image", dilated))
+        using (new OpenCvSharp.Window("dst image", dst))
+        {
+            Cv2.WaitKey();
+        }
     }
 
     public byte[]? GetFont(string faceName)
