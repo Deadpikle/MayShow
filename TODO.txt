@@ -1,3 +1,21 @@
+-Add ImageMagick attribution to about page
+-auto detect receipts in an image and auto-crop?
+    -https://imagemagick.org/api/feature.php#gsc.tab=0 canny edge image
+    -https://blog.jiayu.co/2019/05/edge-detection-with-imagemagick/
+    -https://pyimagesearch.com/2021/10/27/automatically-ocring-receipts-and-scans/ using open CV
+    -https://www.kaggle.com/code/dmitryyemelyanov/receipt-ocr-part-1-image-segmentation-by-opencv manip done before edge detect
+    -https://www.luisllamas.es/en/how-to-use-opencv-in-net-with-opencvsharp/ (some basic code but also line detect)
+    -opencv for macOS? https://www.nuget.org/packages/OpenCvSharp4.runtime.osx.10.15-universal
+        macOS arm64: https://www.nuget.org/packages/OpenCvSharp4.runtime.osx_arm64/4.8.1-rc
+        -can use the normal nuget for windows, linnux
+        -if we can get openCV working then we can probably hack something together...
+        -https://github.com/shimat/opencvsharp/issues/949 -- requires ffmpeg?!
+        -https://github.com/shimat/opencvsharp
+    -https://www.emgu.com/wiki/index.php?title=Main_Page (GPL...)
+    -https://stackoverflow.com/questions/30296710/detecting-paper-edge-and-crop-it
+
+
+---------------
 *-add more items
 *-save last opened folder to settings somewhere
 
@@ -22,3 +40,4 @@
 *-Published app has unneeded .DSYM file (fixed via .app builder)
 *-Published app has Assets folder already copied to it; don't want that in output macOS folder but it's being copied there anyway (fixed via .app builder)
 *-macOS x64 build
+
