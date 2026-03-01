@@ -21,6 +21,9 @@ using MayShow.Interfaces;
 using MayShow.Models;
 using MayShows.Helpers;
 using OpenCvSharp;
+using System.Reflection.Metadata.Ecma335;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace MayShow.ViewModels;
 
@@ -519,22 +522,183 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
 
     public void TestReceiptFinding(object f) => TestReceiptFindingImpl((ReportFile)f);
 
+
+    private Mat? b_algor(ReportFile file)
+    {
+        using var orig = new Mat(file.FilePath);
+        using var src = new Mat(file.FilePath, ImreadModes.Grayscale);
+        if (src.Empty())
+        {
+            LogInfo("File was empty?");
+            return null;
+        }
+        using var blur = orig.GaussianBlur(new Size(5, 5), 0.0);
+        using var kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(9,9));
+        using var dilated = blur.Dilate(kernel, anchor: null, iterations: 4);
+        using var edges = dilated.Canny(100, 200, 3);
+        using var heirarchy = new Mat();
+        Cv2.FindContours(edges, out Mat[] contours, heirarchy, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+        using var orgWithContours = new Mat();
+        orig.CopyTo(orgWithContours);
+        Cv2.DrawContours(orgWithContours, contours, -1, Scalar.Cyan, 3);
+        // largest contours
+        var largestContours = contours.OrderByDescending(x => x.ContourArea()).Take(1).ToArray();
+        var orgWithLargestContours = new Mat();
+        orig.CopyTo(orgWithLargestContours);
+        Cv2.DrawContours(orgWithLargestContours, largestContours, -1, Scalar.Cyan, 5);
+
+        using (new OpenCvSharp.Window("blur", blur))
+        using (new OpenCvSharp.Window("dilated", dilated))
+        using (new OpenCvSharp.Window("edges", edges))
+        using (new OpenCvSharp.Window("contours", orgWithContours))
+        // using (new OpenCvSharp.Window("w biggest contours", orgWithBiggestContours))
+        {
+            Cv2.WaitKey();
+        }
+
+        return orgWithLargestContours;
+    }
+
     private void TestReceiptFindingImpl(ReportFile file)
     {
-        LogInfo("Running receipt edge detection...");
+        LogInfo("Running receipt edge detection on file at path {0} with OpenCV {1}...", file.FilePath, Cv2.GetVersionString() ?? "");
+        using var orig = new Mat(file.FilePath);
         using var src = new Mat(file.FilePath, ImreadModes.Grayscale);
         using var dst = new Mat();
-        using var blur = new Mat();
-        using var dilated = new Mat();
-        Cv2.GaussianBlur(src, blur, new OpenCvSharp.Size(5.0, 5.0), 0.0, 0.0, BorderTypes.Constant);
-        // Cv2.Threshold(dst, dst, 160, 255, ThresholdTypes.Binary & ThresholdTypes.Otsu);
+        using var wContours = new Mat();
+        if (src.Empty())
+        {
+            LogInfo("File was empty?");
+            return;
+        }
+        var threshold = src.Threshold(90,255, ThresholdTypes.Binary);
+        
+        var blur = orig.GaussianBlur(new Size(3.0, 3.0), 0.0);
         var kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(9,9));
-        Cv2.Dilate(blur, dilated, kernel);
-        Cv2.Canny(dilated, dst, 40, 60, 3);
+        var dilated = blur.Dilate(kernel, null, 1);
+        var edges = dilated.Canny(50, 200, 3);
+        //# Detect all contours in Canny-edged image
+        using var heirarchy = new Mat();
+        Cv2.FindContours(threshold, out Mat[] contours, heirarchy, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+        var orgWithContours = new Mat();
+        orig.CopyTo(orgWithContours);
+        Cv2.DrawContours(orgWithContours, contours, -1, Scalar.Cyan, 3);
+        // # find full contours
+
+        var poly = new List<Mat>();
+        foreach (var contour in contours)
+        {
+            var hull = contour.ConvexHull();
+            poly.Add(hull.ApproxPolyDP(0.01 * Cv2.ArcLength(hull, true), false));
+        }
+        Console.WriteLine("How many? {0}", poly.Count);
+        var orgWithAllPly = new Mat();
+        orig.CopyTo(orgWithAllPly);
+        Cv2.DrawContours(orgWithAllPly, poly, -1, Scalar.Red, 3);
+
+        var largestPoly = poly.OrderByDescending(x => x.ContourArea()).Take(10).ToArray();
+        var orgWithLargestContoursPly = new Mat();
+        orig.CopyTo(orgWithLargestContoursPly);
+        Cv2.DrawContours(orgWithLargestContoursPly, largestPoly, -1, Scalar.Red, 5);
+        //  using (new OpenCvSharp.Window("poly", orgWithAllPly))
+        // using (new OpenCvSharp.Window("pol2y", orgWithLargestContoursPly))
+        // {
+        //     Cv2.WaitKey();
+        // }
+        //
+
+        // # Get 10 largest contours
+        Console.WriteLine(contours);
+        var orgWithLargestContours = new Mat();
+        orig.CopyTo(orgWithLargestContours);
+        var largestContours = contours.OrderByDescending(x => x.ContourArea()).Take(10).ToArray();
+        Cv2.DrawContours(orgWithLargestContours, largestContours, -1, Scalar.Cyan, 5);
+        //
+        Mat approximate_contour(Mat contour)
+        {
+            var perimeter = Cv2.ArcLength(contour, true);
+            return contour.ApproxPolyDP(0.02 * perimeter, true);
+        }
+        Mat? get_receipt_counter(Mat[] contours)
+        {
+            var poly = new List<Mat>();
+            foreach (var contour in contours)
+            {
+                // var hull = contour.ConvexHull();
+                // var arcLength = hull.ArcLength(true);
+                // var x = contour.ApproxPolyDP(0.01 * arcLength, true);
+                // poly.Add(x);
+                
+
+
+                var approx = approximate_contour(contour);
+                if (approx.Total() == 4)
+                {
+                    return approx;
+                }
+            }
+            return null;
+        }
+
+        var highestY = 0;
+        var lowestY = 9999;
+        var highestX = 0;
+        var lowestX = 9999;
+        foreach (var contour in largestContours)
+        {
+            Console.WriteLine("Rows: {0}", contour.Rows);
+            if (contour.Rows > 10) // eliminate small things?
+            {
+                for (var i = 0; i < contour.Rows; i++)
+                {
+                    var pt = contour.At<Point>(i);
+                    if (pt.X < lowestX)
+                    {
+                        lowestX = pt.X;
+                    }
+                    if (pt.X > highestX)
+                    {
+                        highestX = pt.X;
+                    }
+                    if (pt.Y < lowestY)
+                    {
+                        lowestY = pt.Y;
+                    }
+                    if (pt.Y > highestY)
+                    {
+                        highestY = pt.Y;
+                    }                
+                }
+            }
+        }
+        Console.WriteLine("Low X: {0}, High X: {1}", lowestX, highestX);
+        Console.WriteLine("Low Y: {0}, High Y: {1}", lowestY, highestY);
+        var rect = new Rect(lowestX, lowestY, Math.Abs(highestX - lowestX), Math.Abs(highestY - lowestY));
+        Console.WriteLine(rect);
+        using var crop = new Mat(orig, rect);
+
+        using (new OpenCvSharp.Window("w largest contours", orgWithLargestContours))
+        using (new OpenCvSharp.Window("crop", crop))
+        using (new OpenCvSharp.Window("crop_b", b_algor(file)))
+        // using (new OpenCvSharp.Window("w biggest contours", orgWithBiggestContours))
+        {
+            Cv2.WaitKey();
+        }
+        return;
+
+
+        var largest = get_receipt_counter(largestContours);
+        Console.WriteLine(largest);
+        var orgWithBiggestContours = new Mat();
+        orig.CopyTo(orgWithBiggestContours);
+        Cv2.DrawContours(orgWithBiggestContours, [largest], -1, Scalar.Cyan, 3);
+        ////
         using (new OpenCvSharp.Window("src image", src))
-        using (new OpenCvSharp.Window("blur image", blur))
-        using (new OpenCvSharp.Window("dilated image", dilated))
-        using (new OpenCvSharp.Window("dst image", dst))
+        // using (new OpenCvSharp.Window("blur image", blur))
+        // using (new OpenCvSharp.Window("dilated image", dilated))
+        using (new OpenCvSharp.Window("orig with all contours", orgWithContours))
+        using (new OpenCvSharp.Window("w largest contours", orgWithLargestContours))
+        // using (new OpenCvSharp.Window("w biggest contours", orgWithBiggestContours))
         {
             Cv2.WaitKey();
         }

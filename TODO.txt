@@ -13,6 +13,7 @@
         -https://github.com/shimat/opencvsharp
     -https://www.emgu.com/wiki/index.php?title=Main_Page (GPL...)
     -https://stackoverflow.com/questions/30296710/detecting-paper-edge-and-crop-it
+    //https://developers.goalist.co.jp/entry/2019/02/13/150126
 
 
 ---------------
