@@ -705,7 +705,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 if (didAdjust)
                 {
                     await mImage.WriteAsync(convertedOutputPath);
-                    filePath = Path.Combine("Converted", info.Name + ".jpg");
+                    filePath = convertedOutputPath;
                     LogInfo(string.Format("Saved adjusted image to JPEG; fileName is now {0}", file.FilePath));                    
                 }
             }
