@@ -12,15 +12,23 @@
              x:DataType="vm:MainViewModel">
   <Grid ColumnDefinitions="*"
         RowDefinitions="Auto, 2*, Auto, Auto, *">
+    <Button Command="{Binding ShowSettings}"
+            Grid.Row="0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Margin="4,4,0,4">
+        <TextBlock><Run Text="&#xf013;" FontFamily="{StaticResource FontAwesomeSolid}"/> Settings</TextBlock>
+    </Button>
     <Button Command="{Binding ShowAbout}"
             Grid.Row="0"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
-            Margin="0,2,4,0">
+            Margin="0,4,4,4">
         <TextBlock><Run Text="&#xf059;" FontFamily="{StaticResource FontAwesomeSolid}"/> About</TextBlock>
     </Button>
     <StackPanel Orientation="Vertical"
-                Spacing="2">
+                Spacing="2"
+                Margin="0,4,0,0">
         <Label Content="MayShow: Report Builder"
                FontSize="20"
                FontWeight="Bold"

@@ -257,6 +257,17 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         DialogHost.Show(new AboutViewModel());
     }
 
+    public async Task ShowSettings()
+    {
+        var updatedSettings = await DialogHost.Show(new SettingsViewModel(_settings));
+        if (updatedSettings != null)
+        {
+            _settings = (Settings)updatedSettings;
+            await _settings.SaveSettingsAsync();
+            LogInfo("Saved updated settings!");
+        }
+    }
+
     public void RemoveFile(object f) => RemoveFileImpl((ReportFile)f);
 
     public async void RemoveFileImpl(ReportFile file)

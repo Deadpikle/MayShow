@@ -1,0 +1,40 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             x:Class="MayShow.Views.SettingsView"
+             xmlns:models="clr-namespace:MayShow.Models"
+             xmlns:vm="clr-namespace:MayShow.ViewModels"
+             x:DataType="vm:SettingsViewModel"
+             MaxWidth="350">
+    <ScrollViewer AllowAutoHide="False">
+        <StackPanel Orientation="Vertical"
+                    Spacing="4"
+                    Margin="12,4,12,0">
+            <Label Content="Settings"
+                    HorizontalAlignment="Center"
+                    FontSize="16"
+                    FontWeight="Bold" />
+            <CheckBox IsChecked="{Binding !UseDocnetPDFImageRendering}">Use legacy PDF handling (does not work with macOS annotations)</CheckBox>
+            <StackPanel Orientation="Horizontal"
+                        Spacing="12"
+                        Margin="0,4,0,0"
+                        HorizontalAlignment="Right">
+                <Button Command="{Binding Cancel}">
+                    <TextBlock>
+                        <Run Text="&#xf0e2;"
+                            FontFamily="{StaticResource FontAwesomeSolid}" /> Cancel</TextBlock>
+                </Button>
+                <Button Command="{Binding Save}"
+                        Classes="accent">
+                    <TextBlock>
+                        <Run Text="&#xf0c7;"
+                            FontFamily="{StaticResource FontAwesomeSolid}" /> Save</TextBlock>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

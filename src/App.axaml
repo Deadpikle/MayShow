@@ -106,6 +106,9 @@
         <DataTemplate DataType="{x:Type viewModels:ConfirmViewModel}">
             <views:ConfirmView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
+            <views:SettingsView/>
+        </DataTemplate>
     </Application.DataTemplates>
     <Application.Resources>
         <ResourceDictionary>
