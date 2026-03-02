@@ -621,8 +621,8 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         reportTitlePar.Format.Font.Bold = true;
         reportTitlePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
         reportTitlePar.AddText(ReportTitle);
-        //
-        var convertedDir = Path.Combine(folderPath, "converted");
+        // get converted files directory path and create it if necessary
+        var convertedDir = Path.Combine(Utilities.GetInternalDataPath(), "converted");
         if (!Directory.Exists(convertedDir))
         {
             Directory.CreateDirectory(convertedDir);
