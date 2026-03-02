@@ -238,10 +238,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 {
                     AddFileBasedOnPath(filePath);
                 }
-                if (!_isPerformingInitialLoad)
-                {
-                    ResortPDFItemsByDate();
-                }
+                ResortPDFItemsByDate();
                 HasUnsavedWork = true;
             }
         }
