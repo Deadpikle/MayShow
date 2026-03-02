@@ -1,6 +1,7 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -34,5 +35,18 @@ class Utilities
             return didWork ? DateOnly.FromDateTime(parsedDateTime) : null;
         }
         return null;
+    }
+
+    public static string GetInternalDataPath()
+    {
+        var path = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "MayShow"
+        );
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        return path;
     }
 }

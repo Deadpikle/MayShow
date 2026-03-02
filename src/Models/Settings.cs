@@ -41,14 +41,7 @@ class Settings : ChangeNotifier
 
     public static string GetSettingsPath()
     {
-        var path = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "MayShow"
-        );
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
+        var path = Utilities.GetInternalDataPath();
         return Path.Combine(path, GetSettingsFileName());
     }
 
