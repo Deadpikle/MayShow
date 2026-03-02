@@ -11,7 +11,7 @@
              MaxWidth="450">
     <StackPanel Orientation="Vertical"
                 Spacing="4">
-        <TextBlock Text="MayShow"
+        <TextBlock Text="MayShow 1.3.0"
                    HorizontalAlignment="Center"
                    TextWrapping="Wrap"
                    FontSize="18"
