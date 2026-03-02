@@ -21,6 +21,14 @@ using MayShow.Interfaces;
 using MayShow.Models;
 using MayShows.Helpers;
 
+using Docnet.Core.Models;
+using Docnet.Core;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+using System.Reflection.Metadata.Ecma335;
+using Docnet.Core.Readers;
+
 namespace MayShow.ViewModels;
 
 class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
@@ -708,40 +716,95 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                     filePath = convertedOutputPath;
                     LogInfo(string.Format("Saved adjusted image to JPEG; file path is now {0}", filePath));                    
                 }
-            }
-            var paragraph = section.AddParagraph();
-            paragraph.Format.Alignment = ParagraphAlignment.Center;
-            var image = paragraph.AddImage(filePath);
-            image.LockAspectRatio = true;
-            if (!isPDF && loadedImageHeight > 600)
-            {
-                image.Height = 550; // make sure it will fit on one page
+                // write to PDF
+                var paragraph = section.AddParagraph();
+                paragraph.Format.Alignment = ParagraphAlignment.Center;
+                var image = paragraph.AddImage(filePath);
+                image.LockAspectRatio = true;
+                if (!isPDF && loadedImageHeight > 600)
+                {
+                    image.Height = 550; // make sure it will fit on one page
+                }
+                else
+                {
+                    image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
+                }
             }
             else
             {
-                image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
-            }
-            LogInfo(string.Format("Added image: {0} ({1})", file.Title, filePath));
-            if (isPDF)
-            {
-                // add other PDF pages
-                // see: https://stackoverflow.com/a/65091204/3938401
-                var pdfFileToAdd = PdfReader.Open(filePath, PdfDocumentOpenMode.Import);
-                var pgCount = pdfFileToAdd.PageCount;
-                pdfFileToAdd.Close();
-                imageTitlePar.AddText(string.Format(" (PDF with {0} page{1}) ", 
-                    pgCount, 
-                    pgCount == 1 ? "" : "s"));
-                for (var j = 2; j <= pgCount; j++)
+                // need to render PDF to images
+                if (_settings.UseDocnetPFDImageRendering)
                 {
-                    section.AddPageBreak();
-                    paragraph = section.AddParagraph();
+                    // render using Docnet library (which utilizes pdfium, the chrome renderer)
+                    string RenderPdfPageToImage(IDocReader docReader, int pgNum)
+                    {
+                        Console.WriteLine("rendering pg " + pgNum);
+                        using var pageReader = docReader.GetPageReader(pgNum);
+                        var rawBytes = pageReader.GetImage(RenderFlags.RenderAnnotations);
+                        var width = pageReader.GetPageWidth();
+                        var height = pageReader.GetPageHeight();
+                        using var img = Image.LoadPixelData<Bgra32>(rawBytes, width, height);
+                        // you are likely going to want this as well otherwise you might end up with transparent parts.
+                        img.Mutate(x => x.BackgroundColor(SixLabors.ImageSharp.Color.White));
+                        var pdfPageImageOutputPath = Path.Combine(convertedDir, info.Name + "-Page-" 
+                            + (pgNum + 1).ToString().PadLeft(3, '0') + ".jpg");
+                        img.Save(pdfPageImageOutputPath);
+                        return pdfPageImageOutputPath;
+                    }
+                    // render all pages to images
+                    using var docReader = DocLib.Instance.GetDocReader(
+                        filePath,
+                        new PageDimensions(1080, 1920)); // TODO: are these dims right?
+                    // add to document
+                    var pgCount = docReader.GetPageCount();
+                    if (pgCount > 0)
+                    {
+                        var convertedPdfImagePath = RenderPdfPageToImage(docReader, 0);
+                        imageTitlePar.AddText(string.Format(" (PDF with {0} page{1}) ", 
+                            pgCount, 
+                            pgCount == 1 ? "" : "s"));
+                        var paragraph = section.AddParagraph();
+                        paragraph.Format.Alignment = ParagraphAlignment.Center;
+                        var image = paragraph.AddImage(convertedPdfImagePath);
+                        for (var j = 1; j < pgCount; j++)
+                        {
+                            section.AddPageBreak();
+                            paragraph = section.AddParagraph();
+                            paragraph.Format.Alignment = ParagraphAlignment.Center;
+                            convertedPdfImagePath = RenderPdfPageToImage(docReader, j);
+                            image = paragraph.AddImage(convertedPdfImagePath);
+                            image.LockAspectRatio = true;
+                            image.Width = imageWidth;
+                        }
+                    }
+                }
+                else
+                {
+                    // render first page (eventually need to improve code to just do everything in a loop)
+                    var paragraph = section.AddParagraph();
                     paragraph.Format.Alignment = ParagraphAlignment.Center;
-                    image = paragraph.AddImage(filePath + "#" + j);
+                    var image = paragraph.AddImage(filePath);
                     image.LockAspectRatio = true;
-                    image.Width = imageWidth;
+                    image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
+                    // render other PDF pages, if any
+                    // see: https://stackoverflow.com/a/65091204/3938401
+                    var pdfFileToAdd = PdfReader.Open(filePath, PdfDocumentOpenMode.Import);
+                    var pgCount = pdfFileToAdd.PageCount;
+                    imageTitlePar.AddText(string.Format(" (PDF with {0} page{1}) ", 
+                        pgCount, 
+                        pgCount == 1 ? "" : "s"));
+                    for (var j = 2; j <= pgCount; j++)
+                    {
+                        section.AddPageBreak();
+                        paragraph = section.AddParagraph();
+                        paragraph.Format.Alignment = ParagraphAlignment.Center;
+                        image = paragraph.AddImage(filePath + "#" + j);
+                        image.LockAspectRatio = true;
+                        image.Width = imageWidth;
+                    }
                 }
             }
+            LogInfo(string.Format("Added image: {0} ({1})", file.Title, filePath));
             hasAddedData = true;
         }
         var pdfRenderer = new PdfDocumentRenderer

@@ -51,5 +51,7 @@
     <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.10.11-preview20251127001" />
     <PackageReference Include="DialogHost.Avalonia" Version="0.10.4" />
     <PackageReference Include="Xaml.Behaviors.Interactions.DragAndDrop.DataGrid" Version="11.3.9.5" />
+    <PackageReference Include="Docnet.Core" Version="2.6.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
   </ItemGroup>
 </Project>

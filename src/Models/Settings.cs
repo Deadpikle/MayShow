@@ -12,10 +12,12 @@ namespace MayShow.Models;
 class Settings : ChangeNotifier
 {
     private string _lastUsedPath;
+    private bool _useDocnetPDFImageRendering;
 
     public Settings()
     {
         _lastUsedPath = "";
+        _useDocnetPDFImageRendering = true;
     }
 
     [JsonInclude]
@@ -23,6 +25,13 @@ class Settings : ChangeNotifier
     {
         get => _lastUsedPath;
         set { _lastUsedPath = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
+    public bool UseDocnetPFDImageRendering
+    {
+        get => _useDocnetPDFImageRendering;
+        set { _useDocnetPDFImageRendering = value; NotifyPropertyChanged(); }
     }
 
     public static string GetSettingsFileName()

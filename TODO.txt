@@ -1,3 +1,32 @@
+magick "2026-01-29 — \$210 — WORK PERMIT.pdf" -background white -alpha background -alpha off -density 288 -resize 25% page-%03d.jpg
+https://github.com/dlemstra/Magick.NET/blob/main/docs/ConvertPDF.md
+https://stackoverflow.com/questions/65089839/add-an-external-pdf-page-to-pdfsharp-migradoc
+https://github.com/mephraim/ghostscriptsharp
+https://stackoverflow.com/a/71485279/3938401
+
+need a PDF viewer that works with annotations
+https://github.com/BobLd/PdfPig.Rendering.Skia/ works but quality is low for some reason, I don't know why. probably need a bug report or some option that is hidden.
+                using (var document = UglyToad.PdfPig.PdfDocument.Open(filePath, UglyToad.PdfPig.Rendering.Skia.SkiaRenderingParsingOptions.Instance))
+                {
+
+                    document.AddSkiaPageFactory(); // Same as document.AddPageFactory<SKPicture, SkiaPageFactory>() and document.AddPageFactory<PdfPageSize, PageSizeFactory>()
+
+                    for (int p = 1; p <= document.NumberOfPages; p++)
+                    {
+                        using var skBitmap = document.GetPageAsSKBitmap(p, 1);
+                        using (var fs = new FileStream(Path.Combine(convertedDir, $"{fileName}_{p}PIG.jpeg"), FileMode.Create))
+                        using (var ms = document.GetPageAsPng(p, 1, 4))
+                        {
+                            MemoryStream memoryStream = new MemoryStream();
+                            skBitmap.Encode(memoryStream, SkiaSharp.SKEncodedImageFormat.Jpeg, 100);
+                            memoryStream.Position = 0L;
+
+                            ms.WriteTo(fs);
+                        }
+                    }
+                }
+https://github.com/GowenGit/docnet -- may need to fork this and publish our own package if some OS doesn't work
+
 *-add more items
 *-save last opened folder to settings somewhere
 
