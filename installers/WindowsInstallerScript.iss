@@ -45,7 +45,9 @@ Source: "..\src\bin\Release\net10.0\win-x64\publish\{#MyAppExeName}"; DestDir: "
 Source: "..\src\bin\Release\net10.0\win-x64\publish\av_libglesv2.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\src\bin\Release\net10.0\win-x64\publish\libHarfBuzzSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\src\bin\Release\net10.0\win-x64\publish\libSkiaSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\src\bin\Release\net10.0\win-x64\publish\Magick.Native-Q16-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\bin\Release\net10.0\win-x64\publish\LICENSE"; DestDir: "{app}"; DestName: "PDFium-license.txt"; Flags: ignoreversion 
+Source: "..\src\bin\Release\net10.0\win-x64\publish\Magick.Native-Q8-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\bin\Release\net10.0\win-x64\publish\pdfium.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\src\bin\Release\net10.0\win-x64\publish\Assets\*"; DestDir: "{app}\Assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
