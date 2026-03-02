@@ -777,6 +777,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                         var paragraph = section.AddParagraph();
                         paragraph.Format.Alignment = ParagraphAlignment.Center;
                         var image = paragraph.AddImage(convertedPdfImagePath);
+                        image.Width = imageWidth;
                         for (var j = 1; j < pgCount; j++)
                         {
                             section.AddPageBreak();
