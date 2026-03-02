@@ -833,6 +833,9 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         pdfRenderer.PdfDocument.Save(outputPDFFileName);
         LogInfo("Finished saving PDF output to: " + outputPDFFileName);
         await CreateAndSaveReportObjectAfterReportCreation();
+        // clean up data dir
+        Directory.Delete(convertedDir, true);
+        // show output folder to user
         OpenFolderForFileInFileViewer(outputPDFFileName);
         IsCreatingPDF = false;
     }
