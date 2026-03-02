@@ -726,11 +726,13 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             {
                 // add other PDF pages
                 // see: https://stackoverflow.com/a/65091204/3938401
-                var pdfFileToAdd = PdfReader.Open(filePath);
+                var pdfFileToAdd = PdfReader.Open(filePath, PdfDocumentOpenMode.Import);
+                var pgCount = pdfFileToAdd.PageCount;
+                pdfFileToAdd.Close();
                 imageTitlePar.AddText(string.Format(" (PDF with {0} page{1}) ", 
-                    pdfFileToAdd.PageCount, 
-                    pdfFileToAdd.PageCount == 1 ? "" : "s"));
-                for (var j = 2; j <= pdfFileToAdd.PageCount; j++)
+                    pgCount, 
+                    pgCount == 1 ? "" : "s"));
+                for (var j = 2; j <= pgCount; j++)
                 {
                     section.AddPageBreak();
                     paragraph = section.AddParagraph();
