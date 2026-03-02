@@ -746,21 +746,25 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                     // render using Docnet library (which utilizes pdfium, the chrome renderer)
                     string RenderPdfPageToImage(IDocReader docReader, int pgNum)
                     {
-                        Console.WriteLine("rendering pg " + pgNum);
+                        Console.WriteLine("Rendering pg " + pgNum);
                         using var pageReader = docReader.GetPageReader(pgNum);
+                        Console.WriteLine("Getting image for page " + pgNum);
                         var rawBytes = pageReader.GetImage(RenderFlags.RenderAnnotations);
+                        Console.WriteLine("Getting width & height for page " + pgNum);
                         var width = pageReader.GetPageWidth();
                         var height = pageReader.GetPageHeight();
+                        Console.WriteLine("Loading pixel data for page " + pgNum);
                         using var img = Image.LoadPixelData<Bgra32>(rawBytes, width, height);
                         // you are likely going to want this as well otherwise you might end up with transparent parts.
                         img.Mutate(x => x.BackgroundColor(SixLabors.ImageSharp.Color.White));
                         var pdfPageImageOutputPath = Path.Combine(convertedDir, info.Name + "-Page-" 
                             + (pgNum + 1).ToString().PadLeft(3, '0') + ".jpg");
                         img.Save(pdfPageImageOutputPath);
+                        Console.WriteLine("Done rendering pg " + pgNum);
                         return pdfPageImageOutputPath;
                     }
                     // render all pages to images
-                    using var docReader = DocLib.Instance.GetDocReader(
+                    var docReader = DocLib.Instance.GetDocReader(
                         filePath,
                         new PageDimensions(1080, 1920)); // TODO: are these dims right?
                     // add to document

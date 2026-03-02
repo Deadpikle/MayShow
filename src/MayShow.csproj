@@ -16,8 +16,13 @@
     <ApplicationIcon>MayShow-icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <TrimmerRootAssembly Include="MigraDoc.DocumentObjectModel" />
+    <TrimmerRootAssembly Include="MigraDoc.Rendering" />
+    <TrimmerRootAssembly Include="MigraDoc.RtfRendering" />
     <TrimmerRootAssembly Include="PdfSharp" />
     <TrimmerRootAssembly Include="Avalonia.Controls.DataGrid" />
+    <!-- <TrimmerRootAssembly Include="Docnet.Core" />
+    <TrimmerRootAssembly Include="SixLabors.ImageSharp" /> -->
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
