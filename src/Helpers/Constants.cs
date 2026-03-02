@@ -5,7 +5,7 @@ namespace MayShow.Helpers;
 
 class Constants
 {
-    public static string AppVersion = "1.2.0";
+    public static string AppVersion = "1.3.0";
 
     public static string[] AllowedFileExtensionPatterns = [ "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp", "*.pdf", "*.heic", ];
     public static string[] AllowedFileExtensionsNoStar = [ "png", "jpg", "jpeg", "gif", "bmp", "webp", "pdf", "heic", ];
