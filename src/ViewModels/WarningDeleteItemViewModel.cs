@@ -2,30 +2,29 @@
 using MayShow.Helpers;
 using MayShow.Models;
 
-namespace MayShow.ViewModels
+namespace MayShow.ViewModels;
+
+class WarningDeleteItemViewModel : ChangeNotifier
 {
-    class WarningDeleteItemViewModel : ChangeNotifier
+    ReportFile _file;
+
+    public WarningDeleteItemViewModel(ReportFile file)
     {
-        ReportFile _file;
+        _file = file;
+    }
 
-        public WarningDeleteItemViewModel(ReportFile file)
-        {
-            _file = file;
-        }
+    public ReportFile File
+    {
+        get => _file;
+    }
 
-        public ReportFile File
-        {
-            get => _file;
-        }
+    public void KeepItem()
+    {
+        DialogHost.Close("DialogHost", false);
+    }
 
-        public void KeepItem()
-        {
-            DialogHost.Close("DialogHost", false);
-        }
-
-        public void RemoveItem()
-        {
-            DialogHost.Close("DialogHost", true);
-        }
+    public void RemoveItem()
+    {
+        DialogHost.Close("DialogHost", true);
     }
 }

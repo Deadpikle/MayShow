@@ -5,41 +5,40 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using MayShow.ViewModels;
 
-namespace MayShow.Views
+namespace MayShow.Views;
+
+public partial class MainView : UserControl
 {
-    public partial class MainView : UserControl
+    public MainView()
     {
-        public MainView()
-        {
-            this.InitializeComponent();
-            LogBlock.PropertyChanged += LogBlock_PropertyChanged;
-            FilesGrid.CellEditEnded += FileCellEditEnded;
-        }
+        this.InitializeComponent();
+        LogBlock.PropertyChanged += LogBlock_PropertyChanged;
+        FilesGrid.CellEditEnded += FileCellEditEnded;
+    }
 
-        private void LogBlock_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    private void LogBlock_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property.ToString() == "Text")
         {
-            if (e.Property.ToString() == "Text")
-            {
-                LogScrollView.ScrollToEnd();
-            }
+            LogScrollView.ScrollToEnd();
         }
+    }
 
-        public void UnfocusTextbox()
+    public void UnfocusTextbox()
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+        topLevel?.FocusManager?.ClearFocus();
+        if (DataContext is MainViewModel mvm)
         {
-            var topLevel = TopLevel.GetTopLevel(this);
-            topLevel?.FocusManager?.ClearFocus();
-            if (DataContext is MainViewModel mvm)
-            {
-                mvm?.HasUnsavedWork = true;
-            }
+            mvm?.HasUnsavedWork = true;
         }
+    }
 
-        private void FileCellEditEnded(object? sender, DataGridCellEditEndedEventArgs args)
+    private void FileCellEditEnded(object? sender, DataGridCellEditEndedEventArgs args)
+    {
+        if (args.EditAction == DataGridEditAction.Commit && DataContext is MainViewModel mvm)
         {
-            if (args.EditAction == DataGridEditAction.Commit && DataContext is MainViewModel mvm)
-            {
-                mvm?.HasUnsavedWork = true;
-            }
+            mvm?.HasUnsavedWork = true;
         }
     }
 }
