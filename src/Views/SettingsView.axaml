@@ -20,7 +20,7 @@
                     FontWeight="Bold" />
             <TextBlock TextWrapping="Wrap"
                        HorizontalAlignment="Left"
-                       Width="300">
+                       Width="350">
                 Always reduce size of images if above this file size in megabytes (MB):
             </TextBlock>
             <NumericUpDown Value="{Binding ImageResizeThreshold}"
@@ -33,18 +33,23 @@
                            Margin="0,0,0,4" />
             <CheckBox IsChecked="{Binding !UseDocnetPDFImageRendering}">Use legacy PDF handling (does not work with macOS annotations)</CheckBox>
             <CheckBox IsChecked="{Binding SaveOutputPdfInWorkingDir}">Always save report PDF in working directory</CheckBox>
-            <Grid ColumnDefinitions="*, *"
+            <Grid ColumnDefinitions="Auto, *"
                 IsVisible="{Binding !SaveOutputPdfInWorkingDir}">
                 <Button Content="Choose output folder..."
                         Grid.Column="0"
                         Command="{Binding ChooseOutputFolder}"
                         VerticalAlignment="Top"/>
                 <TextBlock Text="{Binding OutputPdfDirPath}"
-                           Margin="6,0,0,0"
+                           Margin="4,0,0,0"
                            TextWrapping="Wrap"
                            Grid.Column="1"
+                           HorizontalAlignment="Left"
                            VerticalAlignment="Top"/>
             </Grid>
+            <TextBlock TextWrapping="Wrap"
+                       Foreground="Red"
+                       Text="{Binding ErrorMessage}"
+                       IsVisible="{Binding HasErrorMessage}"/>
             <StackPanel Orientation="Horizontal"
                         Spacing="12"
                         Margin="0,4,0,0"

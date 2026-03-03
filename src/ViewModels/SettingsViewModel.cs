@@ -63,6 +63,7 @@ class SettingsViewModel: ChangeNotifier
         {
             _settings.OutputPdfDir = value;
             NotifyPropertyChanged();
+            NotifyPropertyChanged(nameof(IsOutputPdfDirValid));
         }
     }
 
@@ -122,6 +123,14 @@ class SettingsViewModel: ChangeNotifier
 
     public void Save()
     {
-        DialogHost.Close("DialogHost", _settings);
+        if (!IsOutputPdfDirValid)
+        {
+            ErrorMessage = "Output directory cannot be found!";
+        }
+        else
+        {
+            ErrorMessage = "";
+            DialogHost.Close("DialogHost", _settings);
+        }
     }
 }
