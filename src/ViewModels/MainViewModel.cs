@@ -741,7 +741,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             else
             {
                 // need to render PDF to images
-                if (_settings.UseDocnetPFDImageRendering)
+                if (_settings.UseDocnetPDFImageRendering)
                 {
                     // render using Docnet library (which utilizes pdfium, the chrome renderer)
                     string RenderPdfPageToImage(IDocReader docReader, int pgNum)

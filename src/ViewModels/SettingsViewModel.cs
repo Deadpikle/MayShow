@@ -32,16 +32,16 @@ class SettingsViewModel: ChangeNotifier
         _settings = new Settings
         {
             LastUsedPath = _previousSettings.LastUsedPath,
-            UseDocnetPFDImageRendering = _previousSettings.UseDocnetPFDImageRendering
+            UseDocnetPDFImageRendering = _previousSettings.UseDocnetPDFImageRendering
         };
     }
 
     public bool UseDocnetPDFImageRendering
     {
-        get => _settings.UseDocnetPFDImageRendering;
+        get => _settings.UseDocnetPDFImageRendering;
         set
         {
-            _settings.UseDocnetPFDImageRendering = value;
+            _settings.UseDocnetPDFImageRendering = value;
             NotifyPropertyChanged();
         }
     }

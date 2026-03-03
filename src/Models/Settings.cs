@@ -28,7 +28,8 @@ class Settings : ChangeNotifier
     }
 
     [JsonInclude]
-    public bool UseDocnetPFDImageRendering
+    [JsonPropertyName("UseDocnetPFDImageRendering")] // ...this typo now has to live because people have this saved on disk...
+    public bool UseDocnetPDFImageRendering
     {
         get => _useDocnetPDFImageRendering;
         set { _useDocnetPDFImageRendering = value; NotifyPropertyChanged(); }
