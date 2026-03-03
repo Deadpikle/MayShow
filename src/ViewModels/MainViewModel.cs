@@ -615,7 +615,6 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     private async Task CreatePDF(string folderPath)
     {
         // TODO: calculate needed width for images based on page width and margins and all that?
-        // TODO: resize (non-HEIC) images for smaller size...?
         // safety checks
         var outputDir = _settings.SaveOutputPdfInWorkingDir ? folderPath : _settings.OutputPdfDir;
         if (!Directory.Exists(outputDir))
