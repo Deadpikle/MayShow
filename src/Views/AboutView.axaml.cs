@@ -31,7 +31,7 @@ namespace MayShow.Views
                     licenseText = "Error: Unable to find license file!";
                 }
             }
-            LicenseTextBlock.Text = licenseText;
+            LicenseTextBlock.Text = licenseText.Trim();
         }
     }
 }
