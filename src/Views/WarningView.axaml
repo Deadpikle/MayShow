@@ -18,7 +18,7 @@
                    FontWeight="Bold"
                    TextWrapping="Wrap"
                    FontSize="14"
-                   MaxWidth="350"
+                   MaxWidth="400"
                    Text="{Binding Error}"/>
         <Button Command="{Binding Close}"
                 Classes="accent"

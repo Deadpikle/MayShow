@@ -3,13 +3,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace MayShow.Views
+namespace MayShow.Views;
+
+public partial class WarningView : UserControl
 {
-    public partial class WarningView : UserControl
+    public WarningView()
     {
-        public WarningView()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }
