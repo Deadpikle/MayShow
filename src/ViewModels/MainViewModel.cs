@@ -51,7 +51,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     {
         _isPerformingInitialLoad = true;
         _processDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
-        Console.WriteLine("Process is running from: {0}", _processDir);
+        Console.WriteLine("Internal storage directory is: {0}", Utilities.GetInternalDataPath());
         _isCreatingPDF = false;
         var quotes = Constants.GetQuotes();
         Random random = new Random();
@@ -93,7 +93,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
 
     public bool IsTitleBoxVisible
     {
-        get => !string.IsNullOrWhiteSpace(_workingFolder);
+        get => !string.IsNullOrWhiteSpace(WorkingFolder);
     }
 
     public bool CanAddItem
@@ -121,12 +121,12 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
 
     public bool HasWorkingFolder
     {
-        get => !string.IsNullOrWhiteSpace(_workingFolder) && Directory.Exists(_workingFolder);
+        get => !string.IsNullOrWhiteSpace(WorkingFolder) && Directory.Exists(WorkingFolder);
     }
 
     public bool HasWorkingFolderAndNotMakingPDF
     {
-        get => !string.IsNullOrWhiteSpace(_workingFolder) && Directory.Exists(_workingFolder) && !_isCreatingPDF;
+        get => !string.IsNullOrWhiteSpace(WorkingFolder) && Directory.Exists(WorkingFolder) && !_isCreatingPDF;
     }
 
     public string WorkingFolder
@@ -203,14 +203,49 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         }
     }
 
+    private string GetReportSavedDataPath(string folderPath)
+    {
+        if (_settings.SaveReportJsonDataInInternalDir)
+        {
+            var internalPath = Utilities.GetInternalDataPath();
+            if (!_settings.WorkingFolderToInternalFolderName.ContainsKey(folderPath))
+            {
+                var uuid = "";
+                var potentialPath = "";
+                var isDone = false;
+                // make sure uuid not already used...just in case...because paranoia...
+                do
+                {
+                    uuid = Guid.NewGuid().ToString();
+                    potentialPath = Path.Combine(internalPath, uuid);
+                    isDone = !Directory.Exists(potentialPath);
+                } while (!isDone);
+                // make internal dir -- using dir so we have option to copy data into dir later if needed
+                // (if we ever implement a more robust report system where we keep all files)
+                Directory.CreateDirectory(potentialPath);
+                _settings.WorkingFolderToInternalFolderName[folderPath] = uuid;
+                _settings.SaveSettingsNotAsync(); // save new key/value pair
+            }
+            return Path.Combine(
+                internalPath, 
+                _settings.WorkingFolderToInternalFolderName[folderPath], 
+                Constants.ReportSavedDataFileName
+            );
+        }
+        else
+        {
+            return Path.Combine(folderPath, Constants.ReportSavedDataFileName);
+        }
+    }
+
     private void ScanFolder(string path)
     {
         if (Directory.Exists(path))
         {
             WorkingFolder = path;
             NotifyPropertyChanged(nameof(IsTitleBoxVisible));
-            NotifyPropertyChanged(nameof(CanAddItem)); 
-            var reportFilePath = Path.Combine(path, GetReportSavedDataFileName());
+            NotifyPropertyChanged(nameof(CanAddItem));
+            var reportFilePath = GetReportSavedDataPath(path);
             var successfullyLoadedPriorReport = false;
             if (File.Exists(reportFilePath))
             {
@@ -220,6 +255,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 var report = JsonSerializer.Deserialize<PDFReport>(json, jsonContext.PDFReport);
                 if (report != null && report.Files.Count > 0)
                 {
+                    Console.WriteLine("Loading prior report data at {0}", reportFilePath);
                     ReportFiles = new ObservableCollection<ReportFile>(report.Files);
                     ReportTitle = report.Title;
                     WorkingFolder = report.BaseFolder;
@@ -233,7 +269,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 // Scan folder for files and display in DataGrid
                 ReportFiles.Clear();
                 ReportTitle = "";
-                var filePaths = Directory.GetFiles(_workingFolder);
+                var filePaths = Directory.GetFiles(WorkingFolder);
                 foreach (var filePath in filePaths)
                 {
                     AddFileBasedOnPath(filePath);
@@ -350,7 +386,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             }
             if (!didMatch)
             {
-                if (!filePath.EndsWith(GetReportSavedDataFileName()))
+                if (!filePath.EndsWith(Constants.ReportSavedDataFileName))
                 {
                     LogInfo("File {0} did not match allowed file extension types, so it was not added.", filePath);
                 }
@@ -464,7 +500,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         {
             try
             {
-                await Task.Run(() => CreatePDF(_workingFolder));
+                await Task.Run(() => CreatePDF(WorkingFolder));
             } catch (Exception e)
             {
                 LogInfo("PDF process failed! Reason: " + e.Message);
@@ -492,7 +528,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         {
             Title = ReportTitle,
             Files = ReportFiles.ToList(),
-            BaseFolder = _workingFolder,
+            BaseFolder = WorkingFolder,
             LastSaved = DateTime.Now,
             LastGenerated = _lastGeneratedTime,
         };
@@ -507,7 +543,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         memoryStream.Position = 0;
         using var reader = new StreamReader(memoryStream);
         var json = await reader.ReadToEndAsync();
-        var savePath = Path.Combine(_workingFolder, GetReportSavedDataFileName());
+        var savePath = GetReportSavedDataPath(WorkingFolder);
         await File.WriteAllTextAsync(savePath, json);
         LogInfo("Saved report information to {0}", savePath);
         HasUnsavedWork = false;
@@ -519,17 +555,12 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         {
             Title = ReportTitle,
             Files = ReportFiles.ToList(),
-            BaseFolder = _workingFolder,
+            BaseFolder = WorkingFolder,
             LastSaved = DateTime.Now,
             LastGenerated = DateTime.Now,
         };
         _lastGeneratedTime = DateTime.Now;
         await SavePDFReportDataToDisk(report);
-    }
-
-    private string GetReportSavedDataFileName()
-    {
-        return "report_data.json";
     }
 
     public byte[]? GetFont(string faceName)

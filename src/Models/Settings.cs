@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -16,6 +17,9 @@ class Settings : ChangeNotifier
     private bool _saveOutputPdfInWorkingDir;
     private string _outputPdfDir;
     private decimal _imageResizeThreshold;
+    private bool _saveReportJsonDataInInternalDir;
+    private Dictionary<string, string> _workingFolderToInternalFolderName;
+    public int _settingsVersion;
 
     public Settings()
     {
@@ -24,6 +28,9 @@ class Settings : ChangeNotifier
         _saveOutputPdfInWorkingDir = true;
         _outputPdfDir = "";
         _imageResizeThreshold = 1.5m;
+        _saveReportJsonDataInInternalDir = false;
+        _workingFolderToInternalFolderName = [];
+        _settingsVersion = 1;
     }
 
     public Settings(Settings other)
@@ -33,6 +40,9 @@ class Settings : ChangeNotifier
         _saveOutputPdfInWorkingDir = other.SaveOutputPdfInWorkingDir;
         _outputPdfDir = other.OutputPdfDir;
         _imageResizeThreshold = other.ImageResizeThreshold;
+        _saveReportJsonDataInInternalDir = other.SaveReportJsonDataInInternalDir;
+        _workingFolderToInternalFolderName = other.WorkingFolderToInternalFolderName;
+        _settingsVersion = other.SettingsVersion;
     }
 
     [JsonInclude]
@@ -71,15 +81,46 @@ class Settings : ChangeNotifier
         set { _imageResizeThreshold = value; NotifyPropertyChanged(); }
     }
 
-    public static string GetSettingsFileName()
+    [JsonInclude]
+    public bool SaveReportJsonDataInInternalDir
     {
-        return "settings.json";
+        get => _saveReportJsonDataInInternalDir;
+        set { _saveReportJsonDataInInternalDir = value; NotifyPropertyChanged(); }
     }
+
+    [JsonInclude]
+    public Dictionary<string, string> WorkingFolderToInternalFolderName
+    {
+        get => _workingFolderToInternalFolderName;
+        set { _workingFolderToInternalFolderName = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
+    public int SettingsVersion
+    {
+        get => _settingsVersion;
+        set { _settingsVersion = value; NotifyPropertyChanged(); }
+    }
+
+    public static string SettingsFileName = "settings.json";
 
     public static string GetSettingsPath()
     {
         var path = Utilities.GetInternalDataPath();
-        return Path.Combine(path, GetSettingsFileName());
+        return Path.Combine(path, SettingsFileName);
+    }
+
+
+    public string SaveSettingsNotAsync()
+    {
+        var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
+        using MemoryStream memoryStream = new MemoryStream();
+        JsonSerializer.Serialize(memoryStream, this, jsonContext.Settings);
+        memoryStream.Position = 0;
+        using var reader = new StreamReader(memoryStream);
+        var json = reader.ReadToEnd();
+        File.WriteAllText(GetSettingsPath(), json);
+        return json;
     }
 
     public async Task<string> SaveSettingsAsync()

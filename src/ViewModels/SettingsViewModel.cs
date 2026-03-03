@@ -94,7 +94,17 @@ class SettingsViewModel: ChangeNotifier
         set
         {
             _settings.ImageResizeThreshold = value;
-            NotifyPropertyChanged(nameof(ImageResizeThreshold));
+            NotifyPropertyChanged();
+        }
+    }
+
+    public bool SaveReportJsonDataInInternalDir
+    {
+        get => _settings.SaveReportJsonDataInInternalDir;
+        set
+        {
+            _settings.SaveReportJsonDataInInternalDir = value;
+            NotifyPropertyChanged();
         }
     }
 

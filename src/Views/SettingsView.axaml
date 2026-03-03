@@ -35,7 +35,7 @@
             <CheckBox IsChecked="{Binding SaveOutputPdfInWorkingDir}">Always save report PDF in working directory</CheckBox>
             <Grid ColumnDefinitions="Auto, *"
                 IsVisible="{Binding !SaveOutputPdfInWorkingDir}">
-                <Button Content="Choose output folder..."
+                <Button Content="Choose report output folder..."
                         Grid.Column="0"
                         Command="{Binding ChooseOutputFolder}"
                         VerticalAlignment="Top"/>
@@ -46,6 +46,7 @@
                            HorizontalAlignment="Left"
                            VerticalAlignment="Top"/>
             </Grid>
+            <CheckBox IsChecked="{Binding SaveReportJsonDataInInternalDir}">Save report data (names, notes, etc.) in MayShow settings directory (saves in working directory by default)</CheckBox>
             <TextBlock TextWrapping="Wrap"
                        Foreground="Red"
                        Text="{Binding ErrorMessage}"
