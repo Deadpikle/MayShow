@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
@@ -13,7 +14,8 @@ namespace MayShow.Views
             this.InitializeComponent();
 
             // set license text
-            var licenseFileName = "Assets/LICENSES.txt";
+            var processDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
+            var licenseFileName = Path.Combine(processDir, "Assets", "LICENSES.txt");
             var licenseText = "";
             if (File.Exists(licenseFileName))
             {
@@ -21,7 +23,7 @@ namespace MayShow.Views
             }
             else
             {
-                licenseFileName = "../Resources/Assets/LICENSES.txt";
+                licenseFileName = Path.Combine(processDir, "../Resources/Assets/LICENSES.txt");
                 if (File.Exists(licenseFileName))
                 {
                     licenseText = File.ReadAllText(licenseFileName);
