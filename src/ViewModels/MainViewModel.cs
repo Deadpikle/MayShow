@@ -256,7 +256,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
 
     public async Task ShowSettings()
     {
-        var updatedSettings = await DialogHost.Show(new SettingsViewModel(_settings));
+        var updatedSettings = await DialogHost.Show(new SettingsViewModel(_settings, TopLevelGrabber));
         if (updatedSettings != null)
         {
             _settings = (Settings)updatedSettings;
@@ -575,6 +575,14 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     {
         // TODO: calculate needed width for images based on page width and margins and all that?
         // TODO: resize (non-HEIC) images for smaller size...?
+        // safety checks
+        var outputDir = _settings.SaveOutputPdfInWorkingDir ? folderPath : _settings.OutputPdfDir;
+        if (!Directory.Exists(outputDir))
+        {
+            await DialogHost.Show(new WarningViewModel("Output directory not found! Please adjust your application Settings before continuing. Output directory: " + outputDir));
+            return;
+        }
+        // start making PDF!
         IsCreatingPDF = true;
         var pdfDoc = new Document();
         var outputFileName = ReportTitle + ".pdf";
@@ -828,15 +836,15 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         };
         LogInfo("Rendering document to PDF file...");
         pdfRenderer.RenderDocument();
-        string outputPDFFileName = Path.Join(folderPath, outputFileName);
+        string outputPDFFilePath = Path.Join(outputDir, outputFileName);
         LogInfo("Saving PDF document to disk...");
-        pdfRenderer.PdfDocument.Save(outputPDFFileName);
-        LogInfo("Finished saving PDF output to: " + outputPDFFileName);
+        pdfRenderer.PdfDocument.Save(outputPDFFilePath);
+        LogInfo("Finished saving PDF output to: " + outputPDFFilePath);
         await CreateAndSaveReportObjectAfterReportCreation();
         // clean up data dir
         Directory.Delete(convertedDir, true);
         // show output folder to user
-        OpenFolderForFileInFileViewer(outputPDFFileName);
+        OpenFolderForFileInFileViewer(outputPDFFilePath);
         IsCreatingPDF = false;
     }
 

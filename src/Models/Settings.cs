@@ -13,11 +13,23 @@ class Settings : ChangeNotifier
 {
     private string _lastUsedPath;
     private bool _useDocnetPDFImageRendering;
+    private bool _saveOutputPdfInWorkingDir;
+    private string _outputPdfDir;
 
     public Settings()
     {
         _lastUsedPath = "";
         _useDocnetPDFImageRendering = true;
+        _saveOutputPdfInWorkingDir = true;
+        _outputPdfDir = "";
+    }
+
+    public Settings(Settings other)
+    {
+        _lastUsedPath = other.LastUsedPath;
+        _useDocnetPDFImageRendering = other.UseDocnetPDFImageRendering;
+        _saveOutputPdfInWorkingDir = other.SaveOutputPdfInWorkingDir;
+        _outputPdfDir = other.OutputPdfDir;
     }
 
     [JsonInclude]
@@ -33,6 +45,20 @@ class Settings : ChangeNotifier
     {
         get => _useDocnetPDFImageRendering;
         set { _useDocnetPDFImageRendering = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
+    public bool SaveOutputPdfInWorkingDir
+    {
+        get => _saveOutputPdfInWorkingDir;
+        set { _saveOutputPdfInWorkingDir = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
+    public string OutputPdfDir
+    {
+        get => _outputPdfDir;
+        set { _outputPdfDir = value; NotifyPropertyChanged(); }
     }
 
     public static string GetSettingsFileName()

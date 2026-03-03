@@ -3,13 +3,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace MayShow.Views
+namespace MayShow.Views;
+
+public partial class SettingsView : UserControl
 {
-    public partial class SettingsView : UserControl
+    public SettingsView()
     {
-        public SettingsView()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }
