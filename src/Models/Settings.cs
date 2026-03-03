@@ -15,6 +15,7 @@ class Settings : ChangeNotifier
     private bool _useDocnetPDFImageRendering;
     private bool _saveOutputPdfInWorkingDir;
     private string _outputPdfDir;
+    private decimal _imageResizeThreshold;
 
     public Settings()
     {
@@ -22,6 +23,7 @@ class Settings : ChangeNotifier
         _useDocnetPDFImageRendering = true;
         _saveOutputPdfInWorkingDir = true;
         _outputPdfDir = "";
+        _imageResizeThreshold = 1.5m;
     }
 
     public Settings(Settings other)
@@ -30,6 +32,7 @@ class Settings : ChangeNotifier
         _useDocnetPDFImageRendering = other.UseDocnetPDFImageRendering;
         _saveOutputPdfInWorkingDir = other.SaveOutputPdfInWorkingDir;
         _outputPdfDir = other.OutputPdfDir;
+        _imageResizeThreshold = other.ImageResizeThreshold;
     }
 
     [JsonInclude]
@@ -59,6 +62,13 @@ class Settings : ChangeNotifier
     {
         get => _outputPdfDir;
         set { _outputPdfDir = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
+    public decimal ImageResizeThreshold
+    {
+        get => _imageResizeThreshold;
+        set { _imageResizeThreshold = value; NotifyPropertyChanged(); }
     }
 
     public static string GetSettingsFileName()

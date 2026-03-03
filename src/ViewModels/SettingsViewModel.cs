@@ -87,6 +87,16 @@ class SettingsViewModel: ChangeNotifier
         }
     }
 
+    public decimal ImageResizeThreshold
+    {
+        get => _settings.ImageResizeThreshold;
+        set
+        {
+            _settings.ImageResizeThreshold = value;
+            NotifyPropertyChanged(nameof(ImageResizeThreshold));
+        }
+    }
+
     public async void ChooseOutputFolder()
     {
         var topLevel = _topLevelGrabber?.GetTopLevel();

@@ -9,7 +9,7 @@
              xmlns:models="clr-namespace:MayShow.Models"
              xmlns:vm="clr-namespace:MayShow.ViewModels"
              x:DataType="vm:SettingsViewModel"
-             MaxWidth="350">
+             MaxWidth="450">
     <ScrollViewer AllowAutoHide="False">
         <StackPanel Orientation="Vertical"
                     Spacing="8"
@@ -18,6 +18,19 @@
                     HorizontalAlignment="Center"
                     FontSize="16"
                     FontWeight="Bold" />
+            <TextBlock TextWrapping="Wrap"
+                       HorizontalAlignment="Left"
+                       Width="300">
+                Always reduce size of images if above this file size in megabytes (MB):
+            </TextBlock>
+            <NumericUpDown Value="{Binding ImageResizeThreshold}"
+                           Increment="0.1"
+                           Minimum="0.5"
+                           FormatString="0.00"
+                           Maximum="10"
+                           Width="150"
+                           HorizontalAlignment="Left"
+                           Margin="0,0,0,4" />
             <CheckBox IsChecked="{Binding !UseDocnetPDFImageRendering}">Use legacy PDF handling (does not work with macOS annotations)</CheckBox>
             <CheckBox IsChecked="{Binding SaveOutputPdfInWorkingDir}">Always save report PDF in working directory</CheckBox>
             <Grid ColumnDefinitions="*, *"

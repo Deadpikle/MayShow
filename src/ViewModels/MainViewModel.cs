@@ -706,7 +706,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                     didAdjust = true;
                 }
                 // perform needed image manipulations
-                if (isHEIC || isWebp || isPNG || (!isPDF && info.Length > 1.5 * 1024 * 1024 /* 1.5 MB */))
+                if (isHEIC || isWebp || isPNG || (!isPDF && info.Length > _settings.ImageResizeThreshold * 1024 * 1024))
                 {
                     // Save image as jpg
                     mImage.Quality = 80;
