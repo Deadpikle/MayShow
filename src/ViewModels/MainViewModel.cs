@@ -36,7 +36,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     private bool _isPerformingInitialLoad;
     private string _processDir;
     private bool _isCreatingPDF;
-    private string _createPDFLog;
+    private string _programLog;
     private string _workingFolder;
 
     private string _reportTitle;
@@ -56,11 +56,11 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         var quotes = Constants.GetQuotes();
         Random random = new Random();
         var quoteIndex = random.Next(0, quotes.Length);
-        _createPDFLog = "----- MayShow v" + Constants.AppVersion + " ------" + Environment.NewLine;
-        _createPDFLog += quotes[quoteIndex] + Environment.NewLine;
-        _createPDFLog += "---------------------------------------" + Environment.NewLine;
-        _createPDFLog += "Loaded and ready to create report!" + Environment.NewLine;
-        _createPDFLog += "Please copy and send this Program Log when reporting any issues with the software.";
+        _programLog = "----- MayShow v" + Constants.AppVersion + " ------" + Environment.NewLine;
+        _programLog += quotes[quoteIndex] + Environment.NewLine;
+        _programLog += "---------------------------------------" + Environment.NewLine;
+        _programLog += "Loaded and ready to create report!" + Environment.NewLine;
+        _programLog += "Please copy and send this Program Log when reporting any issues with the software.";
         _workingFolder = "";
         ReportFiles = _reportFiles = new ObservableCollection<ReportFile>();
         _reportTitle = "";
@@ -141,10 +141,10 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         }
     }
 
-    public string CreatePDFLog
+    public string ProgramLog
     {
-        get => _createPDFLog;
-        set { _createPDFLog = value; NotifyPropertyChanged(); }
+        get => _programLog;
+        set { _programLog = value; NotifyPropertyChanged(); }
     }
 
     public bool HasUnsavedWork
@@ -176,7 +176,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     {
         var timestamp = string.Format("[{0:s}]", DateTime.Now);
         Console.WriteLine(timestamp + " " + message, arguments);
-        CreatePDFLog += Environment.NewLine + string.Format(message, arguments ?? []);
+        ProgramLog += Environment.NewLine + string.Format(message, arguments ?? []);
     }
 
     public async void ChooseFolder()
@@ -561,6 +561,16 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         };
         _lastGeneratedTime = DateTime.Now;
         await SavePDFReportDataToDisk(report);
+    }
+
+    public async Task CopyLogToClipboard()
+    {
+        var clipboard = TopLevelGrabber?.GetTopLevel().Clipboard;
+        if (clipboard != null)
+        {
+            await clipboard.SetTextAsync(ProgramLog);
+            LogInfo("Program log has been copied to the clipboard!");
+        }
     }
 
     public byte[]? GetFont(string faceName)
