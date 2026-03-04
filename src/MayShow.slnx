@@ -1,5 +1,4 @@
 <Solution>
-  <Folder Name="/MayShow.Desktop/">
-    <Project Path="MayShow.Desktop/MayShow.Desktop.csproj" />
-  </Folder>
+  <Project Path="MayShow.Desktop/MayShow.Desktop.csproj" />
+  <Project Path="MayShow.iOS/MayShow.iOS.csproj" />
 </Solution>
