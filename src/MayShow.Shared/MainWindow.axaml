@@ -5,20 +5,13 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="MayShow.MainWindow"
         Title="MayShow"
+        xmlns:views="clr-namespace:MayShow.Views"
         xmlns:vm="clr-namespace:MayShow.ViewModels"
         xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
-        x:DataType="vm:MainWindowViewModel"
+        x:DataType="vm:MainViewModel"
         Width="800"
         MinWidth="550"
         Height="650"
         MinHeight="550">
-    <dialogHost:DialogHost CloseOnClickAway="False" 
-                           Identifier="DialogHost"
-                           x:Name="WindowDialogHost">
-        <dialogHost:DialogHost.DialogContent>
-            <StackPanel/>
-        </dialogHost:DialogHost.DialogContent>
-        <!-- put the content over which the dialog is shown here (e.g. your main window grid)-->
-        <ContentControl Content="{Binding CurrentViewModel}"/>
-    </dialogHost:DialogHost>
+    <views:MainView/>
 </Window>

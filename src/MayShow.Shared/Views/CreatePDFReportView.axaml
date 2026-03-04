@@ -1,0 +1,295 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MayShow.Views.CreatePDFReportView"
+             xmlns:helpers="clr-namespace:MayShow.Helpers"
+             xmlns:models="clr-namespace:MayShow.Models"
+             xmlns:views="clr-namespace:MayShow.Views"
+             xmlns:vm="clr-namespace:MayShow.ViewModels"
+             xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             x:DataType="vm:CreatePDFReportViewModel">
+  <Grid ColumnDefinitions="*"
+        RowDefinitions="Auto, 2*, Auto, Auto, *">
+    <Button Command="{Binding ShowSettings}"
+            Grid.Row="0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Margin="4,4,0,4">
+        <TextBlock><Run Text="&#xf013;" FontFamily="{StaticResource FontAwesomeSolid}"/> Settings</TextBlock>
+    </Button>
+    <Button Command="{Binding ShowAbout}"
+            Grid.Row="0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="0,4,4,4">
+        <TextBlock><Run Text="&#xf059;" FontFamily="{StaticResource FontAwesomeSolid}"/> About</TextBlock>
+    </Button>
+    <StackPanel Orientation="Vertical"
+                Spacing="2"
+                Margin="0,4,0,0">
+        <Label Content="MayShow: Report Builder"
+               FontSize="20"
+               FontWeight="Bold"
+               HorizontalAlignment="Center"/>
+        <Grid ColumnDefinitions="Auto, *"
+              Margin="4,0,0,0">
+            <Button Content="Choose Receipt Folder"
+                    Command="{Binding ChooseFolder}"
+                    IsEnabled="{Binding !IsCreatingPDF}"
+                    Grid.Column="0" />
+            <TextBlock Text="{Binding WorkingFolder}"
+                       VerticalAlignment="Center"
+                       TextWrapping="NoWrap"
+                       Margin="4,0,4,0"
+                       TextTrimming="PrefixCharacterEllipsis"
+                       Grid.Column="1"/>
+        </Grid>
+        <Label Content="Report Title"
+               IsVisible="{Binding IsTitleBoxVisible}" />
+        <TextBox Text="{Binding ReportTitle}"
+                 IsVisible="{Binding IsTitleBoxVisible}"
+                 Watermark="Receipts December 2024"
+                 Margin="2,0,2,4"
+                 Classes="clearButton"
+                 Name="TitleTextBox">
+            <TextBox.KeyBindings>
+                <KeyBinding Command="{Binding $parent[views:CreatePDFReportView].UnfocusTextbox}" Gesture="Enter" />
+            </TextBox.KeyBindings>
+        </TextBox>
+    </StackPanel>
+    <DataGrid x:Name="FilesGrid"
+              Classes="DragAndDrop ItemsDragAndDrop"
+              Grid.Row="1"
+              Grid.Column="0"
+              Grid.ColumnSpan="2"
+              Margin="2"
+              ItemsSource="{Binding ReportFiles}"
+              AutoGenerateColumns="False"
+              IsReadOnly="False"
+              GridLinesVisibility="All"
+              CanUserReorderColumns="False"
+              CanUserResizeColumns="True"
+              CanUserSortColumns="False"
+              BorderThickness="1"
+              VerticalScrollBarVisibility="Visible"
+              ScrollViewer.AllowAutoHide="False"
+              HorizontalScrollBarVisibility="Disabled"
+              HeadersVisibility="All"
+              BorderBrush="Gray">
+        <DataGrid.Styles>
+            <Style Selector="TextBlock">
+                <Setter Property="TextWrapping" Value="NoWrap" />
+                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            </Style>
+            <Style Selector="TextBox">
+                <Setter Property="TextWrapping" Value="NoWrap" />
+            </Style>
+            <Style Selector="ToolTip">
+                <Setter Property="MaxWidth" Value="1000" />
+            </Style>
+        </DataGrid.Styles>
+        <DataGrid.Columns>
+            <DataGridTemplateColumn Header="Title"
+                                    IsReadOnly="False"
+                                    Width="*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="Auto, *">
+                            <Button Command="{Binding $parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).LocateFile}"
+                                    CommandParameter="{Binding}"
+                                    IsVisible="{Binding !IsFileFoundOnDisk}"
+                                    Margin="2"
+                                    Content="&#xf071;"
+                                    VerticalContentAlignment="Center"
+                                    Background="Transparent"
+                                    Grid.Column="0"
+                                    FontFamily="{StaticResource FontAwesomeSolid}"
+                                    ToolTip.Tip="File not found; click to locate..."
+                                    IsEnabled="{Binding !$parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF}"/>
+                            <TextBlock Text="{Binding Title}" 
+                                       TextTrimming="CharacterEllipsis"
+                                       TextWrapping="NoWrap"
+                                       ToolTip.Tip="{Binding Title}"
+                                       Grid.Column="1"
+                                       Margin="8,0,4,0"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+                <DataGridTemplateColumn.CellEditingTemplate>
+                    <DataTemplate DataType="models:ReportFile">
+                        <TextBox Text="{Binding Title}"
+                                 Watermark="Title"
+                                 ToolTip.Tip="{Binding Title}"
+                                 Classes="clearButton">
+                            <TextBox.KeyBindings>
+                                <KeyBinding Command="{Binding $parent[views:CreatePDFReportView].UnfocusTextbox}" Gesture="Enter" />
+                            </TextBox.KeyBindings>
+                        </TextBox>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellEditingTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Receipt Date"
+                                    IsReadOnly="False"
+                                    Width="125">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding ReceiptDate}" 
+                               VerticalAlignment="Center"
+                               Margin="8,0,8,0"
+                               HorizontalAlignment="Left"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+                <DataGridTemplateColumn.CellEditingTemplate>
+                    <DataTemplate DataType="models:ReportFile">
+                        <CalendarDatePicker SelectedDate="{Binding ReceiptDateTime}"
+                                            DisplayDate="{Binding ReceiptDateTime}"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellEditingTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="File Name"
+                                    IsReadOnly="True"
+                                    Width="*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding FileName}" 
+                                   VerticalAlignment="Center"
+                                   ToolTip.Tip="{Binding FileName}"
+                                   Margin="8,0,8,0"
+                                   HorizontalAlignment="Left"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header=""
+                                    IsReadOnly="True"
+                                    Width="*">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="4">
+                            <Button Command="{Binding $parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).EditFileProperties}"
+                                    CommandParameter="{Binding}"
+                                    Classes="accent"
+                                    Margin="2"
+                                    IsEnabled="{Binding !$parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF}">
+                                <Button.Content>
+                                    <TextBlock><Run Text="&#xf044;" FontFamily="{StaticResource FontAwesomeSolid}"/> Edit</TextBlock>
+                                </Button.Content>
+                            </Button>
+                            <Button Command="{Binding $parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).RemoveFile}"
+                                    CommandParameter="{Binding}"
+                                    Classes="Danger"
+                                    Margin="2"
+                                    IsEnabled="{Binding !$parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF}">
+                                <Button.Content>
+                                    <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove</TextBlock>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+        </DataGrid.Columns>
+        <DataGrid.RowDetailsTemplate>
+            <DataTemplate x:DataType="models:ReportFile">
+                <Grid ColumnDefinitions="*"
+                      RowDefinitions="Auto, Auto, Auto">
+                    <TextBlock TextWrapping="Wrap" Margin="4" Grid.Row="0">
+                        <Run FontWeight="Bold" Text="File Path"/>: <Run Text="{Binding FilePath}"/>
+                    </TextBlock>
+                    <TextBlock TextWrapping="Wrap" Margin="4" Grid.Row="1">
+                        <Run FontWeight="Bold" Text="Notes"/>: <Run Text="{Binding Notes}"/>
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="8"
+                                Margin="4"
+                                Grid.Row="2">
+                        <Button Command="{Binding $parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).OpenFileLocation}" 
+                                CommandParameter="{Binding}">
+                            <Button.Content>
+                                <TextBlock FontSize="12"><Run Text="&#xf07c;" FontFamily="{StaticResource FontAwesomeSolid}"/> Open File Location</TextBlock>
+                            </Button.Content>
+                        </Button>
+                        <Button Command="{Binding $parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).OpenFile}" 
+                                CommandParameter="{Binding}">
+                            <Button.Content>
+                                <TextBlock FontSize="12"><Run Text="&#xf07c;" FontFamily="{StaticResource FontAwesomeSolid}"/> Open File</TextBlock>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+        </DataGrid.RowDetailsTemplate>
+    </DataGrid>
+    <StackPanel Orientation="Vertical"
+                HorizontalAlignment="Center"
+                Spacing="4"
+                Grid.Row="2"
+                Margin="4">
+        <StackPanel Orientation="Horizontal"
+                    Spacing="4">
+            <Button Command="{Binding AddItem}"
+                    IsEnabled="{Binding CanAddItem}">
+                <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item(s)</TextBlock>
+            </Button>
+            <Button Command="{Binding RemoveAllItems}"
+                    IsEnabled="{Binding IsCreatePDFButtonEnabled}"
+                    Classes="Danger">
+                <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove All Items</TextBlock>
+            </Button>
+            <Button Command="{Binding ResortPDFItemsByDate}"
+                    IsEnabled="{Binding IsCreatePDFButtonEnabled}">
+                <TextBlock><Run Text="&#xf162;" FontFamily="{StaticResource FontAwesomeSolid}"/> Re-sort PDF Items</TextBlock>
+            </Button>
+            <Button Command="{Binding SaveInterimReportInfo}"
+                    IsEnabled="{Binding HasWorkingFolderAndNotMakingPDF}">
+                <TextBlock><Run Text="&#xf0c7;" FontFamily="{StaticResource FontAwesomeSolid}"/> Save Report Info</TextBlock>
+            </Button>
+        </StackPanel>
+      <StackPanel Orientation="Horizontal"
+                  Spacing="6"
+                  HorizontalAlignment="Center">
+        <Button Command="{Binding BuildPDF}"
+                Classes="accent"
+                IsEnabled="{Binding IsCreatePDFButtonEnabled}">
+            <TextBlock><Run Text="&#xf1c1;" FontFamily="{StaticResource FontAwesomeSolid}"/> Create Report PDF</TextBlock>
+        </Button>
+        <Label Content="Creating PDF..."
+               IsVisible="{Binding IsCreatingPDF}"
+               VerticalAlignment="Center"/>
+        <progRing:ProgressRing Width="30" 
+                        Height="30"
+                        IsActive="{Binding IsCreatingPDF}"
+                        Foreground="{DynamicResource SystemAccentColor}"/>
+      </StackPanel>
+    </StackPanel>
+    <StackPanel Orientation="Vertical"
+                HorizontalAlignment="Stretch"
+                Spacing="2"
+                Grid.Row="3">
+        <Rectangle Fill="Gray" Height="3" HorizontalAlignment="Stretch"/>
+        <Grid ColumnDefinitions="Auto, *">
+            <Label Content="Program Log" FontSize="14" FontWeight="Bold" Grid.Column="0"/>
+            <Button Command="{Binding CopyLogToClipboard}"
+                    FontSize="10"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Margin="0,2,8,2">
+                <TextBlock><Run Text="&#xf0c5;" FontFamily="{StaticResource FontAwesomeSolid}"/> Copy Program Log to Clipboard</TextBlock>
+            </Button>
+        </Grid>
+    </StackPanel>
+    <ScrollViewer Margin="2"
+                  Grid.Row="4"
+                  x:Name="LogScrollView"
+                  VerticalScrollBarVisibility="Visible"
+                  AllowAutoHide="False">
+        <SelectableTextBlock Text="{Binding ProgramLog}"
+                            Margin="2"
+                            TextWrapping="Wrap"
+                            x:Name="LogBlock"/>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

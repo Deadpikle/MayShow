@@ -5,12 +5,11 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
-    <PublishTrimmed>true</PublishTrimmed>
-    <PublishAot>true</PublishAot>
     <AssemblyName>MayShow</AssemblyName>
     <AssemblyVersion>1.4.0</AssemblyVersion> <!-- Also update Constants version -->
+  </PropertyGroup>
+  <PropertyGroup>
+    <MSBuildDisableGetCopyToPublishDirectoryItemsOptimization>true</MSBuildDisableGetCopyToPublishDirectoryItemsOptimization>
   </PropertyGroup>
   <ItemGroup>
     <TrimmerRootAssembly Include="MigraDoc.DocumentObjectModel" />
@@ -27,21 +26,27 @@
   <ItemGroup>
     <Content Include="Assets\Fonts\Noto_Sans\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PublishFolderType>Resource</PublishFolderType>
     </Content>
     <Content Include="Assets\Fonts\Noto_Sans\static\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PublishFolderType>Resource</PublishFolderType>
     </Content>
     <Content Include="Assets\Fonts\Noto_Sans_JP\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PublishFolderType>Resource</PublishFolderType>
     </Content>
     <Content Include="Assets\Fonts\Noto_Sans_JP\static\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PublishFolderType>Resource</PublishFolderType>
     </Content>
     <Content Include="Assets\Fonts\FontAwesome\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PublishFolderType>Resource</PublishFolderType>
     </Content>
     <Content Include="Assets\LICENSES.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PublishFolderType>Resource</PublishFolderType>
     </Content>
   </ItemGroup>
   <ItemGroup>

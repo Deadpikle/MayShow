@@ -15,7 +15,7 @@ class DataGridDropHandler : BaseDataGridDropHandler<ReportFile>
     protected override bool Validate(DataGrid dg, DragEventArgs e, object? sourceContext, object? targetContext, bool execute)
     {
         if (sourceContext is not ReportFile sourceItem
-            || targetContext is not MainViewModel vm
+            || targetContext is not CreatePDFReportViewModel vm
             || dg.GetVisualAt(e.GetPosition(dg)) is not Control targetControl
             || targetControl.DataContext is not ReportFile targetItem)
         {

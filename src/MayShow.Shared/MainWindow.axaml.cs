@@ -14,7 +14,7 @@ public partial class MainWindow : Window, ITopLevelGrabber
     public MainWindow()
     {
         InitializeComponent();
-        DataContext = new MainWindowViewModel(this);
+        DataContext = new MainViewModel(this);
 
         Closing += WindowIsClosing;
 
@@ -49,14 +49,14 @@ public partial class MainWindow : Window, ITopLevelGrabber
     private async Task<bool> CheckIfClosePossible()
     {
         var canShutdown = true;
-        if (DataContext is MainWindowViewModel mwvm)
+        if (DataContext is MainViewModel mvm)
         {
-            if (mwvm is ICanCheckShutdown canCheck)
+            if (mvm is ICanCheckShutdown canCheck)
             {
                 canShutdown = await canCheck.CheckIsSafeToShutdown();
             }
             // only checking 1 level but for this app that is OK
-            if (canShutdown && mwvm.CurrentViewModel is ICanCheckShutdown currModel)
+            if (canShutdown && mvm.CurrentViewModel is ICanCheckShutdown currModel)
             {
                 try
                 {
