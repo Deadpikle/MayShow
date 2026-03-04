@@ -131,7 +131,7 @@
     </Application.Resources>
     <NativeMenu.Menu>
         <NativeMenu>
-            <NativeMenuItem Header="About ReceiptBuilder" Click="AboutOnClick" />
+            <NativeMenuItem Header="About MayShow" Click="AboutOnClick" />
         </NativeMenu>
     </NativeMenu.Menu>
 </Application>
