@@ -1,3 +1,11 @@
+https://stackoverflow.com/questions/78855900/error-ios-projects-must-build-with-publishtrimmed-true-when-trimming-is-disabl
+https://blog.verslu.is/maui/exclude-assemblies-from-trimming/
+
+-p:UseParallelGC=true for faster builds? or /p:MtouchUseLlvm=false? or -p:EnableAssemblyILStripping=false?
+possible hints for building publish iOS binaries: https://github.com/dotnet/maui/issues/25022#issuecomment-2385334527
+
+https://signpath.org/
+
 magick "2026-01-29 — \$210 — WORK PERMIT.pdf" -background white -alpha background -alpha off -density 288 -resize 25% page-%03d.jpg
 https://github.com/dlemstra/Magick.NET/blob/main/docs/ConvertPDF.md
 https://stackoverflow.com/questions/65089839/add-an-external-pdf-page-to-pdfsharp-migradoc
