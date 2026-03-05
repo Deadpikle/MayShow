@@ -4,6 +4,9 @@ https://blog.verslu.is/maui/exclude-assemblies-from-trimming/
 -p:UseParallelGC=true for faster builds? or /p:MtouchUseLlvm=false? or -p:EnableAssemblyILStripping=false?
 possible hints for building publish iOS binaries: https://github.com/dotnet/maui/issues/25022#issuecomment-2385334527
 
+linker stuff: https://blog.verslu.is/maui/exclude-assemblies-from-trimming/
+PublishFolderType documentation: https://github.com/dotnet/macios/blob/main/dotnet/BundleContents.md
+
 https://signpath.org/
 
 magick "2026-01-29 — \$210 — WORK PERMIT.pdf" -background white -alpha background -alpha off -density 288 -resize 25% page-%03d.jpg
