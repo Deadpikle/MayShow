@@ -29,10 +29,9 @@ public partial class App : Application, ITopLevelGrabber
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
-            // singleViewPlatform.MainView = new MainView();
-            // _topLevel = singleViewPlatform.MainView as TopLevel;
-            //_topLevel = TopLevel.GetTopLevel(singleViewPlatform.MainView);
-            //singleViewPlatform.MainView.DataContext = new MainViewModel(this);
+            singleViewPlatform.MainView = new MainView();
+            _topLevel = TopLevel.GetTopLevel(singleViewPlatform.MainView);
+            singleViewPlatform.MainView.DataContext = new MainViewModel(this);
         }
 
         base.OnFrameworkInitializationCompleted();
