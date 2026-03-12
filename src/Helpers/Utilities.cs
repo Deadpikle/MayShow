@@ -29,6 +29,7 @@ class Utilities
         var formats = new Dictionary<string, string> 
         {
             {@"\d{4}-\d{2}-\d{2}", "yyyy-MM-dd"},
+            {@"\d{4}.d{2}.d{2}", "yyyy.MM.dd"},
             {@"\d{8}", "yyyyMMdd"}
         };
         foreach (var data in formats)
