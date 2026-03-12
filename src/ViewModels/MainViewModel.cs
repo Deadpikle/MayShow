@@ -628,6 +628,11 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         var outputFileName = ReportTitle + ".pdf";
         var folderName = new DirectoryInfo(folderPath).Name;
         const int imageWidth = 425;
+        var imageLineFormat = new MigraDoc.DocumentObjectModel.Shapes.LineFormat()
+        {
+            Color = Colors.Black,
+            Width = Unit.FromPoint(2),
+        };;
         if (folderName.Contains('-'))
         {
             // see if year/month format
@@ -782,6 +787,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                     image.Height = 550; // make sure it will fit on one page
                 }
                 else
+                image.LineFormat = imageLineFormat.Clone();
                 {
                     image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
                 }
@@ -828,6 +834,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                         var image = paragraph.AddImage(convertedPdfImagePath);
                         image.Width = imageWidth;
                         image.LockAspectRatio = true;
+                        image.LineFormat = imageLineFormat.Clone();
                         for (var j = 1; j < pgCount; j++)
                         {
                             section.AddPageBreak();
@@ -837,6 +844,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                             image = paragraph.AddImage(convertedPdfImagePath);
                             image.LockAspectRatio = true;
                             image.Width = imageWidth;
+                            image.LineFormat = imageLineFormat.Clone();
                         }
                     }
                 }
@@ -848,6 +856,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                     var image = paragraph.AddImage(filePath);
                     image.LockAspectRatio = true;
                     image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
+                    image.LineFormat = imageLineFormat.Clone();
                     // render other PDF pages, if any
                     // see: https://stackoverflow.com/a/65091204/3938401
                     var pdfFileToAdd = PdfReader.Open(filePath, PdfDocumentOpenMode.Import);
@@ -863,6 +872,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                         image = paragraph.AddImage(filePath + "#" + j);
                         image.LockAspectRatio = true;
                         image.Width = imageWidth;
+                        image.LineFormat = imageLineFormat.Clone();
                     }
                 }
             }
