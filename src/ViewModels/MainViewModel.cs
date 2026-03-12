@@ -28,6 +28,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System.Reflection.Metadata.Ecma335;
 using Docnet.Core.Readers;
+using MigraDoc.DocumentObjectModel.Visitors;
 
 namespace MayShow.ViewModels;
 
@@ -627,7 +628,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         var pdfDoc = new Document();
         var outputFileName = ReportTitle + ".pdf";
         var folderName = new DirectoryInfo(folderPath).Name;
-        const int imageWidth = 425;
+        const int maxImageWidth = 425;
         var imageLineFormat = new MigraDoc.DocumentObjectModel.Shapes.LineFormat()
         {
             Color = Colors.Black,
@@ -649,12 +650,15 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         }
         var section = pdfDoc.AddSection();
         section.PageSetup.PageFormat = PageFormat.Letter;
-        section.PageSetup.PageWidth = "8.5in";
-        section.PageSetup.PageHeight = "11in";
-        section.PageSetup.TopMargin = "0.5in";
-        section.PageSetup.RightMargin = "0.5in";
-        section.PageSetup.BottomMargin = "0.5in";
-        section.PageSetup.LeftMargin = "0.5in";
+        const decimal pageWidth = 8.5m;
+        const decimal pageHeight = 11.0m;
+        const decimal margin = 0.5m;
+        section.PageSetup.PageWidth = pageWidth + "in";
+        section.PageSetup.PageHeight = pageHeight + "in";
+        section.PageSetup.TopMargin = margin + "in";
+        section.PageSetup.RightMargin = margin + "in";
+        section.PageSetup.BottomMargin = margin + "in";
+        section.PageSetup.LeftMargin = margin + "in";
         // setup footer for page number
         var footerPar = new Paragraph();
         footerPar.Format.Alignment = ParagraphAlignment.Center;
@@ -781,18 +785,26 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 var paragraph = section.AddParagraph();
                 paragraph.Format.Alignment = ParagraphAlignment.Center;
                 var image = paragraph.AddImage(filePath);
-                image.LockAspectRatio = true;
-                if (loadedImageHeight > 600)
-                {
-                    image.Height = 550; // make sure it will fit on one page
-                }
-                else
+                const int imageResolution = 72;
+                image.Resolution = imageResolution; // dots per inch
+                paragraph.Tag = "ImageParagraphTag";
+                // 
+                //var maxItemPxWidth = ((pageWidth - (2 * margin)) * imageResolution) - 20;
+                //var maxItemPxHeight = ((pageHeight - (2 * margin)) * imageResolution) - 20;
+                //Console.WriteLine("Max width test: {0}; height: {1}", maxItemPxWidth, maxItemPxHeight);
                 image.LineFormat = imageLineFormat.Clone();
+                // image.LockAspectRatio = true;
+                while (loadedImageHeight > 600 || loadedImageWidth > 550)
                 {
-                    image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
+                    // Console.WriteLine("Image height = {0}, width = {1}; decreasing size by 5% to h={2}, w={3}", loadedImageHeight, loadedImageWidth, (uint)Math.Floor(loadedImageHeight * 0.95), (uint)Math.Floor(loadedImageWidth * 0.95));
+                    // keep reducing size by 10% until it fits on the page
+                    loadedImageHeight = (uint)Math.Floor(loadedImageHeight * 0.95);
+                    loadedImageWidth = (uint)Math.Floor(loadedImageWidth * 0.95);
                 }
+                image.Height = loadedImageHeight;
+                image.Width = loadedImageWidth;
             }
-            else
+            else // isPDF
             {
                 // need to render PDF to images
                 if (_settings.UseDocnetPDFImageRendering)
@@ -832,7 +844,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                         var paragraph = section.AddParagraph();
                         paragraph.Format.Alignment = ParagraphAlignment.Center;
                         var image = paragraph.AddImage(convertedPdfImagePath);
-                        image.Width = imageWidth;
+                        image.Width = maxImageWidth;
                         image.LockAspectRatio = true;
                         image.LineFormat = imageLineFormat.Clone();
                         for (var j = 1; j < pgCount; j++)
@@ -843,7 +855,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                             convertedPdfImagePath = RenderPdfPageToImage(docReader, j);
                             image = paragraph.AddImage(convertedPdfImagePath);
                             image.LockAspectRatio = true;
-                            image.Width = imageWidth;
+                            image.Width = maxImageWidth;
                             image.LineFormat = imageLineFormat.Clone();
                         }
                     }
@@ -855,7 +867,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                     paragraph.Format.Alignment = ParagraphAlignment.Center;
                     var image = paragraph.AddImage(filePath);
                     image.LockAspectRatio = true;
-                    image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
+                    image.Width = maxImageWidth; // can't be too wide now...not sure why...maybe due to margins...
                     image.LineFormat = imageLineFormat.Clone();
                     // render other PDF pages, if any
                     // see: https://stackoverflow.com/a/65091204/3938401
@@ -871,7 +883,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                         paragraph.Format.Alignment = ParagraphAlignment.Center;
                         image = paragraph.AddImage(filePath + "#" + j);
                         image.LockAspectRatio = true;
-                        image.Width = imageWidth;
+                        image.Width = maxImageWidth;
                         image.LineFormat = imageLineFormat.Clone();
                     }
                 }
