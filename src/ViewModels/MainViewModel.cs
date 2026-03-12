@@ -777,7 +777,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 paragraph.Format.Alignment = ParagraphAlignment.Center;
                 var image = paragraph.AddImage(filePath);
                 image.LockAspectRatio = true;
-                if (!isPDF && loadedImageHeight > 600)
+                if (loadedImageHeight > 600)
                 {
                     image.Height = 550; // make sure it will fit on one page
                 }
