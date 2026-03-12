@@ -638,6 +638,43 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         return null;
     }
 
+    private Paragraph GetFooterParagraph()
+    {
+        var footerPar = new Paragraph();
+        footerPar.Format.Alignment = ParagraphAlignment.Center;
+        footerPar.Format.Font.Size = 10;
+        footerPar.AddText("--Page ");
+        footerPar.AddPageField();
+        footerPar.AddText(" of ");
+        footerPar.AddNumPagesField();
+        footerPar.AddText("--");
+        footerPar.AddLineBreak();
+        footerPar.AddText("Report generated on " + DateTime.Now.ToString("f"));
+        footerPar.Tag = "FooterPar";
+        footerPar.Format.Font.Name = "Noto Sans";
+        return footerPar;
+    }
+
+    private decimal GetExistingPageItemHeight(PdfDocumentRenderer pdfRenderer, decimal footerParagraphHeight)
+    {
+        pdfRenderer.DocumentRenderer.PrepareDocument();
+        var currPageCount = pdfRenderer.DocumentRenderer.FormattedDocument?.PageCount;
+        var heightForExistingItemsOnPage = footerParagraphHeight;
+        if (currPageCount.HasValue)
+        {
+            var renderInfo = pdfRenderer.DocumentRenderer.GetRenderInfoFromPage(currPageCount.Value);
+            if (renderInfo != null)
+            {
+                // Console.WriteLine("Got render info for page: {0}", currPageCount);
+                foreach (var item in renderInfo)
+                {
+                    heightForExistingItemsOnPage += (decimal)item.LayoutInfo.ContentArea.Height.Inch;
+                }
+            }
+        }
+        return heightForExistingItemsOnPage;
+    }
+
     // https://forum.pdfsharp.net/viewtopic.php?f=2&t=1025
     private async Task CreatePDF(string folderPath)
     {
@@ -649,6 +686,15 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             await DialogHost.Show(new WarningViewModel("Output directory not found! Please adjust your application Settings before continuing. Output directory: " + outputDir));
             return;
         }
+        // setup globals and consts...
+        GlobalFontSettings.FontResolver = this;
+        GlobalFontSettings.FallbackFontResolver = new FailsafeFontResolver();
+        const decimal pageWidth = 8.5m;
+        const decimal pageHeight = 11.0m;
+        const decimal margin = 0.5m;
+        const int imageResolution = 72;
+        const int imageInsertMarginPixels = 30; // we calculate max available; use max - this # for max image size
+        var maxItemPxWidth = ((pageWidth - (2 * margin)) * imageResolution) - imageInsertMarginPixels;
         // start making PDF!
         IsCreatingPDF = true;
         var pdfDoc = new Document();
@@ -674,11 +720,9 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 LogInfo("Auto-changed output file name to " + outputFileName);
             }
         }
+        // setup initial section (for page characteristics)
         var section = pdfDoc.AddSection();
         section.PageSetup.PageFormat = PageFormat.Letter;
-        const decimal pageWidth = 8.5m;
-        const decimal pageHeight = 11.0m;
-        const decimal margin = 0.5m;
         section.PageSetup.PageWidth = pageWidth + "in";
         section.PageSetup.PageHeight = pageHeight + "in";
         section.PageSetup.TopMargin = margin + "in";
@@ -686,24 +730,41 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         section.PageSetup.BottomMargin = margin + "in";
         section.PageSetup.LeftMargin = margin + "in";
         // setup footer for page number
-        var footerPar = new Paragraph();
-        footerPar.Format.Alignment = ParagraphAlignment.Center;
-        footerPar.Format.Font.Size = 10;
-        footerPar.AddText("--Page ");
-        footerPar.AddPageField();
-        footerPar.AddText(" of ");
-        footerPar.AddNumPagesField();
-        footerPar.AddText("--");
-        footerPar.AddLineBreak();
-        footerPar.AddText("Report generated on " + DateTime.Now.ToString("f"));
+        var footerPar = GetFooterParagraph();
         section.Footers.Primary.Add(footerPar);
-        // add report title
+        // create a quick PDF doc renderer to measure footer paragraph height
+        var footerParagraphHeight = 0.4m; // estimate
+        var footerOnlyPdfDoc = new Document();
+        var sectionClone = section.Clone();
+        footerOnlyPdfDoc.Add(sectionClone);
+        sectionClone.Add(GetFooterParagraph());
+        var footerPdfRenderer = new PdfDocumentRenderer
+        {
+            Document = footerOnlyPdfDoc
+        };
+        footerPdfRenderer.DocumentRenderer.PrepareDocument();
+        var footerRenderInfo = footerPdfRenderer.DocumentRenderer.GetRenderInfoFromPage(1);
+        if (footerRenderInfo != null)
+        {
+            foreach (var item in footerRenderInfo)
+            {
+                if (item.DocumentObject.Tag?.ToString() == "FooterPar")
+                {
+                    Console.WriteLine("Got footer paragraph height!");
+                    footerParagraphHeight = (decimal)item.LayoutInfo.ContentArea.Height.Inch;
+                    break;
+                }
+            }
+        }
+        // continue setting up document
+        // First page only: add report title
         var reportTitlePar = section.AddParagraph();
         reportTitlePar.Format.Alignment = ParagraphAlignment.Center;
         reportTitlePar.Format.Font.Size = 16;
         reportTitlePar.Format.Font.Bold = true;
         reportTitlePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
         reportTitlePar.AddText(ReportTitle);
+        reportTitlePar.Tag = "TitlePar";
         // get converted files directory path and create it if necessary
         var convertedDir = Path.Combine(Utilities.GetInternalDataPath(), "converted");
         if (!Directory.Exists(convertedDir))
@@ -711,8 +772,11 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             Directory.CreateDirectory(convertedDir);
         }
         //
-        GlobalFontSettings.FontResolver = this;
-        GlobalFontSettings.FallbackFontResolver = new FailsafeFontResolver();
+        var pdfRenderer = new PdfDocumentRenderer
+        {
+            Document = pdfDoc,
+            WorkingDirectory = folderPath
+        };
         var hasAddedData = false;
         for (var i = 0; i < ReportFiles.Count; i++)
         {
@@ -739,12 +803,14 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             imageTitlePar.Format.Font.Bold = true;
             imageTitlePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
             imageTitlePar.AddText(string.IsNullOrWhiteSpace(file.Title) ? file.FileName : file.Title);
+            imageTitlePar.Tag = "ReceiptTitlePar";
             var receiptDatePar = section.AddParagraph();
             receiptDatePar.Format.Alignment = ParagraphAlignment.Center;
             receiptDatePar.Format.Font.Size = 12;
             receiptDatePar.Format.Font.Bold = true;
             receiptDatePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
             receiptDatePar.AddText(file.ReceiptDate.ToString("yyyy-MM-dd"));
+            receiptDatePar.Tag = "ReceiptDatePar";
             if (!string.IsNullOrWhiteSpace(file.Notes))
             {
                 var imageNotesPar = section.AddParagraph();
@@ -753,8 +819,10 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 imageNotesPar.Format.Font.Bold = false;
                 imageNotesPar.Format.Font.Name = "Noto Sans JP";
                 imageNotesPar.AddText(file.Notes);
+                imageNotesPar.Tag = "ReceiptNotesPar";
             }
-            section.AddParagraph(); // add empty line for spacing
+            var emptyPar = section.AddParagraph(); // add empty line for spacing
+            emptyPar.Tag = "EmptyParagraph";
             // now add the image
             var lowerName = fileName.ToLower();
             var isPDF = lowerName.EndsWith(".pdf");
@@ -807,23 +875,26 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                     filePath = convertedOutputPath;
                     LogInfo(string.Format("Saved adjusted image to JPEG; file path is now {0}", filePath));                    
                 }
+                // do some calculations...
+                // render up to now on this page and get height remaining in inches
+                var currPageCount = pdfRenderer.DocumentRenderer.FormattedDocument?.PageCount;
+                var heightForExistingItemsOnPage = GetExistingPageItemHeight(pdfRenderer, footerParagraphHeight);
+                var remainingHeightInches = pageHeight - (2 * margin) - heightForExistingItemsOnPage;
+                var remainingHeightPixels = (remainingHeightInches * imageResolution) - imageInsertMarginPixels;
                 // write to PDF
                 var paragraph = section.AddParagraph();
                 paragraph.Format.Alignment = ParagraphAlignment.Center;
                 var image = paragraph.AddImage(filePath);
-                const int imageResolution = 72;
                 image.Resolution = imageResolution; // dots per inch
-                paragraph.Tag = "ImageParagraphTag";
-                // 
-                //var maxItemPxWidth = ((pageWidth - (2 * margin)) * imageResolution) - 20;
-                //var maxItemPxHeight = ((pageHeight - (2 * margin)) * imageResolution) - 20;
-                //Console.WriteLine("Max width test: {0}; height: {1}", maxItemPxWidth, maxItemPxHeight);
+                image.Tag = "ReceiptImageTag";
+                paragraph.Tag = "ReceiptImageParagraphTag";
                 image.LineFormat = imageLineFormat.Clone();
-                // image.LockAspectRatio = true;
-                while (loadedImageHeight > 600 || loadedImageWidth > 550)
+                // resize down until it will fit on the page
+                while (loadedImageHeight > remainingHeightPixels || loadedImageWidth > maxItemPxWidth)
                 {
                     // Console.WriteLine("Image height = {0}, width = {1}; decreasing size by 5% to h={2}, w={3}", loadedImageHeight, loadedImageWidth, (uint)Math.Floor(loadedImageHeight * 0.95), (uint)Math.Floor(loadedImageWidth * 0.95));
-                    // keep reducing size by 10% until it fits on the page
+                    // keep reducing size by 5% (little by little) until it fits on the page
+                    // ...might skew ever so slightly but should not be noticable...
                     loadedImageHeight = (uint)Math.Floor(loadedImageHeight * 0.95);
                     loadedImageWidth = (uint)Math.Floor(loadedImageWidth * 0.95);
                 }
@@ -917,13 +988,10 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             LogInfo(string.Format("Added image: {0} ({1})", file.Title, filePath));
             hasAddedData = true;
         }
-        var pdfRenderer = new PdfDocumentRenderer
-        {
-            Document = pdfDoc,
-            WorkingDirectory = folderPath
-        };
         LogInfo("Rendering document to PDF file...");
+        pdfRenderer.DocumentRenderer.PrepareDocument(); // needed if you make edits after first PrepareDocument() is called
         pdfRenderer.RenderDocument();
+        // actually save to disk now
         string outputPDFFilePath = Path.Join(outputDir, outputFileName);
         LogInfo("Saving PDF document to disk...");
         pdfRenderer.PdfDocument.Save(outputPDFFilePath);
