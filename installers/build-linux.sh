@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="1.4.1"
+VERSION="1.4.2"
 SRC_DIR="src" # user ran script from main folder
 if [ ! -d "$SRC_DIR" ]; then
     SRC_DIR= "../src" # try 
