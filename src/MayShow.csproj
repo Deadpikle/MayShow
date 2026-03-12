@@ -12,7 +12,7 @@
     <PublishTrimmed>true</PublishTrimmed>
     <PublishAot>true</PublishAot>
     <AssemblyName>MayShow</AssemblyName>
-    <AssemblyVersion>1.4.0</AssemblyVersion> <!-- Also update Constants version -->
+    <AssemblyVersion>1.4.1</AssemblyVersion> <!-- Also update Constants version -->
     <ApplicationIcon>MayShow-icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
