@@ -577,6 +577,24 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     public byte[]? GetFont(string faceName)
     {
         LogInfo(string.Format("Loading font {0}", faceName));
+        if (faceName == "Noto Sans")
+        {
+            var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans/static/NotoSans-Regular.ttf");
+            if (!File.Exists(path))
+            {
+                path = Path.Combine(_processDir, "../Resources/Assets/Fonts/Noto_Sans/static/NotoSans-Regular.ttf");
+            }
+            return File.ReadAllBytes(path);
+        }
+        if (faceName == "Noto Sans Bold")
+        {
+            var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans/static/NotoSans-Bold.ttf");
+            if (!File.Exists(path))
+            {
+                path = Path.Combine(_processDir, "../Resources/Assets/Fonts/Noto_Sans/static/NotoSans-Bold.ttf");
+            }
+            return File.ReadAllBytes(path);
+        }
         if (faceName == "Noto Sans JP")
         {
             var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf");
@@ -601,6 +619,14 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     public FontResolverInfo? ResolveTypeface(string familyName, bool bold, bool italic)
     {
         // LogInfo(string.Format("Resolving font name {0}", familyName));
+        if (familyName == "Noto Sans")
+        {
+            if (bold)
+            {
+                return new FontResolverInfo(familyName + " Bold");
+            }
+            return new FontResolverInfo(familyName);
+        }
         if (familyName == "Noto Sans JP")
         {
             if (bold)
