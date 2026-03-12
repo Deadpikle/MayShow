@@ -834,6 +834,14 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             var info = new FileInfo(file.FilePath);
             uint loadedImageWidth = 0;
             uint loadedImageHeight = 0;
+            // get max pixel height remaining for items on this page
+            // (For multi-page PDFs, showing page 2 and on will have more height since they have no title, 
+            // but to keep things consistent we will use the same height for all PDF pages.)
+            // render up to now on this page and get height remaining in inches
+            var currPageCount = pdfRenderer.DocumentRenderer.FormattedDocument?.PageCount;
+            var heightForExistingItemsOnPage = GetExistingPageItemHeight(pdfRenderer, footerParagraphHeight);
+            var remainingHeightInches = pageHeight - (2 * margin) - heightForExistingItemsOnPage;
+            var remainingHeightPixels = (remainingHeightInches * imageResolution) - imageInsertMarginPixels;
             if (!isPDF)
             {
                 using var mImage = new MagickImage(info.FullName);
@@ -875,12 +883,6 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                     filePath = convertedOutputPath;
                     LogInfo(string.Format("Saved adjusted image to JPEG; file path is now {0}", filePath));                    
                 }
-                // do some calculations...
-                // render up to now on this page and get height remaining in inches
-                var currPageCount = pdfRenderer.DocumentRenderer.FormattedDocument?.PageCount;
-                var heightForExistingItemsOnPage = GetExistingPageItemHeight(pdfRenderer, footerParagraphHeight);
-                var remainingHeightInches = pageHeight - (2 * margin) - heightForExistingItemsOnPage;
-                var remainingHeightPixels = (remainingHeightInches * imageResolution) - imageInsertMarginPixels;
                 // write to PDF
                 var paragraph = section.AddParagraph();
                 paragraph.Format.Alignment = ParagraphAlignment.Center;
@@ -940,10 +942,23 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                             pgCount == 1 ? "" : "s"));
                         var paragraph = section.AddParagraph();
                         paragraph.Format.Alignment = ParagraphAlignment.Center;
+                        // get image height/width off of disk so we can resize down if needed
                         var image = paragraph.AddImage(convertedPdfImagePath);
-                        image.Width = maxImageWidth;
                         image.LockAspectRatio = true;
                         image.LineFormat = imageLineFormat.Clone();
+                        using (var firstPdfPageImage = new MagickImage(convertedPdfImagePath))
+                        {
+                            var pdfPageImageWidth = firstPdfPageImage.Width;
+                            var pdfPageImageHeight = firstPdfPageImage.Height;
+                            // resize down until it will fit on the page
+                            while (pdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
+                            {
+                                pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * 0.95);
+                                pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * 0.95);
+                            }
+                            image.Height = pdfPageImageHeight;
+                            image.Width = pdfPageImageWidth;
+                        }
                         for (var j = 1; j < pgCount; j++)
                         {
                             section.AddPageBreak();
@@ -954,11 +969,28 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                             image.LockAspectRatio = true;
                             image.Width = maxImageWidth;
                             image.LineFormat = imageLineFormat.Clone();
+                            using (var otherPdfPageImage = new MagickImage(convertedPdfImagePath))
+                            {
+                                var pdfPageImageWidth = otherPdfPageImage.Width;
+                                var pdfPageImageHeight = otherPdfPageImage.Height;
+                                // resize down until it will fit on the page
+                                while (pdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
+                                {
+                                    pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * 0.95);
+                                    pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * 0.95);
+                                }
+                                image.Height = pdfPageImageHeight;
+                                image.Width = pdfPageImageWidth;
+                            }
                         }
                     }
                 }
                 else
                 {
+                    // use older, not-docnet rendering method.
+                    // uses MigraDoc rendering. Does not work with annotations, and since Migradoc
+                    // doesn't let us know how big the image is, we can't do the image resizing, so
+                    // we just do our best.
                     // render first page (eventually need to improve code to just do everything in a loop)
                     var paragraph = section.AddParagraph();
                     paragraph.Format.Alignment = ParagraphAlignment.Center;
