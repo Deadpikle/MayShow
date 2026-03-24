@@ -1,10 +1,12 @@
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using Tmds.DBus.Protocol;
 
 namespace MayShows.Helpers;
 
@@ -23,16 +25,27 @@ class Utilities
     public static DateOnly? CheckValidDateInString(string str)
     {
         // https://stackoverflow.com/a/14918404/3938401
-        var rgx = new Regex(@"\d{4}-\d{2}-\d{2}");
-        var mat = rgx.Match(str);
-        if (mat.Success)
+        // formats = regex format -> DateTime parsing format
+        var formats = new Dictionary<string, string> 
         {
-            var dtStr = mat.ToString();
-            string[] formats = ["yyyy-MM-dd"];
-            DateTime parsedDateTime;
-            var didWork = DateTime.TryParseExact(dtStr, formats, CultureInfo.InvariantCulture,
-                                        DateTimeStyles.None, out parsedDateTime);
-            return didWork ? DateOnly.FromDateTime(parsedDateTime) : null;
+            {@"\d{4}-\d{2}-\d{2}", "yyyy-MM-dd"},
+            {@"\d{4}.d{2}.d{2}", "yyyy.MM.dd"},
+            {@"\d{8}", "yyyyMMdd"}
+        };
+        foreach (var data in formats)
+        {
+            var rgx = new Regex(data.Key);
+            var mat = rgx.Match(str);
+            if (mat.Success)
+            {
+                var dtStr = mat.ToString();
+                var didWork = DateTime.TryParseExact(dtStr, [data.Value], CultureInfo.InvariantCulture,
+                                            DateTimeStyles.None, out var parsedDateTime);
+                if (didWork)
+                {
+                    return DateOnly.FromDateTime(parsedDateTime);
+                }
+            }
         }
         return null;
     }

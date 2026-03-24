@@ -18,6 +18,7 @@ using PdfSharp.Snippets.Font;
 using MayShow.Interfaces;
 using MayShow.Models;
 using MayShow.Helpers;
+using MayShows.Helpers;
 
 namespace MayShow.ViewModels;
 
@@ -123,6 +124,18 @@ class SettingsViewModel: ChangeNotifier
                 var folder = folders[0];
                 OutputPdfDirPath = folder.Path.LocalPath;
             }
+        }
+    }
+
+    public void OpenSettingsDir()
+    {
+        var topLevel = _topLevelGrabber?.GetTopLevel();
+        Console.WriteLine(Utilities.GetInternalDataPath());
+        var dirName = Utilities.GetInternalDataPath();
+        if (topLevel is not null && dirName != null)
+        {
+            var launcher = topLevel.Launcher;
+            launcher.LaunchUriAsync(new Uri(dirName));
         }
     }
 

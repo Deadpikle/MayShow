@@ -28,6 +28,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System.Reflection.Metadata.Ecma335;
 using Docnet.Core.Readers;
+using MigraDoc.DocumentObjectModel.Visitors;
 
 namespace MayShow.ViewModels;
 
@@ -576,6 +577,24 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     public byte[]? GetFont(string faceName)
     {
         LogInfo(string.Format("Loading font {0}", faceName));
+        if (faceName == "Noto Sans")
+        {
+            var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans/static/NotoSans-Regular.ttf");
+            if (!File.Exists(path))
+            {
+                path = Path.Combine(_processDir, "../Resources/Assets/Fonts/Noto_Sans/static/NotoSans-Regular.ttf");
+            }
+            return File.ReadAllBytes(path);
+        }
+        if (faceName == "Noto Sans Bold")
+        {
+            var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans/static/NotoSans-Bold.ttf");
+            if (!File.Exists(path))
+            {
+                path = Path.Combine(_processDir, "../Resources/Assets/Fonts/Noto_Sans/static/NotoSans-Bold.ttf");
+            }
+            return File.ReadAllBytes(path);
+        }
         if (faceName == "Noto Sans JP")
         {
             var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf");
@@ -600,6 +619,14 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     public FontResolverInfo? ResolveTypeface(string familyName, bool bold, bool italic)
     {
         // LogInfo(string.Format("Resolving font name {0}", familyName));
+        if (familyName == "Noto Sans")
+        {
+            if (bold)
+            {
+                return new FontResolverInfo(familyName + " Bold");
+            }
+            return new FontResolverInfo(familyName);
+        }
         if (familyName == "Noto Sans JP")
         {
             if (bold)
@@ -609,6 +636,43 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             return new FontResolverInfo(familyName);
         }
         return null;
+    }
+
+    private Paragraph GetFooterParagraph()
+    {
+        var footerPar = new Paragraph();
+        footerPar.Format.Alignment = ParagraphAlignment.Center;
+        footerPar.Format.Font.Size = 10;
+        footerPar.AddText("--Page ");
+        footerPar.AddPageField();
+        footerPar.AddText(" of ");
+        footerPar.AddNumPagesField();
+        footerPar.AddText("--");
+        footerPar.AddLineBreak();
+        footerPar.AddText("Report generated on " + DateTime.Now.ToString("f"));
+        footerPar.Tag = "FooterPar";
+        footerPar.Format.Font.Name = "Noto Sans";
+        return footerPar;
+    }
+
+    private decimal GetExistingPageItemHeight(PdfDocumentRenderer pdfRenderer, decimal footerParagraphHeight)
+    {
+        pdfRenderer.DocumentRenderer.PrepareDocument();
+        var currPageCount = pdfRenderer.DocumentRenderer.FormattedDocument?.PageCount;
+        var heightForExistingItemsOnPage = footerParagraphHeight;
+        if (currPageCount.HasValue)
+        {
+            var renderInfo = pdfRenderer.DocumentRenderer.GetRenderInfoFromPage(currPageCount.Value);
+            if (renderInfo != null)
+            {
+                // Console.WriteLine("Got render info for page: {0}", currPageCount);
+                foreach (var item in renderInfo)
+                {
+                    heightForExistingItemsOnPage += (decimal)item.LayoutInfo.ContentArea.Height.Inch;
+                }
+            }
+        }
+        return heightForExistingItemsOnPage;
     }
 
     // https://forum.pdfsharp.net/viewtopic.php?f=2&t=1025
@@ -622,12 +686,26 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             await DialogHost.Show(new WarningViewModel("Output directory not found! Please adjust your application Settings before continuing. Output directory: " + outputDir));
             return;
         }
+        // setup globals and consts...
+        GlobalFontSettings.FontResolver = this;
+        GlobalFontSettings.FallbackFontResolver = new FailsafeFontResolver();
+        const decimal pageWidth = 8.5m;
+        const decimal pageHeight = 11.0m;
+        const decimal margin = 0.5m;
+        const int imageResolution = 72;
+        const int imageInsertMarginPixels = 30; // we calculate max available; use max - this # for max image size
+        var maxItemPxWidth = ((pageWidth - (2 * margin)) * imageResolution) - imageInsertMarginPixels;
         // start making PDF!
         IsCreatingPDF = true;
         var pdfDoc = new Document();
         var outputFileName = ReportTitle + ".pdf";
         var folderName = new DirectoryInfo(folderPath).Name;
-        const int imageWidth = 425;
+        const int maxImageWidth = 425;
+        var imageLineFormat = new MigraDoc.DocumentObjectModel.Shapes.LineFormat()
+        {
+            Color = Colors.Black,
+            Width = Unit.FromPoint(2),
+        };;
         if (folderName.Contains('-'))
         {
             // see if year/month format
@@ -642,33 +720,51 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 LogInfo("Auto-changed output file name to " + outputFileName);
             }
         }
+        // setup initial section (for page characteristics)
         var section = pdfDoc.AddSection();
         section.PageSetup.PageFormat = PageFormat.Letter;
-        section.PageSetup.PageWidth = "8.5in";
-        section.PageSetup.PageHeight = "11in";
-        section.PageSetup.TopMargin = "0.5in";
-        section.PageSetup.RightMargin = "0.5in";
-        section.PageSetup.BottomMargin = "0.5in";
-        section.PageSetup.LeftMargin = "0.5in";
+        section.PageSetup.PageWidth = pageWidth + "in";
+        section.PageSetup.PageHeight = pageHeight + "in";
+        section.PageSetup.TopMargin = margin + "in";
+        section.PageSetup.RightMargin = margin + "in";
+        section.PageSetup.BottomMargin = margin + "in";
+        section.PageSetup.LeftMargin = margin + "in";
         // setup footer for page number
-        var footerPar = new Paragraph();
-        footerPar.Format.Alignment = ParagraphAlignment.Center;
-        footerPar.Format.Font.Size = 10;
-        footerPar.AddText("--Page ");
-        footerPar.AddPageField();
-        footerPar.AddText(" of ");
-        footerPar.AddNumPagesField();
-        footerPar.AddText("--");
-        footerPar.AddLineBreak();
-        footerPar.AddText("Report generated on " + DateTime.Now.ToString("f"));
+        var footerPar = GetFooterParagraph();
         section.Footers.Primary.Add(footerPar);
-        // add report title
+        // create a quick PDF doc renderer to measure footer paragraph height
+        var footerParagraphHeight = 0.4m; // estimate
+        var footerOnlyPdfDoc = new Document();
+        var sectionClone = section.Clone();
+        footerOnlyPdfDoc.Add(sectionClone);
+        sectionClone.Add(GetFooterParagraph());
+        var footerPdfRenderer = new PdfDocumentRenderer
+        {
+            Document = footerOnlyPdfDoc
+        };
+        footerPdfRenderer.DocumentRenderer.PrepareDocument();
+        var footerRenderInfo = footerPdfRenderer.DocumentRenderer.GetRenderInfoFromPage(1);
+        if (footerRenderInfo != null)
+        {
+            foreach (var item in footerRenderInfo)
+            {
+                if (item.DocumentObject.Tag?.ToString() == "FooterPar")
+                {
+                    Console.WriteLine("Got footer paragraph height!");
+                    footerParagraphHeight = (decimal)item.LayoutInfo.ContentArea.Height.Inch;
+                    break;
+                }
+            }
+        }
+        // continue setting up document
+        // First page only: add report title
         var reportTitlePar = section.AddParagraph();
         reportTitlePar.Format.Alignment = ParagraphAlignment.Center;
         reportTitlePar.Format.Font.Size = 16;
         reportTitlePar.Format.Font.Bold = true;
         reportTitlePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
         reportTitlePar.AddText(ReportTitle);
+        reportTitlePar.Tag = "TitlePar";
         // get converted files directory path and create it if necessary
         var convertedDir = Path.Combine(Utilities.GetInternalDataPath(), "converted");
         if (!Directory.Exists(convertedDir))
@@ -676,8 +772,11 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             Directory.CreateDirectory(convertedDir);
         }
         //
-        GlobalFontSettings.FontResolver = this;
-        GlobalFontSettings.FallbackFontResolver = new FailsafeFontResolver();
+        var pdfRenderer = new PdfDocumentRenderer
+        {
+            Document = pdfDoc,
+            WorkingDirectory = folderPath
+        };
         var hasAddedData = false;
         for (var i = 0; i < ReportFiles.Count; i++)
         {
@@ -704,12 +803,14 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             imageTitlePar.Format.Font.Bold = true;
             imageTitlePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
             imageTitlePar.AddText(string.IsNullOrWhiteSpace(file.Title) ? file.FileName : file.Title);
+            imageTitlePar.Tag = "ReceiptTitlePar";
             var receiptDatePar = section.AddParagraph();
             receiptDatePar.Format.Alignment = ParagraphAlignment.Center;
             receiptDatePar.Format.Font.Size = 12;
             receiptDatePar.Format.Font.Bold = true;
             receiptDatePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
             receiptDatePar.AddText(file.ReceiptDate.ToString("yyyy-MM-dd"));
+            receiptDatePar.Tag = "ReceiptDatePar";
             if (!string.IsNullOrWhiteSpace(file.Notes))
             {
                 var imageNotesPar = section.AddParagraph();
@@ -718,8 +819,10 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 imageNotesPar.Format.Font.Bold = false;
                 imageNotesPar.Format.Font.Name = "Noto Sans JP";
                 imageNotesPar.AddText(file.Notes);
+                imageNotesPar.Tag = "ReceiptNotesPar";
             }
-            section.AddParagraph(); // add empty line for spacing
+            var emptyPar = section.AddParagraph(); // add empty line for spacing
+            emptyPar.Tag = "EmptyParagraph";
             // now add the image
             var lowerName = fileName.ToLower();
             var isPDF = lowerName.EndsWith(".pdf");
@@ -731,6 +834,14 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             var info = new FileInfo(file.FilePath);
             uint loadedImageWidth = 0;
             uint loadedImageHeight = 0;
+            // get max pixel height remaining for items on this page
+            // (For multi-page PDFs, showing page 2 and on will have more height since they have no title, 
+            // but to keep things consistent we will use the same height for all PDF pages.)
+            // render up to now on this page and get height remaining in inches
+            var currPageCount = pdfRenderer.DocumentRenderer.FormattedDocument?.PageCount;
+            var heightForExistingItemsOnPage = GetExistingPageItemHeight(pdfRenderer, footerParagraphHeight);
+            var remainingHeightInches = pageHeight - (2 * margin) - heightForExistingItemsOnPage;
+            var remainingHeightPixels = (remainingHeightInches * imageResolution) - imageInsertMarginPixels;
             if (!isPDF)
             {
                 using var mImage = new MagickImage(info.FullName);
@@ -776,17 +887,23 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 var paragraph = section.AddParagraph();
                 paragraph.Format.Alignment = ParagraphAlignment.Center;
                 var image = paragraph.AddImage(filePath);
-                image.LockAspectRatio = true;
-                if (!isPDF && loadedImageHeight > 600)
+                image.Resolution = imageResolution; // dots per inch
+                image.Tag = "ReceiptImageTag";
+                paragraph.Tag = "ReceiptImageParagraphTag";
+                image.LineFormat = imageLineFormat.Clone();
+                // resize down until it will fit on the page
+                while (loadedImageHeight > remainingHeightPixels || loadedImageWidth > maxItemPxWidth)
                 {
-                    image.Height = 550; // make sure it will fit on one page
+                    // Console.WriteLine("Image height = {0}, width = {1}; decreasing size by 5% to h={2}, w={3}", loadedImageHeight, loadedImageWidth, (uint)Math.Floor(loadedImageHeight * 0.95), (uint)Math.Floor(loadedImageWidth * 0.95));
+                    // keep reducing size by 5% (little by little) until it fits on the page
+                    // ...might skew ever so slightly but should not be noticable...
+                    loadedImageHeight = (uint)Math.Floor(loadedImageHeight * 0.95);
+                    loadedImageWidth = (uint)Math.Floor(loadedImageWidth * 0.95);
                 }
-                else
-                {
-                    image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
-                }
+                image.Height = loadedImageHeight;
+                image.Width = loadedImageWidth;
             }
-            else
+            else // isPDF
             {
                 // need to render PDF to images
                 if (_settings.UseDocnetPDFImageRendering)
@@ -825,9 +942,23 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                             pgCount == 1 ? "" : "s"));
                         var paragraph = section.AddParagraph();
                         paragraph.Format.Alignment = ParagraphAlignment.Center;
+                        // get image height/width off of disk so we can resize down if needed
                         var image = paragraph.AddImage(convertedPdfImagePath);
-                        image.Width = imageWidth;
                         image.LockAspectRatio = true;
+                        image.LineFormat = imageLineFormat.Clone();
+                        using (var firstPdfPageImage = new MagickImage(convertedPdfImagePath))
+                        {
+                            var pdfPageImageWidth = firstPdfPageImage.Width;
+                            var pdfPageImageHeight = firstPdfPageImage.Height;
+                            // resize down until it will fit on the page
+                            while (pdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
+                            {
+                                pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * 0.95);
+                                pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * 0.95);
+                            }
+                            image.Height = pdfPageImageHeight;
+                            image.Width = pdfPageImageWidth;
+                        }
                         for (var j = 1; j < pgCount; j++)
                         {
                             section.AddPageBreak();
@@ -836,18 +967,37 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                             convertedPdfImagePath = RenderPdfPageToImage(docReader, j);
                             image = paragraph.AddImage(convertedPdfImagePath);
                             image.LockAspectRatio = true;
-                            image.Width = imageWidth;
+                            image.Width = maxImageWidth;
+                            image.LineFormat = imageLineFormat.Clone();
+                            using (var otherPdfPageImage = new MagickImage(convertedPdfImagePath))
+                            {
+                                var pdfPageImageWidth = otherPdfPageImage.Width;
+                                var pdfPageImageHeight = otherPdfPageImage.Height;
+                                // resize down until it will fit on the page
+                                while (pdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
+                                {
+                                    pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * 0.95);
+                                    pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * 0.95);
+                                }
+                                image.Height = pdfPageImageHeight;
+                                image.Width = pdfPageImageWidth;
+                            }
                         }
                     }
                 }
                 else
                 {
+                    // use older, not-docnet rendering method.
+                    // uses MigraDoc rendering. Does not work with annotations, and since Migradoc
+                    // doesn't let us know how big the image is, we can't do the image resizing, so
+                    // we just do our best.
                     // render first page (eventually need to improve code to just do everything in a loop)
                     var paragraph = section.AddParagraph();
                     paragraph.Format.Alignment = ParagraphAlignment.Center;
                     var image = paragraph.AddImage(filePath);
                     image.LockAspectRatio = true;
-                    image.Width = imageWidth; // can't be too wide now...not sure why...maybe due to margins...
+                    image.Width = maxImageWidth; // can't be too wide now...not sure why...maybe due to margins...
+                    image.LineFormat = imageLineFormat.Clone();
                     // render other PDF pages, if any
                     // see: https://stackoverflow.com/a/65091204/3938401
                     var pdfFileToAdd = PdfReader.Open(filePath, PdfDocumentOpenMode.Import);
@@ -862,20 +1012,18 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                         paragraph.Format.Alignment = ParagraphAlignment.Center;
                         image = paragraph.AddImage(filePath + "#" + j);
                         image.LockAspectRatio = true;
-                        image.Width = imageWidth;
+                        image.Width = maxImageWidth;
+                        image.LineFormat = imageLineFormat.Clone();
                     }
                 }
             }
             LogInfo(string.Format("Added image: {0} ({1})", file.Title, filePath));
             hasAddedData = true;
         }
-        var pdfRenderer = new PdfDocumentRenderer
-        {
-            Document = pdfDoc,
-            WorkingDirectory = folderPath
-        };
         LogInfo("Rendering document to PDF file...");
+        pdfRenderer.DocumentRenderer.PrepareDocument(); // needed if you make edits after first PrepareDocument() is called
         pdfRenderer.RenderDocument();
+        // actually save to disk now
         string outputPDFFilePath = Path.Join(outputDir, outputFileName);
         LogInfo("Saving PDF document to disk...");
         pdfRenderer.PdfDocument.Save(outputPDFFilePath);

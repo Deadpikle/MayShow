@@ -47,6 +47,11 @@
                            VerticalAlignment="Top"/>
             </Grid>
             <CheckBox IsChecked="{Binding SaveReportJsonDataInInternalDir}">Save report data (names, notes, etc.) in MayShow settings directory (saves in working directory by default)</CheckBox>
+        <Button Command="{Binding OpenSettingsDir}">
+                <TextBlock>
+                    <Run Text="&#xf07c;"
+                        FontFamily="{StaticResource FontAwesomeSolid}" /> Open MayShow Settings Directory</TextBlock>
+            </Button>
             <TextBlock TextWrapping="Wrap"
                        Foreground="Red"
                        Text="{Binding ErrorMessage}"
