@@ -12,7 +12,7 @@ class MainViewModel : ChangeNotifier, IChangeViewModel
     public MainViewModel(ITopLevelGrabber topLevelGrabber)
     {
         _viewModels = new Stack<BaseViewModel>();
-        var initialViewModel = new CreatePDFReportViewModel(this)
+        var initialViewModel = new StartNewChooseReportViewModel(this)
         {
             TopLevelGrabber = topLevelGrabber
         };

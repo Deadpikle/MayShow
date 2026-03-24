@@ -1,0 +1,82 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+             x:Class="MayShow.Views.StartNewChooseReport"
+             xmlns:models="clr-namespace:MayShow.Models"
+             xmlns:vm="clr-namespace:MayShow.ViewModels"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             x:DataType="vm:StartNewChooseReportViewModel">
+    <Grid ColumnDefinitions="100, *, 100"
+          RowDefinitions="Auto, Auto, Auto, Auto, Auto, *">
+        <TextBlock HorizontalAlignment="Center"
+                   FontSize="36"
+                   FontWeight="Bold"
+                   Margin="0,16,0,0"
+                   Grid.Column="1"
+                   Grid.Row="0">
+            MayShow <Run Text="{Binding Version}"/>
+        </TextBlock>
+        <Image Source="avares://MayShow/Assets/MayShowIcon.png" 
+               Width="125"
+               Margin="0,24,0,0"
+               HorizontalAlignment="Center"
+               Grid.Column="1"
+               Grid.Row="1" />
+        <Label Content="Start New Project"
+               HorizontalAlignment="Left"
+               FontSize="18"
+               FontWeight="Bold"
+               Margin="0,24,0,0"
+               Grid.Column="1"
+               Grid.Row="2"/>
+        <Grid HorizontalAlignment="Stretch"
+              ColumnDefinitions="*, Auto"
+              Margin="0,8,0,0"
+              Grid.Column="1"
+              Grid.Row="3">
+            <TextBox Watermark="Report Title"
+                     Classes="clearButton"
+                     Text="{Binding CreatingReportTitle}"
+                     VerticalAlignment="Stretch"
+                     HorizontalAlignment="Stretch"
+                     TextWrapping="Wrap"
+                     Margin="0,0,16,0"
+                     Grid.Column="0" />
+            <Button Command="{Binding StartReport}"
+                    Classes="accent"
+                    Grid.Column="1">
+                <TextBlock>
+                    <Run Text="&#xe494;"
+                        FontFamily="{StaticResource FontAwesomeSolid}" /> Create and Start Report</TextBlock>
+            </Button>
+        </Grid>
+        <Label Content="Load Existing Project"
+               FontSize="18"
+               FontWeight="Bold"
+               HorizontalAlignment="Left"
+               Margin="0,16,0,0"
+               Grid.Column="1"
+               Grid.Row="4"/>
+        <ScrollViewer Margin="0,8,0,8"
+                      Grid.Column="1"
+                      Grid.Row="5"
+                      VerticalScrollBarVisibility="Visible"
+                      AllowAutoHide="False"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding SavedReports}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding}" />
+                            <!-- TODO: buttons to load, delete reports -->
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
