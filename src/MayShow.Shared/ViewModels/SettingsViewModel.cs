@@ -130,7 +130,6 @@ class SettingsViewModel: ChangeNotifier
     public void OpenSettingsDir()
     {
         var topLevel = _topLevelGrabber?.GetTopLevel();
-        Console.WriteLine(Utilities.GetInternalDataPath());
         var dirName = Utilities.GetInternalDataPath();
         if (topLevel is not null && dirName != null)
         {
