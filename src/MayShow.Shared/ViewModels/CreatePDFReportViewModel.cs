@@ -650,6 +650,19 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         return heightForExistingItemsOnPage;
     }
 
+    private Paragraph MakeParagraph(Section section, string text, bool isBold, int fontSize, string tag, bool isCenter = true)
+    {
+        const string defaultFontName = "Noto Sans JP";
+        var par = section.AddParagraph();
+        par.Format.Alignment = isCenter ? ParagraphAlignment.Center : ParagraphAlignment.Left;
+        par.Format.Font.Size = fontSize;
+        par.Format.Font.Bold = isBold;
+        par.Format.Font.Name = defaultFontName; // has english letters in it, too
+        par.AddText(text);
+        par.Tag = tag;
+        return par;
+    }
+
     // https://forum.pdfsharp.net/viewtopic.php?f=2&t=1025
     private async Task CreatePDF(string folderPath)
     {
@@ -675,6 +688,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         var outputFileName = ReportTitle + ".pdf";
         var folderName = new DirectoryInfo(folderPath).Name;
         const int maxImageWidth = 425;
+        var convertedDir = Utilities.GetTempConvertedImagesFolderPath();
         var imageLineFormat = new MigraDoc.DocumentObjectModel.Shapes.LineFormat()
         {
             Color = Colors.Black,
@@ -732,19 +746,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
         // continue setting up document
         // First page only: add report title
-        var reportTitlePar = section.AddParagraph();
-        reportTitlePar.Format.Alignment = ParagraphAlignment.Center;
-        reportTitlePar.Format.Font.Size = 16;
-        reportTitlePar.Format.Font.Bold = true;
-        reportTitlePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
-        reportTitlePar.AddText(ReportTitle);
-        reportTitlePar.Tag = "TitlePar";
-        // get converted files directory path and create it if necessary
-        var convertedDir = Path.Combine(Utilities.GetInternalDataPath(), "converted");
-        if (!Directory.Exists(convertedDir))
-        {
-            Directory.CreateDirectory(convertedDir);
-        }
+        MakeParagraph(section, ReportTitle, true, 16, "TitlePar");
         //
         var pdfRenderer = new PdfDocumentRenderer
         {
@@ -771,29 +773,12 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             {
                 section.AddPageBreak();
             }
-            var imageTitlePar = section.AddParagraph();
-            imageTitlePar.Format.Alignment = ParagraphAlignment.Center;
-            imageTitlePar.Format.Font.Size = 12;
-            imageTitlePar.Format.Font.Bold = true;
-            imageTitlePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
-            imageTitlePar.AddText(string.IsNullOrWhiteSpace(file.Title) ? file.FileName : file.Title);
-            imageTitlePar.Tag = "ReceiptTitlePar";
-            var receiptDatePar = section.AddParagraph();
-            receiptDatePar.Format.Alignment = ParagraphAlignment.Center;
-            receiptDatePar.Format.Font.Size = 12;
-            receiptDatePar.Format.Font.Bold = true;
-            receiptDatePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
-            receiptDatePar.AddText(file.ReceiptDate.ToString("yyyy-MM-dd"));
-            receiptDatePar.Tag = "ReceiptDatePar";
+            var imageTitle = string.IsNullOrWhiteSpace(file.Title) ? file.FileName : file.Title;
+            var imageTitlePar = MakeParagraph(section, imageTitle, true, 12, "ReceiptTitlePar");
+            MakeParagraph(section, file.ReceiptDate.ToString("yyyy-MM-dd"), true, 12, "ReceiptDatePar");
             if (!string.IsNullOrWhiteSpace(file.Notes))
             {
-                var imageNotesPar = section.AddParagraph();
-                imageNotesPar.Format.Alignment = ParagraphAlignment.Center;
-                imageNotesPar.Format.Font.Size = 10;
-                imageNotesPar.Format.Font.Bold = false;
-                imageNotesPar.Format.Font.Name = "Noto Sans JP";
-                imageNotesPar.AddText(file.Notes);
-                imageNotesPar.Tag = "ReceiptNotesPar";
+                var imageNotesPar = MakeParagraph(section, file.Notes, false, 10, "ReceiptNotesPar");
             }
             var emptyPar = section.AddParagraph(); // add empty line for spacing
             emptyPar.Tag = "EmptyParagraph";
@@ -1003,7 +988,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         pdfRenderer.PdfDocument.Save(outputPDFFilePath);
         LogInfo("Finished saving PDF output to: " + outputPDFFilePath);
         await CreateAndSaveReportObjectAfterReportCreation();
-        // clean up data dir
+        // clean up converted files data dir
         Directory.Delete(convertedDir, true);
         // show output folder to user
         OpenFolderForFileInFileViewer(outputPDFFilePath);

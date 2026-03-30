@@ -62,4 +62,15 @@ class Utilities
         }
         return path;
     }
+
+    public static string GetTempConvertedImagesFolderPath()
+    {
+        // get converted files directory path and create it if necessary
+        var convertedDir = Path.Combine(Utilities.GetInternalDataPath(), "converted");
+        if (!Directory.Exists(convertedDir))
+        {
+            Directory.CreateDirectory(convertedDir);
+        }
+        return convertedDir;        
+    }
 }
