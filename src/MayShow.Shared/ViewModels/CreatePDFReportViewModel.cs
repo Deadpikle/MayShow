@@ -681,6 +681,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         const decimal margin = 0.5m;
         const int imageResolution = 72;
         const int imageInsertMarginPixels = 30; // we calculate max available; use max - this # for max image size
+        const decimal reduceImageSizeAmount = 0.95m;
         var maxItemPxWidth = ((pageWidth - (2 * margin)) * imageResolution) - imageInsertMarginPixels;
         // start making PDF!
         IsCreatingPDF = true;
@@ -853,11 +854,11 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                 // resize down until it will fit on the page
                 while (loadedImageHeight > remainingHeightPixels || loadedImageWidth > maxItemPxWidth)
                 {
-                    // Console.WriteLine("Image height = {0}, width = {1}; decreasing size by 5% to h={2}, w={3}", loadedImageHeight, loadedImageWidth, (uint)Math.Floor(loadedImageHeight * 0.95), (uint)Math.Floor(loadedImageWidth * 0.95));
+                    // Console.WriteLine("Image height = {0}, width = {1}; decreasing size by 5% to h={2}, w={3}", loadedImageHeight, loadedImageWidth, (uint)Math.Floor(loadedImageHeight * reduceImageSizeAmount), (uint)Math.Floor(loadedImageWidth * reduceImageSizeAmount));
                     // keep reducing size by 5% (little by little) until it fits on the page
                     // ...might skew ever so slightly but should not be noticable...
-                    loadedImageHeight = (uint)Math.Floor(loadedImageHeight * 0.95);
-                    loadedImageWidth = (uint)Math.Floor(loadedImageWidth * 0.95);
+                    loadedImageHeight = (uint)Math.Floor(loadedImageHeight * reduceImageSizeAmount);
+                    loadedImageWidth = (uint)Math.Floor(loadedImageWidth * reduceImageSizeAmount);
                 }
                 image.Height = loadedImageHeight;
                 image.Width = loadedImageWidth;
@@ -912,8 +913,8 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                             // resize down until it will fit on the page
                             while (pdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
                             {
-                                pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * 0.95);
-                                pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * 0.95);
+                                pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * reduceImageSizeAmount);
+                                pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * reduceImageSizeAmount);
                             }
                             image.Height = pdfPageImageHeight;
                             image.Width = pdfPageImageWidth;
@@ -935,8 +936,8 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                                 // resize down until it will fit on the page
                                 while (pdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
                                 {
-                                    pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * 0.95);
-                                    pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * 0.95);
+                                    pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * reduceImageSizeAmount);
+                                    pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * reduceImageSizeAmount);
                                 }
                                 image.Height = pdfPageImageHeight;
                                 image.Width = pdfPageImageWidth;
