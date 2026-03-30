@@ -44,15 +44,17 @@ class StartNewChooseReportViewModel : BaseViewModel
 
     public async void StartReport()
     {
+        if (string.IsNullOrWhiteSpace(CreatingReportTitle))
+        {
+            await DialogHost.Show(new WarningViewModel("Report title cannot be blank!"));
+            return;
+        }
+        // TODO: if report with name already exists in system, error
         var reportInfo = new PDFReportInfo()
         {
             Title = CreatingReportTitle,
             LastSaved = DateTime.Now
         };
-        _settings.AllReportInfo.Add(reportInfo);
-        // ... this sort and save is slow, technically, but we're not going to have millions of items here, so...
-        SavedReports = new ObservableCollection<PDFReportInfo>(_settings.AllReportInfo.OrderBy(x => x.Title));
-        await _settings.SaveSettingsAsync();
         // create folder for report data
         var path = Path.Combine(Utilities.GetInternalDataPath(), reportInfo.UUID);
         while (Directory.Exists(path))
@@ -61,8 +63,13 @@ class StartNewChooseReportViewModel : BaseViewModel
             path = Path.Combine(Utilities.GetInternalDataPath(), reportInfo.UUID);
         }
         Directory.CreateDirectory(path);
+        reportInfo.BaseFolder = path; // default to internal directory
+        _settings.AllReportInfo.Add(reportInfo);
+        // ... this sort and save is slow, technically, but we're not going to have millions of items here, so...
+        SavedReports = new ObservableCollection<PDFReportInfo>(_settings.AllReportInfo.OrderBy(x => x.Title));
+        await _settings.SaveSettingsAsync();
         // now update UI
-        ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(ViewModelChanger)
+        ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
         {
             ReportTitle = CreatingReportTitle
         });
@@ -73,6 +80,10 @@ class StartNewChooseReportViewModel : BaseViewModel
     public void LoadExistingReportImpl(PDFReportInfo reportInfo)
     {
         // TODO: load data and send to create PDF report view model
+        ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
+        {
+            ReportTitle = CreatingReportTitle
+        });
     }
 
     public void DeleteExistingReport(object info) => DeleteExistingReportImpl((PDFReportInfo) info);

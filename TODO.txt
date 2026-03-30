@@ -1,3 +1,10 @@
+----iOS----
+
+-quickstart for loading last edited report on main menu
+-option/setting to put picture data into internal data dir for backup (always on for mobile)
+
+-----------
+
 https://stackoverflow.com/questions/78855900/error-ios-projects-must-build-with-publishtrimmed-true-when-trimming-is-disabl
 https://blog.verslu.is/maui/exclude-assemblies-from-trimming/
 

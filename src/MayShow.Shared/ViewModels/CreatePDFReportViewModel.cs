@@ -48,12 +48,18 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     private bool _hasUnsavedWork;
 
-    public CreatePDFReportViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
+    private CreatePDFReportViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
-        _isPerformingInitialLoad = true;
         _processDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
         Console.WriteLine("Internal storage directory is: {0}", Utilities.GetInternalDataPath());
         _isCreatingPDF = false;
+        _workingFolder = "";
+        ReportFiles = _reportFiles = new ObservableCollection<ReportFile>();
+        _reportTitle = "";
+        _lastGeneratedTime = null;
+        _settings = Settings.LoadSettings(); // TODO: needs tweaking
+        HasUnsavedWork = false;
+        // setup initial quote and program log data
         var quotes = Constants.GetQuotes();
         Random random = new Random();
         var quoteIndex = random.Next(0, quotes.Length);
@@ -62,21 +68,50 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         _programLog += "---------------------------------------" + Environment.NewLine;
         _programLog += "Loaded and ready to create report!" + Environment.NewLine;
         _programLog += "Please copy and send this Program Log when reporting any issues with the software.";
-        _workingFolder = "";
-        ReportFiles = _reportFiles = new ObservableCollection<ReportFile>();
-        _reportTitle = "";
-        _lastGeneratedTime = null;
-        _settings = Settings.LoadSettings();
-        if (!string.IsNullOrWhiteSpace(_settings.LastUsedPath))
+    }
+
+    // this is the "normal path" into the pdf report view
+    // pathToLoad is presumably _settings.LastUsedPath but doesn't have to be
+    public CreatePDFReportViewModel(string pathToLoad, IChangeViewModel viewModelChanger) : this(viewModelChanger)
+    {
+        _isPerformingInitialLoad = true;
+        // TODO: load settings properly
+        if (!string.IsNullOrWhiteSpace(pathToLoad))
         {
-            LogInfo("Loading data at last used path of {0}", _settings.LastUsedPath);
-            ScanFolder(_settings.LastUsedPath);
+            LogInfo("Loading report data at path: {0}", pathToLoad);
+            ScanFolder(pathToLoad);
         }
         else
         {
             LogInfo("Choose a receipt folder to begin...");
         }
-        HasUnsavedWork = false;
+        _isPerformingInitialLoad = false;
+    }
+
+    public CreatePDFReportViewModel(PDFReportInfo reportInfo, IChangeViewModel viewModelChanger) : this(viewModelChanger)
+    {
+        _isPerformingInitialLoad = true;
+        // todo: load settings properly!
+        // if BaseFolder set, regardless of where the JSON data is saved,
+        // the working data (pictures, etc.) is outside of the current, working folder
+        if (!string.IsNullOrWhiteSpace(reportInfo.BaseFolder))
+        {
+            LogInfo("Loading report data at path: {0}", reportInfo.BaseFolder);
+            ScanFolder(reportInfo.BaseFolder);
+        }
+        else
+        {
+            // load data file in internal dir + UUID
+            var path = Path.Combine(Utilities.GetInternalDataPath(), reportInfo.UUID);
+            if (Directory.Exists(path))
+            {
+                ScanFolder(path); // even if points internally will be A-OK
+            }
+            else
+            {
+                // TODO: error
+            }
+        }
         _isPerformingInitialLoad = false;
     }
 

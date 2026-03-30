@@ -20,6 +20,16 @@ class PDFReport : PDFReportInfo
         _lastGenerated = null;
     }
 
+    public PDFReport(PDFReportInfo info) : base()
+    {
+        _files = [];
+        _lastGenerated = null;
+        BaseFolder = info.BaseFolder;
+        UUID = info.UUID;
+        Title = info.Title;
+        LastSaved = info.LastSaved;
+    }
+
     public List<ReportFile> Files
     {
         get => _files;

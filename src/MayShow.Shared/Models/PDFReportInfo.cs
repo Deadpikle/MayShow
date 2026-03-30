@@ -12,7 +12,7 @@ namespace MayShow.Models;
 
 class PDFReportInfo : ChangeNotifier
 {
-    private string? _baseFolder; // might be null
+    private string? _baseFolder; // might be null; if set, use this to know where (initial) working dir is
     private string _uuid;
     private string _title;
     private DateTime? _lastSaved;
@@ -52,6 +52,15 @@ class PDFReportInfo : ChangeNotifier
     public void ResetUUID()
     {
         UUID = Guid.NewGuid().ToString();
+    }
+
+    public string GetWorkingPath()
+    {
+        if (string.IsNullOrWhiteSpace(BaseFolder))
+        {
+            return Path.Combine(Utilities.GetInternalDataPath(), UUID);
+        }
+        return BaseFolder;
     }
     
     public void DeleteInternalFolderFromDisk()
