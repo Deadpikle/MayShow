@@ -8,6 +8,7 @@ using MayShow.Interfaces;
 using MayShow.Models;
 using MayShow.Helpers;
 using MayShows.Helpers;
+using System;
 
 namespace MayShow.ViewModels;
 
@@ -46,9 +47,10 @@ class StartNewChooseReportViewModel : BaseViewModel
         var reportInfo = new PDFReportInfo()
         {
             Title = CreatingReportTitle,
+            LastSaved = DateTime.Now
         };
         _settings.AllReportInfo.Add(reportInfo);
-        // ... this sort is slow, technically, but we're not going to have millions of items here, so...
+        // ... this sort and save is slow, technically, but we're not going to have millions of items here, so...
         SavedReports = new ObservableCollection<PDFReportInfo>(_settings.AllReportInfo.OrderBy(x => x.Title));
         await _settings.SaveSettingsAsync();
         // create folder for report data
@@ -66,7 +68,6 @@ class StartNewChooseReportViewModel : BaseViewModel
         });
         CreatingReportTitle = ""; // when user comes back they can start another new report
     }
-
 
     public void LoadExistingReport(object info) => LoadExistingReportImpl((PDFReportInfo) info);
     public void LoadExistingReportImpl(PDFReportInfo reportInfo)

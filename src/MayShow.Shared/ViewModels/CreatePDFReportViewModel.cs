@@ -32,7 +32,7 @@ using MigraDoc.DocumentObjectModel.Visitors;
 
 namespace MayShow.ViewModels;
 
-class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
+class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 {
     private bool _isPerformingInitialLoad;
     private string _processDir;
@@ -173,7 +173,7 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         }
     }
 
-    private void LogInfo(string message, params object[]? arguments)
+    public void LogInfo(string message, params object[]? arguments)
     {
         var timestamp = string.Format("[{0:s}]", DateTime.Now);
         Console.WriteLine(timestamp + " " + message, arguments);
@@ -409,7 +409,11 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
 
     public async void RemoveAllItems()
     {
-        var result = await DialogHost.Show(new ConfirmViewModel("Warning!", "Are you sure you want to remove all items from this report?", "Remove All Items", "Cancel"));
+        var result = await DialogHost.Show(new ConfirmViewModel("Warning!", "Are you sure you want to remove all items from this report?", "Remove All Items", "Cancel")
+        {
+            ConfirmButtonUsesDangerStyle = true,
+            ConfirmTitleIcon = "\uf1f8;"
+        });
         if (result != null && (bool)result)
         {
             ReportFiles.Clear();
@@ -574,70 +578,6 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         }
     }
 
-    public byte[]? GetFont(string faceName)
-    {
-        LogInfo(string.Format("Loading font {0}", faceName));
-        if (faceName == "Noto Sans")
-        {
-            var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans/static/NotoSans-Regular.ttf");
-            if (!File.Exists(path))
-            {
-                path = Path.Combine(_processDir, "../Resources/Assets/Fonts/Noto_Sans/static/NotoSans-Regular.ttf");
-            }
-            return File.ReadAllBytes(path);
-        }
-        if (faceName == "Noto Sans Bold")
-        {
-            var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans/static/NotoSans-Bold.ttf");
-            if (!File.Exists(path))
-            {
-                path = Path.Combine(_processDir, "../Resources/Assets/Fonts/Noto_Sans/static/NotoSans-Bold.ttf");
-            }
-            return File.ReadAllBytes(path);
-        }
-        if (faceName == "Noto Sans JP")
-        {
-            var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf");
-            if (!File.Exists(path))
-            {
-                path = Path.Combine(_processDir, "../Resources/Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf");
-            }
-            return File.ReadAllBytes(path);
-        }
-        if (faceName == "Noto Sans JP Bold")
-        {
-            var path = Path.Combine(_processDir, "Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-SemiBold.ttf");
-            if (!File.Exists(path))
-            {
-                path = Path.Combine(_processDir, "../Resources/Assets/Fonts/Noto_Sans_JP/static/NotoSansJP-SemiBold.ttf");
-            }
-            return File.ReadAllBytes(path);
-        }
-        return null;
-    }
-
-    public FontResolverInfo? ResolveTypeface(string familyName, bool bold, bool italic)
-    {
-        // LogInfo(string.Format("Resolving font name {0}", familyName));
-        if (familyName == "Noto Sans")
-        {
-            if (bold)
-            {
-                return new FontResolverInfo(familyName + " Bold");
-            }
-            return new FontResolverInfo(familyName);
-        }
-        if (familyName == "Noto Sans JP")
-        {
-            if (bold)
-            {
-                return new FontResolverInfo(familyName + " Bold");
-            }
-            return new FontResolverInfo(familyName);
-        }
-        return null;
-    }
-
     private Paragraph GetFooterParagraph()
     {
         var footerPar = new Paragraph();
@@ -678,7 +618,6 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     // https://forum.pdfsharp.net/viewtopic.php?f=2&t=1025
     private async Task CreatePDF(string folderPath)
     {
-        // TODO: calculate needed width for images based on page width and margins and all that?
         // safety checks
         var outputDir = _settings.SaveOutputPdfInWorkingDir ? folderPath : _settings.OutputPdfDir;
         if (!Directory.Exists(outputDir))
@@ -687,7 +626,7 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             return;
         }
         // setup globals and consts...
-        GlobalFontSettings.FontResolver = this;
+        GlobalFontSettings.FontResolver = new PDFFontResolver(_processDir, this);
         GlobalFontSettings.FallbackFontResolver = new FailsafeFontResolver();
         const decimal pageWidth = 8.5m;
         const decimal pageHeight = 11.0m;
