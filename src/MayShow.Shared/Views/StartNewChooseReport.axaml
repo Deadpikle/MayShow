@@ -26,7 +26,7 @@
                HorizontalAlignment="Center"
                Grid.Column="1"
                Grid.Row="1" />
-        <Label Content="Start New Project"
+        <Label Content="Start New Report"
                HorizontalAlignment="Left"
                FontSize="18"
                FontWeight="Bold"
@@ -38,7 +38,7 @@
               Margin="0,8,0,0"
               Grid.Column="1"
               Grid.Row="3">
-            <TextBox Watermark="Report Title"
+            <TextBox Watermark="Feb 2024 Report"
                      Classes="clearButton"
                      Text="{Binding CreatingReportTitle}"
                      VerticalAlignment="Stretch"
@@ -54,14 +54,14 @@
                         FontFamily="{StaticResource FontAwesomeSolid}" /> Create and Start Report</TextBlock>
             </Button>
         </Grid>
-        <Label Content="Load Existing Project"
+        <Label Content="Load Existing Report"
                FontSize="18"
                FontWeight="Bold"
                HorizontalAlignment="Left"
                Margin="0,16,0,0"
                Grid.Column="1"
                Grid.Row="4"/>
-        <ScrollViewer Margin="0,8,0,8"
+        <ScrollViewer Margin="0,8,0,32"
                       Grid.Column="1"
                       Grid.Row="5"
                       VerticalScrollBarVisibility="Visible"
@@ -69,10 +69,38 @@
                       HorizontalScrollBarVisibility="Disabled">
             <ItemsControl ItemsSource="{Binding SavedReports}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding}" />
-                            <!-- TODO: buttons to load, delete reports -->
+                    <DataTemplate x:DataType="models:PDFReportInfo">
+                        <StackPanel Orientation="Vertical"
+                                    Margin="12,4,4,8"
+                                    Spacing="4">
+                            <TextBlock Text="{Binding Title}" />
+                            <!-- <TextBlock Text="{Binding BaseFolder}" 
+                                       Foreground="Gray"
+                                       TextWrapping="Wrap" /> -->
+                            <TextBlock Foreground="Gray"
+                                       TextWrapping="Wrap">
+                                Last saved on: <Run Text="{Binding LastSaved, StringFormat='{}{0:yyyy-MM-dd}'}"/>
+                            </TextBlock>
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="8">
+                                <Button Command="{Binding $parent[UserControl].((vm:StartNewChooseReportViewModel)DataContext).LoadExistingReport}"
+                                        CommandParameter="{Binding}"
+                                        Classes="accent"
+                                        Grid.Column="1">
+                                    <TextBlock>
+                                        <Run Text="&#xf56f;"
+                                            FontFamily="{StaticResource FontAwesomeSolid}" /> Load Report</TextBlock>
+                                </Button>
+                                <Button Command="{Binding $parent[UserControl].((vm:StartNewChooseReportViewModel)DataContext).DeleteExistingReport}"
+                                        CommandParameter="{Binding}"
+                                        Classes="Danger"
+                                        Grid.Column="1">
+                                    <TextBlock>
+                                        <Run Text="&#xf1f8;"
+                                            FontFamily="{StaticResource FontAwesomeSolid}" /> Delete Report</TextBlock>
+                                </Button>
+                            </StackPanel>
+                            <Rectangle Fill="Gray" Height="2" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

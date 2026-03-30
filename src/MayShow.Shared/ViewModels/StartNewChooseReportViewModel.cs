@@ -1,43 +1,30 @@
 #nullable enable
 
-using System;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using Avalonia.Platform.Storage;
-using Avalonia.Themes.Fluent;
 using DialogHostAvalonia;
-using ImageMagick;
-using MigraDoc.DocumentObjectModel;
-using MigraDoc.Rendering;
-using PdfSharp.Fonts;
-using PdfSharp.Pdf.IO;
-using PdfSharp.Snippets.Font;
 using MayShow.Interfaces;
 using MayShow.Models;
 using MayShow.Helpers;
+using MayShows.Helpers;
 
 namespace MayShow.ViewModels;
 
 class StartNewChooseReportViewModel : BaseViewModel
 {
     private string _creatingReportTitle;
-    private ObservableCollection<string> _savedReports;
+    private ObservableCollection<PDFReportInfo> _savedReports;
+    private Settings _settings;
 
     public StartNewChooseReportViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
         _creatingReportTitle = "";
-        // TODO: load existing reports
-        _savedReports = [];
-        for (var i = 1; i <= 100; i++)
-        {
-            _savedReports.Add("Report " + i);
-        }
+        _settings = Settings.LoadSettings();
+        _savedReports = new ObservableCollection<PDFReportInfo>(_settings.AllReportInfo.OrderBy(x => x.Title));
     }
 
-    public string Version
+    public static string Version
     {
         get => Constants.AppVersion;
     }
@@ -48,30 +35,66 @@ class StartNewChooseReportViewModel : BaseViewModel
         set { _creatingReportTitle = value; NotifyPropertyChanged(); }
     }
 
-    public ObservableCollection<string> SavedReports
+    public ObservableCollection<PDFReportInfo> SavedReports
     {
         get => _savedReports;
         set { _savedReports = value; NotifyPropertyChanged(); }
     }
 
-    public void StartReport()
+    public async void StartReport()
     {
-        // TODO: make sure there is a folder and everything set up for this report
+        var reportInfo = new PDFReportInfo()
+        {
+            Title = CreatingReportTitle,
+        };
+        _settings.AllReportInfo.Add(reportInfo);
+        // ... this sort is slow, technically, but we're not going to have millions of items here, so...
+        SavedReports = new ObservableCollection<PDFReportInfo>(_settings.AllReportInfo.OrderBy(x => x.Title));
+        await _settings.SaveSettingsAsync();
+        // create folder for report data
+        var path = Path.Combine(Utilities.GetInternalDataPath(), reportInfo.UUID);
+        while (Directory.Exists(path))
+        {
+            reportInfo.ResetUUID();
+            path = Path.Combine(Utilities.GetInternalDataPath(), reportInfo.UUID);
+        }
+        Directory.CreateDirectory(path);
+        // now update UI
         ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(ViewModelChanger)
         {
             ReportTitle = CreatingReportTitle
         });
         CreatingReportTitle = ""; // when user comes back they can start another new report
-        // TODO: add to existing reports list
     }
 
-    public void LoadExistingReport()
+
+    public void LoadExistingReport(object info) => LoadExistingReportImpl((PDFReportInfo) info);
+    public void LoadExistingReportImpl(PDFReportInfo reportInfo)
     {
         // TODO: load data and send to create PDF report view model
     }
 
-    public void DeleteExistingReport()
+    public void DeleteExistingReport(object info) => DeleteExistingReportImpl((PDFReportInfo) info);
+    public async void DeleteExistingReportImpl(PDFReportInfo reportInfo)
     {
-        // TODO: warn user, delete if they want to proceed
+        var message = string.IsNullOrWhiteSpace(reportInfo.BaseFolder)
+            ? "Are you sure you want to delete this report and its associated data? It will be gone forever!"
+            : "Are you sure you want to delete information about this report? It will be gone forever!";
+        var result = await DialogHost.Show(new ConfirmViewModel(
+            "Warning!", 
+            message, 
+            "Delete Report", 
+            "Cancel")
+        {
+            ConfirmButtonUsesDangerStyle = true,
+            ConfirmTitleIcon = "\uf1f8;"
+        });
+        if (result != null && (bool)result)
+        {
+            SavedReports.Remove(reportInfo);
+            _settings.AllReportInfo.Remove(reportInfo);
+            reportInfo.DeleteInternalFolderFromDisk(); // delete internal data if available
+            await _settings.SaveSettingsAsync(); // update saved items list
+        }
     }
 }

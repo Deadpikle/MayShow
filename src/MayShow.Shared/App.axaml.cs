@@ -39,7 +39,7 @@ public partial class App : Application, ITopLevelGrabber
 
     public TopLevel GetTopLevel()
     {
-        return _topLevel;
+        return _topLevel!;
     }
 
     public void AboutOnClick(object? sender, EventArgs args)

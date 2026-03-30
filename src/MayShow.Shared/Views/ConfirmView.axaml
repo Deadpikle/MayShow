@@ -20,16 +20,21 @@
                    MaxWidth="350"
                    Text="{Binding Message}"/>
         <StackPanel Orientation="Horizontal"
-                    Spacing="12"
+                    Spacing="16"
                     HorizontalAlignment="Right"
                     Margin="4">
             <Button Command="{Binding Decline}"
                     Content="{Binding DeclineTitle}"
                     HorizontalAlignment="Right"/>
             <Button Command="{Binding Confirm}"
-                    Classes="accent"
-                    Content="{Binding ConfirmTitle}"
-                    HorizontalAlignment="Right"/>
+                    Classes.accent="{Binding ConfirmButtonIsAccent}"
+                    Classes.Danger="{Binding ConfirmButtonIsDanger}"
+                    HorizontalAlignment="Right">
+                <TextBlock>
+                    <Run Text="{Binding ConfirmTitleIcon}"
+                        FontFamily="{StaticResource FontAwesomeSolid}" /> <Run Text="{Binding ConfirmTitle}"/>
+                </TextBlock>
+            </Button>
         </StackPanel>
     </StackPanel>
 </UserControl>

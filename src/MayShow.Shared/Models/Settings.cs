@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -18,10 +19,11 @@ class Settings : ChangeNotifier
     private string _outputPdfDir;
     private decimal _imageResizeThreshold;
     private bool _saveReportJsonDataInInternalDir;
-    private Dictionary<string, string> _workingFolderToInternalFolderName;
+    private Dictionary<string, string> _workingFolderToInternalFolderName; // obsolete
+    private List<PDFReportInfo> _allReportInfo;
     public int _settingsVersion;
 
-    public Settings()
+    public Settings() : base()
     {
         _lastUsedPath = "";
         _useDocnetPDFImageRendering = true;
@@ -30,7 +32,8 @@ class Settings : ChangeNotifier
         _imageResizeThreshold = 1.5m;
         _saveReportJsonDataInInternalDir = false;
         _workingFolderToInternalFolderName = [];
-        _settingsVersion = 1;
+        _allReportInfo = [];
+        _settingsVersion = 2;
     }
 
     public Settings(Settings other)
@@ -43,6 +46,7 @@ class Settings : ChangeNotifier
         _saveReportJsonDataInInternalDir = other.SaveReportJsonDataInInternalDir;
         _workingFolderToInternalFolderName = other.WorkingFolderToInternalFolderName;
         _settingsVersion = other.SettingsVersion;
+        _allReportInfo = other.AllReportInfo;
     }
 
     [JsonInclude]
@@ -96,6 +100,13 @@ class Settings : ChangeNotifier
     }
 
     [JsonInclude]
+    public List<PDFReportInfo> AllReportInfo
+    {
+        get => _allReportInfo;
+        set { _allReportInfo = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
     public int SettingsVersion
     {
         get => _settingsVersion;
@@ -135,6 +146,39 @@ class Settings : ChangeNotifier
         return json;
     }
 
+    private static Settings UpgradeSettings(Settings settings)
+    {
+        if (settings.SettingsVersion == 1)
+        {
+            // update settings
+            var internalPath = Utilities.GetInternalDataPath();
+            var list = new List<PDFReportInfo>();
+            foreach (var data in settings.WorkingFolderToInternalFolderName)
+            {
+                var uuid = data.Value;
+                var path = Path.Combine(internalPath, uuid, Constants.ReportSavedDataFileName);
+                var json = File.ReadAllText(path);
+                var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
+                var report = File.Exists(path) ? JsonSerializer.Deserialize(json, jsonContext.PDFReport) : null;
+                var reportTitle = report?.Title ?? "";
+                var lastSaved = report?.LastSaved;
+                var reportInfo = new PDFReportInfo()
+                {
+                    Title = reportTitle,
+                    UUID = uuid,
+                    LastSaved = lastSaved,
+                    BaseFolder = data.Key,
+                };
+                list.Add(reportInfo);
+            }
+            settings.AllReportInfo = list.OrderBy(x => x.Title).ToList();
+            settings.WorkingFolderToInternalFolderName = []; // clear this list; it is no longer used
+            settings.SettingsVersion = 2;
+            // TODO: finish using new array for everything, make sure we save data, etc.
+        }
+        return settings;
+    }
+
     public static Settings LoadSettings()
     {
         var path = GetSettingsPath();
@@ -144,7 +188,7 @@ class Settings : ChangeNotifier
         }
         var json = File.ReadAllText(GetSettingsPath());
         var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
-        return JsonSerializer.Deserialize<Settings>(json, jsonContext.Settings) ?? new Settings();
+        return UpgradeSettings(JsonSerializer.Deserialize<Settings>(json, jsonContext.Settings) ?? new Settings());
     }
 
     public static async Task<Settings> LoadSettingsAsync()
@@ -152,6 +196,6 @@ class Settings : ChangeNotifier
         using FileStream fileStream = File.OpenRead(GetSettingsPath());
         var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
         var output = await JsonSerializer.DeserializeAsync<Settings>(fileStream, jsonContext.Settings) ?? new Settings();
-        return output;
+        return UpgradeSettings(output);
     }
 }

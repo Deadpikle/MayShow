@@ -253,13 +253,13 @@ class CreatePDFReportViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 // load prior report
                 var json = File.ReadAllText(reportFilePath);
                 var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
-                var report = JsonSerializer.Deserialize<PDFReport>(json, jsonContext.PDFReport);
+                var report = JsonSerializer.Deserialize(json, jsonContext.PDFReport);
                 if (report != null && report.Files.Count > 0)
                 {
                     Console.WriteLine("Loading prior report data at {0}", reportFilePath);
                     ReportFiles = new ObservableCollection<ReportFile>(report.Files);
                     ReportTitle = report.Title;
-                    WorkingFolder = report.BaseFolder;
+                    WorkingFolder = report.BaseFolder ?? "";
                     _lastGeneratedTime = report.LastGenerated ?? null;
                     LogInfo("Reloaded report last saved at {0}", report.LastSaved);
                     successfullyLoadedPriorReport = true;

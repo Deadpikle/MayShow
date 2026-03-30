@@ -9,45 +9,21 @@ using MayShow.Helpers;
 
 namespace MayShow.Models;
 
-class PDFReport : ChangeNotifier
+class PDFReport : PDFReportInfo
 {
-    private string _baseFolder;
-    private string _title;
     private List<ReportFile> _files;
-    private DateTime _lastSaved;
     private DateTime? _lastGenerated;
 
-    public PDFReport()
+    public PDFReport() : base()
     {
-        _baseFolder = "";
-        _title = "";
         _files = [];
-        _lastSaved = DateTime.Now;
         _lastGenerated = null;
-    }
-
-    public string BaseFolder
-    {
-        get => _baseFolder;
-        set { _baseFolder = value; NotifyPropertyChanged(); }
-    }
-
-    public string Title
-    {
-        get => _title;
-        set { _title = value; NotifyPropertyChanged(); }
     }
 
     public List<ReportFile> Files
     {
         get => _files;
         set { _files = value; NotifyPropertyChanged(); }
-    }
-
-    public DateTime LastSaved
-    {
-        get => _lastSaved;
-        set { _lastSaved = value; NotifyPropertyChanged(); }
     }
 
     public DateTime? LastGenerated
