@@ -12,7 +12,7 @@ class BaseViewModel : ChangeNotifier
     IChangeViewModel _viewModelChanger;
     ITopLevelGrabber? _topLevelGrabber;
 
-    public BaseViewModel(IChangeViewModel viewModelChanger)
+    public BaseViewModel(IChangeViewModel viewModelChanger): base()
     {
         _viewModelChanger = viewModelChanger;
         _topLevelGrabber = null;

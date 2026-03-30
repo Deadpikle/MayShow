@@ -29,7 +29,7 @@ class SettingsViewModel: ChangeNotifier
     private string _errorMessage;
     private ITopLevelGrabber? _topLevelGrabber;
 
-    public SettingsViewModel(Settings settingsToEdit, ITopLevelGrabber? topLevelGrabber)
+    public SettingsViewModel(Settings settingsToEdit, ITopLevelGrabber? topLevelGrabber): base()
     {
         _previousSettings = settingsToEdit;
         _settings = new Settings(settingsToEdit); // clone it

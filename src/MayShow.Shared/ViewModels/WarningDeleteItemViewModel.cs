@@ -8,7 +8,7 @@ class WarningDeleteItemViewModel : ChangeNotifier
 {
     ReportFile _file;
 
-    public WarningDeleteItemViewModel(ReportFile file)
+    public WarningDeleteItemViewModel(ReportFile file): base()
     {
         _file = file;
     }

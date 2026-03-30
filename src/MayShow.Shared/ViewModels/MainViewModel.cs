@@ -9,7 +9,7 @@ class MainViewModel : ChangeNotifier, IChangeViewModel
     BaseViewModel _currentViewModel;
     Stack<BaseViewModel> _viewModels;
 
-    public MainViewModel(ITopLevelGrabber topLevelGrabber)
+    public MainViewModel(ITopLevelGrabber topLevelGrabber): base()
     {
         _viewModels = new Stack<BaseViewModel>();
         var initialViewModel = new StartNewChooseReportViewModel(this)

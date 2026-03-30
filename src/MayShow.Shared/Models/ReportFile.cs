@@ -12,7 +12,7 @@ class ReportFile : ChangeNotifier
     private string _notes;
     private string _filePath;
 
-    public ReportFile()
+    public ReportFile() : base()
     {
         _title = "";
         _receiptDateTime = DateTime.Now;
