@@ -526,7 +526,9 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     public void ResortPDFItemsByDate()
     {
         LogInfo("Sorting report files list...");
-        ReportFiles = new ObservableCollection<ReportFile>(ReportFiles.OrderBy(x => x.ReceiptDateTime));
+        ReportFiles = new ObservableCollection<ReportFile>(
+            ReportFiles.OrderBy(x => x.ReceiptDateTime)
+                       .ThenBy(x => x.Title));
         HasUnsavedWork = true;
     }
 
