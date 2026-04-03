@@ -19,27 +19,22 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 {
     private bool _isPerformingInitialLoad;
     private string _processDir;
+    private string _programLog;
     private bool _isCreatingPDF;
-    private string _programLog = "";
-    private string _workingFolder;
 
-    private string _reportTitle;
-    private ObservableCollection<ReportFile> _reportFiles;
-    private DateTime? _lastGeneratedTime;
+    private PDFReport _pdfReport;
 
     private Settings _settings;
-
     private bool _hasUnsavedWork;
 
     private CreatePDFReportViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
+        _pdfReport = new PDFReport();
         _processDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
         Console.WriteLine("Internal storage directory is: {0}", Utilities.GetInternalDataPath());
         _isCreatingPDF = false;
-        _workingFolder = "";
-        ReportFiles = _reportFiles = new ObservableCollection<ReportFile>();
-        _reportTitle = "";
-        _lastGeneratedTime = null;
+        ReportFiles = [];
+        _programLog = "";
         _settings = Settings.LoadSettings(); // TODO: needs tweaking
         HasUnsavedWork = false;
         // setup initial quote and program log data
@@ -91,24 +86,12 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         _isPerformingInitialLoad = false;
     }
 
-    private void InitializeProgramLog()
-    {
-        var quotes = Constants.GetQuotes();
-        var random = new Random();
-        var quoteIndex = random.Next(0, quotes.Length);
-        _programLog = "----- MayShow v" + Constants.AppVersion + " ------" + Environment.NewLine;
-        _programLog += quotes[quoteIndex] + Environment.NewLine;
-        _programLog += "---------------------------------------" + Environment.NewLine;
-        _programLog += "Loaded and ready to create report!" + Environment.NewLine;
-        _programLog += "Please copy and send this Program Log when reporting any issues with the software.";
-    }
-
     public string ReportTitle
     {
-        get => _reportTitle;
+        get => _pdfReport.Title;
         set 
         { 
-            _reportTitle = value;
+            _pdfReport.Title = value;
             NotifyPropertyChanged(); 
             NotifyPropertyChanged(nameof(IsTitleBoxVisible)); 
             NotifyPropertyChanged(nameof(CanAddItem)); 
@@ -140,7 +123,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     public bool IsCreatePDFButtonEnabled
     {
-        get => !_isCreatingPDF && _reportFiles.Count > 0;
+        get => !_isCreatingPDF && _pdfReport.Files.Count > 0;
     }
 
     public bool HasWorkingFolder
@@ -155,10 +138,20 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     public string WorkingFolder
     {
-        get => _workingFolder;
+        get 
+        {
+            if (string.IsNullOrWhiteSpace(_pdfReport.BaseFolder))
+            {
+                return Path.Combine(Utilities.GetInternalDataPath(), _pdfReport.UUID);
+            }
+            else
+            {
+                return _pdfReport.BaseFolder;
+            }
+        }
         set
         {
-            _workingFolder = value;
+            _pdfReport.BaseFolder = value;
             NotifyPropertyChanged();
             NotifyPropertyChanged(nameof(HasWorkingFolder));
             NotifyPropertyChanged(nameof(HasWorkingFolderAndNotMakingPDF));
@@ -183,17 +176,29 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     public ObservableCollection<ReportFile> ReportFiles
     {
-        get => _reportFiles;
+        get => _pdfReport.Files;
         set 
         { 
-            _reportFiles = value;
+            _pdfReport.Files = value;
             NotifyPropertyChanged(); 
-            _reportFiles.CollectionChanged += ( sender, e ) => 
+            _pdfReport.Files.CollectionChanged += ( sender, e ) => 
             { 
                 NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
                 HasUnsavedWork = true;
             };
         }
+    }
+
+    private void InitializeProgramLog()
+    {
+        var quotes = Constants.GetQuotes();
+        var random = new Random();
+        var quoteIndex = random.Next(0, quotes.Length);
+        _programLog = "----- MayShow v" + Constants.AppVersion + " ------" + Environment.NewLine;
+        _programLog += quotes[quoteIndex] + Environment.NewLine;
+        _programLog += "---------------------------------------" + Environment.NewLine;
+        _programLog += "Loaded and ready to create report!" + Environment.NewLine;
+        _programLog += "Please copy and send this Program Log when reporting any issues with the software.";
     }
 
     public void LogInfo(string message, params object[]? arguments)
@@ -227,12 +232,41 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
     }
 
-    private string GetReportSavedDataPath(string folderPath)
+    private string GetReportSavedDataPath(string workingFolder)
     {
         if (_settings.SaveReportJsonDataInInternalDir)
         {
+            // TODO: keep thinking through how this is going to work and sync back
+            // to the main new/load screen and all that.
+            // cause at this point there may already be a dir...depending on flow...
+
+            // .......
+            // basically we need to decide when report data is first saved to disk,
+            // when a unique UUID is chosen, and how to sync data back to the overall
+            // settings object so the main menu continues to function.
+            // and need to get rid of all use of WorkingFolderToInternalFolderName.
+            // and fix/finish up fixing constructor(s).
+            // .......
+            
+            // some tmp code follows
             var internalPath = Utilities.GetInternalDataPath();
-            if (!_settings.WorkingFolderToInternalFolderName.ContainsKey(folderPath))
+            var didFind = false;
+            foreach (var report in _settings.AllReportInfo)
+            {
+                if (report.UUID == _pdfReport.UUID)
+                {
+                    didFind = true;
+                    break;
+                }
+            }
+            if (!didFind)
+            {
+                var reportPath = Path.Combine(internalPath, _pdfReport.UUID);
+                Directory.CreateDirectory(reportPath);
+            }
+            
+            // if we already don't know about this working folder, make sure we have a folder for its files.
+            if (!_settings.WorkingFolderToInternalFolderName.ContainsKey(workingFolder))
             {
                 var uuid = "";
                 var potentialPath = "";
@@ -247,18 +281,18 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                 // make internal dir -- using dir so we have option to copy data into dir later if needed
                 // (if we ever implement a more robust report system where we keep all files)
                 Directory.CreateDirectory(potentialPath);
-                _settings.WorkingFolderToInternalFolderName[folderPath] = uuid;
+                _settings.WorkingFolderToInternalFolderName[workingFolder] = uuid;
                 _settings.SaveSettingsNotAsync(); // save new key/value pair
             }
             return Path.Combine(
                 internalPath, 
-                _settings.WorkingFolderToInternalFolderName[folderPath], 
+                _settings.WorkingFolderToInternalFolderName[workingFolder], 
                 Constants.ReportSavedDataFileName
             );
         }
         else
         {
-            return Path.Combine(folderPath, Constants.ReportSavedDataFileName);
+            return Path.Combine(workingFolder, Constants.ReportSavedDataFileName);
         }
     }
 
@@ -283,8 +317,8 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                     ReportFiles = new ObservableCollection<ReportFile>(report.Files);
                     ReportTitle = report.Title;
                     WorkingFolder = report.BaseFolder ?? "";
-                    _lastGeneratedTime = report.LastGenerated ?? null;
-                    LogInfo("Reloaded report last saved at {0}", report.LastSaved);
+                    _pdfReport.LastGenerated = report.LastGenerated ?? null;
+                    LogInfo("Reloaded report last saved at {0}", report.LastSaved ?? DateTime.Now);
                     successfullyLoadedPriorReport = true;
                 }
             }
@@ -555,15 +589,15 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     public async Task SaveInterimReportInfo()
     {
-        var report = new PDFReport()
-        {
-            Title = ReportTitle,
-            Files = ReportFiles.ToList(),
-            BaseFolder = WorkingFolder,
-            LastSaved = DateTime.Now,
-            LastGenerated = _lastGeneratedTime,
-        };
-        await SavePDFReportDataToDisk(report);
+        _pdfReport.LastSaved = DateTime.Now;
+        await SavePDFReportDataToDisk(_pdfReport);
+    }
+
+    private async Task CreateAndSaveReportObjectAfterReportCreation()
+    {
+        _pdfReport.LastSaved = DateTime.Now;
+        _pdfReport.LastGenerated = DateTime.Now;
+        await SavePDFReportDataToDisk(_pdfReport);
     }
 
     private async Task SavePDFReportDataToDisk(PDFReport report)
@@ -578,20 +612,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         await File.WriteAllTextAsync(savePath, json);
         LogInfo("Saved report information to {0}", savePath);
         HasUnsavedWork = false;
-    }
-
-    private async Task CreateAndSaveReportObjectAfterReportCreation()
-    {
-        var report = new PDFReport()
-        {
-            Title = ReportTitle,
-            Files = ReportFiles.ToList(),
-            BaseFolder = WorkingFolder,
-            LastSaved = DateTime.Now,
-            LastGenerated = DateTime.Now,
-        };
-        _lastGeneratedTime = DateTime.Now;
-        await SavePDFReportDataToDisk(report);
     }
 
     // called from UI button

@@ -11,7 +11,7 @@
              xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:DataType="vm:StartNewChooseReportViewModel">
     <Grid ColumnDefinitions="100, *, 100"
-          RowDefinitions="Auto, Auto, Auto, Auto, Auto, *">
+          RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, *">
         <TextBlock HorizontalAlignment="Center"
                    FontSize="36"
                    FontWeight="Bold"
@@ -28,7 +28,7 @@
                Grid.Row="1" />
         <Label Content="Start New Report"
                HorizontalAlignment="Left"
-               FontSize="18"
+               FontSize="16"
                FontWeight="Bold"
                Margin="0,24,0,0"
                Grid.Column="1"
@@ -51,19 +51,34 @@
                     Grid.Column="1">
                 <TextBlock>
                     <Run Text="&#xe494;"
-                        FontFamily="{StaticResource FontAwesomeSolid}" /> Create and Start Report</TextBlock>
+                        FontFamily="{StaticResource FontAwesomeSolid}" /> Create Blank Report</TextBlock>
             </Button>
         </Grid>
-        <Label Content="Load Existing Report"
-               FontSize="18"
+        <Label Content="Start New Report From Existing Files"
+               HorizontalAlignment="Left"
+               FontSize="16"
+               FontWeight="Bold"
+               Margin="0,8,0,0"
+               Grid.Column="1"
+               Grid.Row="4"/>
+        <Button Command="{Binding StartReportFromFolder}"
+                Classes="accent"
+                Grid.Row="5"
+                Grid.Column="1">
+            <TextBlock>
+                <Run Text="&#xe494;"
+                    FontFamily="{StaticResource FontAwesomeSolid}" /> Create Report from Existing Folder</TextBlock>
+        </Button>
+        <Label Content="Load Previously Saved Report"
+               FontSize="16"
                FontWeight="Bold"
                HorizontalAlignment="Left"
                Margin="0,16,0,0"
                Grid.Column="1"
-               Grid.Row="4"/>
+               Grid.Row="6"/>
         <ScrollViewer Margin="0,8,0,32"
                       Grid.Column="1"
-                      Grid.Row="5"
+                      Grid.Row="7"
                       VerticalScrollBarVisibility="Visible"
                       AllowAutoHide="False"
                       HorizontalScrollBarVisibility="Disabled">

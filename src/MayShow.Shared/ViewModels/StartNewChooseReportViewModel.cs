@@ -10,6 +10,7 @@ using MayShow.Helpers;
 using MayShows.Helpers;
 using System;
 using System.Threading.Tasks;
+using Avalonia.Platform.Storage;
 
 namespace MayShow.ViewModels;
 
@@ -43,48 +44,60 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown
         set { _savedReports = value; NotifyPropertyChanged(); }
     }
 
-    public async void StartReport()
+    public async void StartReport() // start a new report based on a title alone
     {
         if (string.IsNullOrWhiteSpace(CreatingReportTitle))
         {
             await DialogHost.Show(new WarningViewModel("Report title cannot be blank!"));
             return;
         }
-        // TODO: if report with name already exists in system, error
         var reportInfo = new PDFReportInfo()
         {
             Title = CreatingReportTitle,
-            LastSaved = DateTime.Now
+            LastSaved = null,
+            UUID = Utilities.GetUniqueReportGuid(_settings).ToString()
         };
-        // create folder for report data
-        var path = Path.Combine(Utilities.GetInternalDataPath(), reportInfo.UUID);
-        while (Directory.Exists(path))
-        {
-            reportInfo.ResetUUID();
-            path = Path.Combine(Utilities.GetInternalDataPath(), reportInfo.UUID);
-        }
-        Directory.CreateDirectory(path);
-        reportInfo.BaseFolder = path; // default to internal directory
-        _settings.AllReportInfo.Add(reportInfo);
+        reportInfo.BaseFolder = Path.Combine(Utilities.GetInternalDataPath(), reportInfo.UUID); // default to internal directory
         // ... this sort and save is slow, technically, but we're not going to have millions of items here, so...
-        SavedReports = new ObservableCollection<PDFReportInfo>(_settings.AllReportInfo.OrderBy(x => x.Title));
-        await _settings.SaveSettingsAsync();
+        // TODO: save automatically only if mobile; desktop only saves on command
+        // SavedReports = new ObservableCollection<PDFReportInfo>(_settings.AllReportInfo.OrderBy(x => x.Title));
+        // await _settings.SaveSettingsAsync();
         // now update UI
-        ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
-        {
-            ReportTitle = CreatingReportTitle
-        });
+        ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger));
         CreatingReportTitle = ""; // when user comes back they can start another new report
+    }
+
+    public async void StartReportFromFolder()
+    {
+        // pick folder, then create new report based on folder
+        // use folder name as report title for now
+        var topLevel = TopLevelGrabber?.GetTopLevel();
+        if (topLevel is not null)
+        {
+            var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()
+            {
+                Title = "Pick a folder of files...",
+                AllowMultiple = false,
+            });
+            if (folders.Count == 1)
+            {
+                var folder = folders[0];
+                var reportInfo = new PDFReportInfo()
+                {
+                    Title = Path.GetDirectoryName(folder.Path.LocalPath) ?? "",
+                    LastSaved = null,
+                    UUID = Utilities.GetUniqueReportGuid(_settings).ToString(),
+                    BaseFolder = folder.Path.LocalPath
+                };
+                ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger));
+            }
+        }
     }
 
     public void LoadExistingReport(object info) => LoadExistingReportImpl((PDFReportInfo) info);
     public void LoadExistingReportImpl(PDFReportInfo reportInfo)
     {
-        // TODO: load data and send to create PDF report view model
-        ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
-        {
-            ReportTitle = CreatingReportTitle
-        });
+        ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger));
     }
 
     public void DeleteExistingReport(object info) => DeleteExistingReportImpl((PDFReportInfo) info);
