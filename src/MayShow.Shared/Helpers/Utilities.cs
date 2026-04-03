@@ -6,6 +6,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using MayShow.Models;
 using Tmds.DBus.Protocol;
 
 namespace MayShows.Helpers;
@@ -66,11 +67,45 @@ class Utilities
     public static string GetTempConvertedImagesFolderPath()
     {
         // get converted files directory path and create it if necessary
-        var convertedDir = Path.Combine(Utilities.GetInternalDataPath(), "converted");
+        var convertedDir = Path.Combine(GetInternalDataPath(), "converted");
         if (!Directory.Exists(convertedDir))
         {
             Directory.CreateDirectory(convertedDir);
         }
         return convertedDir;        
+    }
+
+    public static Guid GetUniqueReportGuid(Settings settings)
+    {
+        // Guid should be, well, unique already, BUT we are not going to take ANY chances.
+        var internalPath = GetInternalDataPath();
+        Guid guid = Guid.NewGuid();
+        var isUnique = false;
+        while (!isUnique)
+        {
+            var strUUID = guid.ToString();
+            var didFind = false;
+            foreach (var existingReport in settings.AllReportInfo)
+            {
+                if (existingReport.UUID == strUUID)
+                {
+                    didFind = true;
+                    break;
+                }
+            }
+            if (Directory.Exists(Path.Combine(internalPath, strUUID)))
+            {
+                didFind = true;
+            }
+            if (!didFind)
+            {
+                isUnique = true;
+            }
+            else
+            {
+                guid = Guid.NewGuid();
+            }
+        }
+        return guid;
     }
 }
