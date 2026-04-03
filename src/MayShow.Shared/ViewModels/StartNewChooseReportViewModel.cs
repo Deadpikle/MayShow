@@ -9,10 +9,11 @@ using MayShow.Models;
 using MayShow.Helpers;
 using MayShows.Helpers;
 using System;
+using System.Threading.Tasks;
 
 namespace MayShow.ViewModels;
 
-class StartNewChooseReportViewModel : BaseViewModel
+class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown
 {
     private string _creatingReportTitle;
     private ObservableCollection<PDFReportInfo> _savedReports;
@@ -108,5 +109,10 @@ class StartNewChooseReportViewModel : BaseViewModel
             reportInfo.DeleteInternalFolderFromDisk(); // delete internal data if available
             await _settings.SaveSettingsAsync(); // update saved items list
         }
+    }
+
+    public async Task<bool> CheckIsSafeToShutdown()
+    {
+        return true;
     }
 }
