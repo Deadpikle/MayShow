@@ -2,30 +2,16 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using DialogHostAvalonia;
-using ImageMagick;
-using MigraDoc.DocumentObjectModel;
-using MigraDoc.Rendering;
-using PdfSharp.Fonts;
-using PdfSharp.Pdf.IO;
-using PdfSharp.Snippets.Font;
 using MayShow.Helpers;
 using MayShow.Interfaces;
 using MayShow.Models;
 using MayShows.Helpers;
-
-using Docnet.Core.Models;
-using Docnet.Core;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using Docnet.Core.Readers;
 
 namespace MayShow.ViewModels;
 
@@ -608,6 +594,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         await SavePDFReportDataToDisk(report);
     }
 
+    // called from UI button
     public async Task CopyLogToClipboard()
     {
         var clipboard = TopLevelGrabber?.GetTopLevel().Clipboard;
