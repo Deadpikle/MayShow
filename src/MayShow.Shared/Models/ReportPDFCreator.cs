@@ -84,10 +84,10 @@ class ReportPDFCreator : ChangeNotifier
     }
 
     // https://forum.pdfsharp.net/viewtopic.php?f=2&t=1025
-    public async Task<string?> CreatePDF(List<ReportFile> reportFiles, string reportTitle, string folderPath, PDFFontResolver fontResolver, Settings appSettings)
+    public async Task<string?> CreatePDF(List<ReportFile> reportFiles, string reportTitle, string workingDirPath, PDFFontResolver fontResolver, Settings appSettings)
     {
         // safety checks
-        var outputDir = appSettings.SaveOutputPdfInWorkingDir ? folderPath : appSettings.OutputPdfDir;
+        var outputDir = appSettings.SaveOutputPdfInWorkingDir ? workingDirPath : appSettings.OutputPdfDir;
         if (!Directory.Exists(outputDir))
         {
             await DialogHost.Show(new WarningViewModel("Output directory not found! Please adjust your application Settings before continuing. Output directory: " + outputDir));
@@ -96,6 +96,7 @@ class ReportPDFCreator : ChangeNotifier
         // setup globals and consts...
         GlobalFontSettings.FontResolver = fontResolver;
         GlobalFontSettings.FallbackFontResolver = new FailsafeFontResolver();
+        const int maxImageWidth = 425;
         const decimal pageWidth = 8.5m;
         const decimal pageHeight = 11.0m;
         const decimal margin = 0.5m;
@@ -103,17 +104,15 @@ class ReportPDFCreator : ChangeNotifier
         const int imageInsertMarginPixels = 30; // we calculate max available; use max - this # for max image size
         const decimal reduceImageSizeAmount = 0.95m;
         var maxItemPxWidth = ((pageWidth - (2 * margin)) * imageResolution) - imageInsertMarginPixels;
-        // start making PDF!
-        var pdfDoc = new Document();
-        var outputFileName = reportTitle + ".pdf";
-        var folderName = new DirectoryInfo(folderPath).Name;
-        const int maxImageWidth = 425;
-        var convertedDir = Utilities.GetTempConvertedImagesFolderPath();
         var imageLineFormat = new MigraDoc.DocumentObjectModel.Shapes.LineFormat()
         {
             Color = Colors.Black,
             Width = Unit.FromPoint(2),
         };;
+        // start making PDF!
+        var outputFileName = reportTitle + ".pdf";
+        var convertedDir = Utilities.GetTempConvertedImagesFolderPath();
+        var folderName = new DirectoryInfo(workingDirPath).Name;
         if (folderName.Contains('-'))
         {
             // see if year/month format
@@ -128,7 +127,8 @@ class ReportPDFCreator : ChangeNotifier
                 _logger?.LogInfo("Auto-changed output file name to " + outputFileName);
             }
         }
-        // setup initial section (for page characteristics)
+        // create doc and setup initial section (for page characteristics)
+        var pdfDoc = new Document();
         var section = pdfDoc.AddSection();
         section.PageSetup.PageFormat = PageFormat.Letter;
         section.PageSetup.PageWidth = pageWidth + "in";
@@ -171,7 +171,7 @@ class ReportPDFCreator : ChangeNotifier
         var pdfRenderer = new PdfDocumentRenderer
         {
             Document = pdfDoc,
-            WorkingDirectory = folderPath
+            WorkingDirectory = workingDirPath
         };
         var hasAddedData = false;
         for (var i = 0; i < reportFiles.Count; i++)
