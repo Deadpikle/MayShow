@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -11,7 +12,7 @@ namespace MayShow.Models;
 
 class PDFReport : PDFReportInfo
 {
-    private List<ReportFile> _files;
+    private ObservableCollection<ReportFile> _files;
     private DateTime? _lastGenerated;
 
     public PDFReport() : base()
@@ -30,7 +31,7 @@ class PDFReport : PDFReportInfo
         LastSaved = info.LastSaved;
     }
 
-    public List<ReportFile> Files
+    public ObservableCollection<ReportFile> Files
     {
         get => _files;
         set { _files = value; NotifyPropertyChanged(); }
