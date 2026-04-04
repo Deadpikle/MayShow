@@ -3,6 +3,7 @@
 -quickstart for loading last edited report on main menu
 -option/setting to put picture data into internal data dir for backup (always on for mobile)
 -duplicate existing report with new name
+-cleanup empty uuid folders in case user gets an internal folder created but never saves
 
 -----------
 
