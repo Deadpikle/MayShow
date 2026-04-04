@@ -64,6 +64,8 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         _isPerformingInitialLoad = true;
         _pdfReport = new PDFReport(reportInfo);
         // todo: load/interact with StartNewChooseReportViewModel settings object properly!
+        // ...which basically means when something is saved make sure to update the recently used stuff.
+        //      which i think we can just do through a simple interface and call it a day.
         // always default to using BaseFolder, which will always be set in the general case
         if (!string.IsNullOrWhiteSpace(_pdfReport.BaseFolder))
         {
@@ -85,6 +87,8 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
         _isPerformingInitialLoad = false;
     }
+
+    public IUpdateRecentlyUsed? UpdateRecentlyUsed { get; set; }
 
     public PDFReport PDFReport
     {
@@ -591,6 +595,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         await File.WriteAllTextAsync(savePath, json);
         LogInfo("Saved report information to {0}", savePath);
         HasUnsavedWork = false;
+        UpdateRecentlyUsed?.UpdateRecentlyUsed(report);
     }
 
     // called from UI button

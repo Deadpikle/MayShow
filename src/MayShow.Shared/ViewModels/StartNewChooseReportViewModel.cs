@@ -14,7 +14,7 @@ using Avalonia.Platform.Storage;
 
 namespace MayShow.ViewModels;
 
-class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown
+class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateRecentlyUsed
 {
     private string _creatingReportTitle;
     private ObservableCollection<PDFReportInfo> _savedReports;
@@ -58,12 +58,11 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown
             UUID = Utilities.GetUniqueReportGuid(_settings).ToString()
         };
         reportInfo.BaseFolder = Path.Combine(Utilities.GetInternalDataPath(), reportInfo.UUID); // default to internal directory
-        // ... this sort and save is slow, technically, but we're not going to have millions of items here, so...
-        // TODO: save automatically only if mobile; desktop only saves on command
-        // SavedReports = new ObservableCollection<PDFReportInfo>(_settings.AllReportInfo.OrderBy(x => x.Title));
-        // await _settings.SaveSettingsAsync();
         // now update UI
-        ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger));
+        ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
+        {
+            UpdateRecentlyUsed = this
+        });
         CreatingReportTitle = ""; // when user comes back they can start another new report
     }
 
@@ -89,7 +88,10 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown
                     UUID = Utilities.GetUniqueReportGuid(_settings).ToString(),
                     BaseFolder = folder.Path.LocalPath
                 };
-                ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger));
+                ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
+                {
+                    UpdateRecentlyUsed = this
+                });
             }
         }
     }
@@ -127,5 +129,28 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown
     public async Task<bool> CheckIsSafeToShutdown()
     {
         return true;
+    }
+
+    public async void UpdateRecentlyUsed(PDFReport report)
+    {
+        var didFind = false;
+        foreach (var existing in _settings.AllReportInfo)
+        {
+            if (existing.UUID == report.UUID)
+            {
+                didFind = true;
+                // update info on existing object
+                existing.LastSaved = report.LastSaved;
+                existing.Title = report.Title;
+                existing.BaseFolder = report.BaseFolder;
+            }
+        }
+        if (!didFind)
+        {
+            _settings.AllReportInfo.Add(report);
+        }
+        // ... this sort and save is slow, technically, but we're not going to have millions of items here, so...
+        SavedReports = new ObservableCollection<PDFReportInfo>(_settings.AllReportInfo.OrderBy(x => x.Title));
+        await _settings.SaveSettingsAsync();
     }
 }
