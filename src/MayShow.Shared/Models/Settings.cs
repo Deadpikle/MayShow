@@ -174,7 +174,6 @@ class Settings : ChangeNotifier
             settings.AllReportInfo = list.OrderBy(x => x.Title).ToList();
             settings.WorkingFolderToInternalFolderName = []; // clear this list; it is no longer used
             settings.SettingsVersion = 2;
-            // TODO: finish using new array for everything, make sure we save data, etc.
         }
         return settings;
     }

@@ -35,7 +35,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         _isCreatingPDF = false;
         ReportFiles = [];
         _programLog = "";
-        _settings = Settings.LoadSettings(); // TODO: needs tweaking
+        _settings = Settings.LoadSettings();
         HasUnsavedWork = false;
         // setup initial quote and program log data
         InitializeProgramLog();
@@ -46,7 +46,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     // public CreatePDFReportViewModel(string pathToLoad, IChangeViewModel viewModelChanger) : this(viewModelChanger)
     // {
     //     _isPerformingInitialLoad = true;
-    //     // TODO: load settings properly
     //     if (!string.IsNullOrWhiteSpace(pathToLoad))
     //     {
     //         LogInfo("Loading report data at path: {0}", pathToLoad);
@@ -63,9 +62,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     {
         _isPerformingInitialLoad = true;
         _pdfReport = new PDFReport(reportInfo);
-        // todo: load/interact with StartNewChooseReportViewModel settings object properly!
-        // ...which basically means when something is saved make sure to update the recently used stuff.
-        //      which i think we can just do through a simple interface and call it a day.
         // always default to using BaseFolder, which will always be set in the general case
         if (!string.IsNullOrWhiteSpace(_pdfReport.BaseFolder))
         {
