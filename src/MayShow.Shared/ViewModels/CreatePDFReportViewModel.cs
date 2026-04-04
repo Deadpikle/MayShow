@@ -43,47 +43,61 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     // this is the "normal path" into the pdf report view
     // pathToLoad is presumably _settings.LastUsedPath but doesn't have to be
-    public CreatePDFReportViewModel(string pathToLoad, IChangeViewModel viewModelChanger) : this(viewModelChanger)
-    {
-        _isPerformingInitialLoad = true;
-        // TODO: load settings properly
-        if (!string.IsNullOrWhiteSpace(pathToLoad))
-        {
-            LogInfo("Loading report data at path: {0}", pathToLoad);
-            ScanFolder(pathToLoad);
-        }
-        else
-        {
-            LogInfo("Choose a receipt folder to begin...");
-        }
-        _isPerformingInitialLoad = false;
-    }
+    // public CreatePDFReportViewModel(string pathToLoad, IChangeViewModel viewModelChanger) : this(viewModelChanger)
+    // {
+    //     _isPerformingInitialLoad = true;
+    //     // TODO: load settings properly
+    //     if (!string.IsNullOrWhiteSpace(pathToLoad))
+    //     {
+    //         LogInfo("Loading report data at path: {0}", pathToLoad);
+    //         ScanFolder(pathToLoad);
+    //     }
+    //     else
+    //     {
+    //         LogInfo("Choose a receipt folder to begin...");
+    //     }
+    //     _isPerformingInitialLoad = false;
+    // }
 
     public CreatePDFReportViewModel(PDFReportInfo reportInfo, IChangeViewModel viewModelChanger) : this(viewModelChanger)
     {
         _isPerformingInitialLoad = true;
-        // todo: load settings properly!
-        // if BaseFolder set, regardless of where the JSON data is saved,
-        // the working data (pictures, etc.) is outside of the current, working folder
-        if (!string.IsNullOrWhiteSpace(reportInfo.BaseFolder))
+        _pdfReport = new PDFReport(reportInfo);
+        // todo: load/interact with StartNewChooseReportViewModel settings object properly!
+        // always default to using BaseFolder, which will always be set in the general case
+        if (!string.IsNullOrWhiteSpace(_pdfReport.BaseFolder))
         {
-            LogInfo("Loading report data at path: {0}", reportInfo.BaseFolder);
-            ScanFolder(reportInfo.BaseFolder);
+            LogInfo("Loading report data at path: {0}", _pdfReport.BaseFolder);
+            ScanFolder(_pdfReport.BaseFolder);
         }
         else
         {
             // load data file in internal dir + UUID
-            var path = Path.Combine(Utilities.GetInternalDataPath(), reportInfo.UUID);
+            var path = Path.Combine(Utilities.GetInternalDataPath(), _pdfReport.UUID);
             if (Directory.Exists(path))
             {
-                ScanFolder(path); // even if points internally will be A-OK
+                ScanFolder(path); // even if points entirely to internal folder, we will be A-OK loading here
             }
             else
             {
-                // TODO: error
+                LogInfo("Erorr loading report! Folder does not exist: {0}", path);
             }
         }
         _isPerformingInitialLoad = false;
+    }
+
+    public PDFReport PDFReport
+    {
+        get => _pdfReport;
+        set
+        {
+            _pdfReport = value;
+            NotifyPropertyChanged(nameof(ReportTitle));
+            NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
+            NotifyPropertyChanged(nameof(WorkingFolder));
+            NotifyPropertyChanged(nameof(ReportFiles));
+            SetupFileCollectionChangedWatcher();
+        }
     }
 
     public string ReportTitle
@@ -180,13 +194,18 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         set 
         { 
             _pdfReport.Files = value;
-            NotifyPropertyChanged(); 
-            _pdfReport.Files.CollectionChanged += ( sender, e ) => 
-            { 
-                NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
-                HasUnsavedWork = true;
-            };
+            NotifyPropertyChanged();
+            SetupFileCollectionChangedWatcher();
         }
+    }
+
+    private void SetupFileCollectionChangedWatcher()
+    {
+        _pdfReport.Files.CollectionChanged += ( sender, e ) => 
+        { 
+            NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
+            HasUnsavedWork = true;
+        };
     }
 
     private void InitializeProgramLog()
@@ -236,59 +255,13 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     {
         if (_settings.SaveReportJsonDataInInternalDir)
         {
-            // TODO: keep thinking through how this is going to work and sync back
-            // to the main new/load screen and all that.
-            // cause at this point there may already be a dir...depending on flow...
-
-            // .......
-            // basically we need to decide when report data is first saved to disk,
-            // when a unique UUID is chosen, and how to sync data back to the overall
-            // settings object so the main menu continues to function.
-            // and need to get rid of all use of WorkingFolderToInternalFolderName.
-            // and fix/finish up fixing constructor(s).
-            // .......
-            
-            // some tmp code follows
             var internalPath = Utilities.GetInternalDataPath();
-            var didFind = false;
-            foreach (var report in _settings.AllReportInfo)
+            var internalReportDataDir = Path.Combine(internalPath, _pdfReport.UUID);
+            if (!Directory.Exists(internalReportDataDir))
             {
-                if (report.UUID == _pdfReport.UUID)
-                {
-                    didFind = true;
-                    break;
-                }
+                Directory.CreateDirectory(internalReportDataDir);
             }
-            if (!didFind)
-            {
-                var reportPath = Path.Combine(internalPath, _pdfReport.UUID);
-                Directory.CreateDirectory(reportPath);
-            }
-            
-            // if we already don't know about this working folder, make sure we have a folder for its files.
-            if (!_settings.WorkingFolderToInternalFolderName.ContainsKey(workingFolder))
-            {
-                var uuid = "";
-                var potentialPath = "";
-                var isDone = false;
-                // make sure uuid not already used...just in case...because paranoia...
-                do
-                {
-                    uuid = Guid.NewGuid().ToString();
-                    potentialPath = Path.Combine(internalPath, uuid);
-                    isDone = !Directory.Exists(potentialPath);
-                } while (!isDone);
-                // make internal dir -- using dir so we have option to copy data into dir later if needed
-                // (if we ever implement a more robust report system where we keep all files)
-                Directory.CreateDirectory(potentialPath);
-                _settings.WorkingFolderToInternalFolderName[workingFolder] = uuid;
-                _settings.SaveSettingsNotAsync(); // save new key/value pair
-            }
-            return Path.Combine(
-                internalPath, 
-                _settings.WorkingFolderToInternalFolderName[workingFolder], 
-                Constants.ReportSavedDataFileName
-            );
+            return Path.Combine(internalReportDataDir, Constants.ReportSavedDataFileName);
         }
         else
         {
@@ -304,27 +277,35 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             NotifyPropertyChanged(nameof(IsTitleBoxVisible));
             NotifyPropertyChanged(nameof(CanAddItem));
             var reportFilePath = GetReportSavedDataPath(path);
-            var successfullyLoadedPriorReport = false;
+            var successfullyLoadedPriorReportFile = false;
             if (File.Exists(reportFilePath))
             {
                 // load prior report
-                var json = File.ReadAllText(reportFilePath);
                 var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
-                var report = JsonSerializer.Deserialize(json, jsonContext.PDFReport);
-                if (report != null && report.Files.Count > 0)
+                var report = JsonSerializer.Deserialize(File.ReadAllText(reportFilePath), jsonContext.PDFReport);
+                if (report != null)
                 {
+                    PDFReport = report;
                     Console.WriteLine("Loading prior report data at {0}", reportFilePath);
-                    ReportFiles = new ObservableCollection<ReportFile>(report.Files);
-                    ReportTitle = report.Title;
-                    WorkingFolder = report.BaseFolder ?? "";
-                    _pdfReport.LastGenerated = report.LastGenerated ?? null;
                     LogInfo("Reloaded report last saved at {0}", report.LastSaved ?? DateTime.Now);
-                    successfullyLoadedPriorReport = true;
+                    successfullyLoadedPriorReportFile = true;
                 }
             }
-            if (!successfullyLoadedPriorReport)
+            if (!successfullyLoadedPriorReportFile)
             {
                 // Scan folder for files and display in DataGrid
+                if (path != PDFReport.BaseFolder)
+                {
+                    // in this case, there is essentially no report existing, 
+                    // so we need to make a new one.
+                    PDFReport = new PDFReport()
+                    {
+                        Title = Path.GetDirectoryName(path) ?? "",
+                        LastSaved = null,
+                        UUID = Utilities.GetUniqueReportGuid(_settings).ToString(),
+                        BaseFolder = path
+                    };
+                }
                 ReportFiles.Clear();
                 ReportTitle = "";
                 var filePaths = Directory.GetFiles(WorkingFolder);
@@ -359,25 +340,8 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
     }
 
-    public void RemoveFile(object f) => RemoveFileImpl((ReportFile)f);
-
-    public async void RemoveFileImpl(ReportFile file)
-    {
-        var result = await DialogHost.Show(new WarningDeleteItemViewModel(file));
-        if (result != null && (bool)result)
-        {
-            var idx = ReportFiles.IndexOf(file);
-            if (idx != -1)
-            {
-                ReportFiles.RemoveAt(idx);
-                HasUnsavedWork = true;
-            }
-        }
-    }
-
     // https://github.com/AvaloniaUI/Avalonia/issues/10075
     public void EditFileProperties(object f) => EditFilePropertiesImpl((ReportFile)f);
-
     public async void EditFilePropertiesImpl(ReportFile file)
     {
         var result = await DialogHost.Show(new EditFileViewModel(file, ViewModelChanger));
@@ -464,6 +428,21 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
     }
 
+    public void RemoveFile(object f) => RemoveFileImpl((ReportFile)f);
+    public async void RemoveFileImpl(ReportFile file)
+    {
+        var result = await DialogHost.Show(new WarningDeleteItemViewModel(file));
+        if (result != null && (bool)result)
+        {
+            var idx = ReportFiles.IndexOf(file);
+            if (idx != -1)
+            {
+                ReportFiles.RemoveAt(idx);
+                HasUnsavedWork = true;
+            }
+        }
+    }
+
     public async void RemoveAllItems()
     {
         var result = await DialogHost.Show(new ConfirmViewModel("Warning!", "Are you sure you want to remove all items from this report?", "Remove All Items", "Cancel")
@@ -479,7 +458,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
     }
 
-    public void LocateFile(object f) => LocateFileImpl((ReportFile) f);
+    public void LocateFile(object f) => LocateFileImpl((ReportFile)f);
     public async void LocateFileImpl(ReportFile reportFile)
     {
         var topLevel = TopLevelGrabber?.GetTopLevel();
