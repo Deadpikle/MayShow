@@ -22,6 +22,14 @@ public class DateFormatConverter : IMultiValueConverter
         {
             return dateOnly.ToString(dateFormat);
         }
-        return 0.0;
+        if (values.Count >= 2 && values[0] is DateTime dateTime && values[1] is string format3)
+        {
+            return dateTime.ToString(format3);
+        }
+        if (values.Count >= 2 && values[0] is string format4 && values[1] is DateTime dateTime2)
+        {
+            return dateTime2.ToString(format4);
+        }
+        return "";
     }
 }
