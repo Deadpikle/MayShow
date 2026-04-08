@@ -32,7 +32,7 @@ class Settings : ChangeNotifier
         _saveReportJsonDataInInternalDir = false;
         _workingFolderToInternalFolderName = [];
         _settingsVersion = 1;
-        _dataGridDateFormat = "yyyy-MM-dd";
+        _dataGridDateFormat = "dd/MM/yyyy";
         _reportDateFormat = "yyyy-MM-dd";
     }
 

@@ -815,7 +815,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             receiptDatePar.Format.Font.Size = 12;
             receiptDatePar.Format.Font.Bold = true;
             receiptDatePar.Format.Font.Name = "Noto Sans JP"; // has english letters in it, too
-            receiptDatePar.AddText(file.ReceiptDate.ToString("yyyy-MM-dd"));
+            receiptDatePar.AddText(file.ReceiptDate.ToString(_settings.ReportDateFormat));
             receiptDatePar.Tag = "ReceiptDatePar";
             if (!string.IsNullOrWhiteSpace(file.Notes))
             {

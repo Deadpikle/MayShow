@@ -22,8 +22,8 @@ class Constants
             new DateDisplayFormat("DOW, Month Day, Year", "Sunday, April 5, 2026", "dddd, MMMM d, yyyy"),
             new DateDisplayFormat("Abbreviated-Month Day, Year", "Apr 5, 2026", "MMM d, yyyy"),
             new DateDisplayFormat("DOW, Abbreviated-Month Day, Year", "Sunday, Apr 5, 2026", "dddd, MMM d, yyyy"),
-            new DateDisplayFormat("Day Month, Year", "5 April, 2026", "d MMMM, yyyy"),
-            new DateDisplayFormat("Day Abbreviated-Month, Year", "5 Apr, 2026", "d MMM, yyyy"),
+            new DateDisplayFormat("Day Month, Year", "5 April 2026", "d MMMM yyyy"),
+            new DateDisplayFormat("Day Abbreviated-Month, Year", "5 Apr 2026", "d MMM yyyy"),
             new DateDisplayFormat("Day Month, Year", "05 April 2026", "dd MMMM yyyy"),
             new DateDisplayFormat("Day Abbreviated-Month, Year", "05 Apr 2026", "dd MMM yyyy"),
         ];
