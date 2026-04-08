@@ -97,7 +97,7 @@
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Grid ColumnDefinitions="Auto, *">
-                            <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).LocateFile}"
+                            <Button Command="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).LocateFile}"
                                     CommandParameter="{Binding}"
                                     IsVisible="{Binding !IsFileFoundOnDisk}"
                                     Margin="2"
@@ -107,7 +107,7 @@
                                     Grid.Column="0"
                                     FontFamily="{StaticResource FontAwesomeSolid}"
                                     ToolTip.Tip="File not found; click to locate..."
-                                    IsEnabled="{Binding !$parent[DataGrid].((vm:MainViewModel)DataContext).IsCreatingPDF}"/>
+                                    IsEnabled="{Binding !$parent[UserControl].((vm:MainViewModel)DataContext).IsCreatingPDF}"/>
                             <TextBlock Text="{Binding Title}" 
                                        TextTrimming="CharacterEllipsis"
                                        TextWrapping="NoWrap"
@@ -147,7 +147,7 @@
                         <CalendarDatePicker SelectedDate="{Binding ReceiptDateTime}"
                                             DisplayDate="{Binding ReceiptDateTime}"
                                             SelectedDateFormat="Custom"
-                                            CustomDateFormatString="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).DataGridDateFormat}"/>
+                                            CustomDateFormatString="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).DataGridDateFormat}"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>
             </DataGridTemplateColumn>
@@ -171,20 +171,20 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal"
                                     Spacing="4">
-                            <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).EditFileProperties}"
+                            <Button Command="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).EditFileProperties}"
                                     CommandParameter="{Binding}"
                                     Classes="accent"
                                     Margin="2"
-                                    IsEnabled="{Binding !$parent[DataGrid].((vm:MainViewModel)DataContext).IsCreatingPDF}">
+                                    IsEnabled="{Binding !$parent[UserControl].((vm:MainViewModel)DataContext).IsCreatingPDF}">
                                 <Button.Content>
                                     <TextBlock><Run Text="&#xf044;" FontFamily="{StaticResource FontAwesomeSolid}"/> Edit</TextBlock>
                                 </Button.Content>
                             </Button>
-                            <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).RemoveFile}"
+                            <Button Command="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).RemoveFile}"
                                     CommandParameter="{Binding}"
                                     Classes="Danger"
                                     Margin="2"
-                                    IsEnabled="{Binding !$parent[DataGrid].((vm:MainViewModel)DataContext).IsCreatingPDF}">
+                                    IsEnabled="{Binding !$parent[UserControl].((vm:MainViewModel)DataContext).IsCreatingPDF}">
                                 <Button.Content>
                                     <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove</TextBlock>
                                 </Button.Content>
@@ -208,13 +208,13 @@
                                 Spacing="8"
                                 Margin="4"
                                 Grid.Row="2">
-                        <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).OpenFileLocation}" 
+                        <Button Command="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).OpenFileLocation}" 
                                 CommandParameter="{Binding}">
                             <Button.Content>
                                 <TextBlock FontSize="12"><Run Text="&#xf07c;" FontFamily="{StaticResource FontAwesomeSolid}"/> Open File Location</TextBlock>
                             </Button.Content>
                         </Button>
-                        <Button Command="{Binding $parent[DataGrid].((vm:MainViewModel)DataContext).OpenFile}" 
+                        <Button Command="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).OpenFile}" 
                                 CommandParameter="{Binding}">
                             <Button.Content>
                                 <TextBlock FontSize="12"><Run Text="&#xf07c;" FontFamily="{StaticResource FontAwesomeSolid}"/> Open File</TextBlock>
