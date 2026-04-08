@@ -18,7 +18,6 @@ using PdfSharp.Snippets.Font;
 using MayShow.Interfaces;
 using MayShow.Models;
 using MayShow.Helpers;
-using MayShows.Helpers;
 using System.Collections.Generic;
 
 namespace MayShow.ViewModels;

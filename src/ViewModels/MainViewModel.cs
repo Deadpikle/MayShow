@@ -19,7 +19,6 @@ using PdfSharp.Snippets.Font;
 using MayShow.Helpers;
 using MayShow.Interfaces;
 using MayShow.Models;
-using MayShows.Helpers;
 
 using Docnet.Core.Models;
 using Docnet.Core;

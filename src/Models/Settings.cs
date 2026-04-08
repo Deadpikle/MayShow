@@ -6,7 +6,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using MayShow.Helpers;
-using MayShows.Helpers;
 
 namespace MayShow.Models;
 

@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Tmds.DBus.Protocol;
 
-namespace MayShows.Helpers;
+namespace MayShow.Helpers;
 
 class Utilities
 {
