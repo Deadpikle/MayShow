@@ -136,7 +136,7 @@
             </DataGridTemplateColumn>
             <DataGridTemplateColumn Header="Receipt Date"
                                     IsReadOnly="False"
-                                    Width="125">
+                                    Width="150">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Label VerticalAlignment="Center"
@@ -156,6 +156,8 @@
                         <CalendarDatePicker SelectedDate="{Binding ReceiptDateTime}"
                                             DisplayDate="{Binding ReceiptDateTime}"
                                             SelectedDateFormat="Custom"
+                                            HorizontalAlignment="Stretch"
+                                            Watermark="12/31/2025"
                                             CustomDateFormatString="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).DataGridDateFormat}"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>
@@ -167,6 +169,7 @@
                     <DataTemplate>
                         <TextBlock Text="{Binding FileName}" 
                                    VerticalAlignment="Center"
+                                   TextTrimming="PrefixCharacterEllipsis"
                                    ToolTip.Tip="{Binding FileName}"
                                    Margin="8,0,8,0"
                                    HorizontalAlignment="Left"/>
@@ -175,7 +178,7 @@
             </DataGridTemplateColumn>
             <DataGridTemplateColumn Header=""
                                     IsReadOnly="True"
-                                    Width="*">
+                                    Width="200">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal"
@@ -184,6 +187,7 @@
                                     CommandParameter="{Binding}"
                                     Classes="accent"
                                     Margin="2"
+                                    FontSize="12"
                                     IsEnabled="{Binding !$parent[UserControl].((vm:MainViewModel)DataContext).IsCreatingPDF}">
                                 <Button.Content>
                                     <TextBlock><Run Text="&#xf044;" FontFamily="{StaticResource FontAwesomeSolid}"/> Edit</TextBlock>
@@ -193,6 +197,7 @@
                                     CommandParameter="{Binding}"
                                     Classes="Danger"
                                     Margin="2"
+                                    FontSize="12"
                                     IsEnabled="{Binding !$parent[UserControl].((vm:MainViewModel)DataContext).IsCreatingPDF}">
                                 <Button.Content>
                                     <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove</TextBlock>
