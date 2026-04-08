@@ -67,6 +67,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         _reportTitle = "";
         _lastGeneratedTime = null;
         _settings = Settings.LoadSettings();
+        NotifyPropertyChanged(nameof(DataGridDateFormat));
         if (!string.IsNullOrWhiteSpace(_settings.LastUsedPath))
         {
             LogInfo("Loading data at last used path of {0}", _settings.LastUsedPath);
@@ -171,6 +172,11 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 HasUnsavedWork = true;
             };
         }
+    }
+
+    public string DataGridDateFormat
+    {
+        get => _settings.DataGridDateFormat;
     }
 
     private void LogInfo(string message, params object[]? arguments)
@@ -299,6 +305,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             _settings = (Settings)updatedSettings;
             await _settings.SaveSettingsAsync();
             LogInfo("Saved updated settings!");
+            NotifyPropertyChanged(nameof(DataGridDateFormat));
         }
     }
 
