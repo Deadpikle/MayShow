@@ -53,15 +53,15 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)">
+    <!-- <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)">
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-    </PackageReference>
+    </PackageReference> -->
     <PackageReference Include="PDFsharp-MigraDoc" Version="6.2.4" />
-    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.10.4" />
-    <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.10.11-preview20251127001" />
-    <PackageReference Include="DialogHost.Avalonia" Version="0.10.4" />
-    <PackageReference Include="Xaml.Behaviors.Interactions.DragAndDrop.DataGrid" Version="11.3.9.5" />
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.11.1" />
+    <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.11.0" />
+    <PackageReference Include="DialogHost.Avalonia" Version="0.11.1" />
+    <PackageReference Include="Xaml.Behaviors.Interactions.DragAndDrop.DataGrid" Version="12.0.0-rc1" />
     <PackageReference Include="Docnet.Core" Version="2.6.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
   </ItemGroup>
