@@ -50,7 +50,7 @@
                IsVisible="{Binding IsTitleBoxVisible}" />
         <TextBox Text="{Binding ReportTitle}"
                  IsVisible="{Binding IsTitleBoxVisible}"
-                 Watermark="Receipts December 2024"
+                 PlaceholderText="Receipts December 2024"
                  Margin="2,0,2,4"
                  Classes="clearButton"
                  Name="TitleTextBox">
@@ -121,7 +121,7 @@
                 <DataGridTemplateColumn.CellEditingTemplate>
                     <DataTemplate DataType="models:ReportFile">
                         <TextBox Text="{Binding Title}"
-                                 Watermark="Title"
+                                 PlaceholderText="Title"
                                  ToolTip.Tip="{Binding Title}"
                                  Classes="clearButton">
                             <TextBox.KeyBindings>

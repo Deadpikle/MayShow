@@ -20,12 +20,12 @@
                     FontSize="16"
                     FontWeight="Bold" />
             <Label Content="Title" />
-            <TextBox Watermark="Title"
+            <TextBox PlaceholderText="Title"
                         Text="{Binding ClonedFile.Title}"
                         VerticalAlignment="Stretch"
                         TextWrapping="Wrap" />
             <Label Content="Notes" />
-            <TextBox Watermark="Notes"
+            <TextBox PlaceholderText="Notes"
                         Text="{Binding ClonedFile.Notes}"
                         VerticalAlignment="Stretch"
                         AcceptsReturn="True"
