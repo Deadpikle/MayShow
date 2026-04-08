@@ -46,8 +46,34 @@
                            HorizontalAlignment="Left"
                            VerticalAlignment="Top"/>
             </Grid>
+            <Label Content="File List Date Format"
+                   HorizontalAlignment="Left"
+                   FontSize="14" />
+            <ComboBox SelectedIndex="{Binding DataGridDisplayDateFormatSelectedIndex}" 
+                      ItemsSource="{Binding DateFormats}"
+                      MaxDropDownHeight="300">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:DateDisplayFormat">
+                        <TextBlock Text="{Binding Example}" 
+                                TextWrapping="Wrap"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Label Content="PDF Report Date Format"
+                   HorizontalAlignment="Left"
+                   FontSize="14" />
+            <ComboBox SelectedIndex="{Binding ReportDisplayDateFormatSelectedIndex}" 
+                      ItemsSource="{Binding DateFormats}"
+                      MaxDropDownHeight="300">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:DateDisplayFormat">
+                        <TextBlock Text="{Binding Example}" 
+                                TextWrapping="Wrap"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
             <CheckBox IsChecked="{Binding SaveReportJsonDataInInternalDir}">Save report data (names, notes, etc.) in MayShow settings directory (saves in working directory by default)</CheckBox>
-        <Button Command="{Binding OpenSettingsDir}">
+            <Button Command="{Binding OpenSettingsDir}">
                 <TextBlock>
                     <Run Text="&#xf07c;"
                         FontFamily="{StaticResource FontAwesomeSolid}" /> Open MayShow Settings Directory</TextBlock>

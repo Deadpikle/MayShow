@@ -19,6 +19,8 @@ class Settings : ChangeNotifier
     private decimal _imageResizeThreshold;
     private bool _saveReportJsonDataInInternalDir;
     private Dictionary<string, string> _workingFolderToInternalFolderName;
+    public string _dataGridDateFormat;
+    public string _reportDateFormat;
     public int _settingsVersion;
 
     public Settings()
@@ -31,6 +33,8 @@ class Settings : ChangeNotifier
         _saveReportJsonDataInInternalDir = false;
         _workingFolderToInternalFolderName = [];
         _settingsVersion = 1;
+        _dataGridDateFormat = "yyyy-MM-dd";
+        _reportDateFormat = "yyyy-MM-dd";
     }
 
     public Settings(Settings other)
@@ -43,6 +47,8 @@ class Settings : ChangeNotifier
         _saveReportJsonDataInInternalDir = other.SaveReportJsonDataInInternalDir;
         _workingFolderToInternalFolderName = other.WorkingFolderToInternalFolderName;
         _settingsVersion = other.SettingsVersion;
+        _dataGridDateFormat = "yyyy-MM-dd";
+        _reportDateFormat = "yyyy-MM-dd";
     }
 
     [JsonInclude]
@@ -100,6 +106,20 @@ class Settings : ChangeNotifier
     {
         get => _settingsVersion;
         set { _settingsVersion = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
+    public string DataGridDateFormat
+    {
+        get => _dataGridDateFormat;
+        set { _dataGridDateFormat = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
+    public string ReportDateFormat
+    {
+        get => _reportDateFormat;
+        set { _reportDateFormat = value; NotifyPropertyChanged(); }
     }
 
     public static string SettingsFileName = "settings.json";
