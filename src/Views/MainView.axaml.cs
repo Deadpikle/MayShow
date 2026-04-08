@@ -27,7 +27,7 @@ public partial class MainView : UserControl
     public void UnfocusTextbox()
     {
         var topLevel = TopLevel.GetTopLevel(this);
-        topLevel?.FocusManager?.ClearFocus();
+        topLevel?.FocusManager?.Focus(null);
         if (DataContext is MainViewModel mvm)
         {
             mvm?.HasUnsavedWork = true;

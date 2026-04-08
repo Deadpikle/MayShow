@@ -29,6 +29,7 @@ using SixLabors.ImageSharp.Processing;
 using System.Reflection.Metadata.Ecma335;
 using Docnet.Core.Readers;
 using MigraDoc.DocumentObjectModel.Visitors;
+using Avalonia.Input.Platform;
 
 namespace MayShow.ViewModels;
 
