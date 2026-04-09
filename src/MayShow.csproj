@@ -59,7 +59,8 @@
     </PackageReference>
     <PackageReference Include="PDFsharp-MigraDoc" Version="6.2.4" />
     <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.11.1" Condition="'$(RuntimeIdentifier)' != 'osx-x64'" />
-    <PackageReference Include="Magick.NET-Q8-x64" Version="14.11.1" Condition="'$(RuntimeIdentifier)' == 'osx-x64'" />
+    <!-- DO NOT UPDATE BEYOND 14.9.2 OR YOU WILL BREAK macOS MONTEREY USERS -->
+    <PackageReference Include="Magick.NET-Q8-x64" Version="14.9.1" Condition="'$(RuntimeIdentifier)' == 'osx-x64'" />
     <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.10.11-preview20251127001" />
     <PackageReference Include="DialogHost.Avalonia" Version="0.10.4" />
     <PackageReference Include="Xaml.Behaviors.Interactions.DragAndDrop.DataGrid" Version="11.3.9.5" />
