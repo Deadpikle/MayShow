@@ -515,13 +515,15 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
                 {
                     LogInfo(e.StackTrace);
                 }
-                if (e.InnerException != null)
+                var otherException = e.InnerException;
+                while (otherException != null)
                 {
-                    LogInfo("Inner exception: " + e.InnerException.Message);
-                    if (e.InnerException.StackTrace != null)
+                    LogInfo(">> Inner exception: " + otherException.Message);
+                    if (otherException.StackTrace != null)
                     {
-                        LogInfo(e.InnerException.StackTrace);
+                        LogInfo(otherException.StackTrace);
                     }
+                    otherException = otherException.InnerException;
                 }
                 LogInfo("Please report this error to a programmer or fix the issue listed above.");
                 IsCreatingPDF = false;
