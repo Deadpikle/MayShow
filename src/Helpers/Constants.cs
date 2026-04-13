@@ -17,7 +17,7 @@ class Constants
     {
         return [
             new DateDisplayFormat("Month/Day/Year", "4/5/2026", "M/d/yyyy"),
-            new DateDisplayFormat("Year-Month-Day", "2026-04-05", "yyyy-dd-MM"),
+            new DateDisplayFormat("Year-Month-Day", "2026-04-05", "yyyy-MM-dd"),
             new DateDisplayFormat("Month Day, Year", "April 5, 2026", "MMMM d, yyyy"),
             new DateDisplayFormat("DOW, Month Day, Year", "Sunday, April 5, 2026", "dddd, MMMM d, yyyy"),
             new DateDisplayFormat("Abbreviated-Month Day, Year", "Apr 5, 2026", "MMM d, yyyy"),
