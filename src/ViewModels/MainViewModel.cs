@@ -184,7 +184,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
 
     public string DataGridDateFormatWatermark
     {
-        get => _dateDisplayFormats.Where(x => x.Value == _settings.DataGridDateFormat).FirstOrDefault()?.Example ?? "2025-12-04";
+        get => _dateDisplayFormats.FirstOrDefault(x => x.Value == _settings.DataGridDateFormat)?.Example ?? "2025-12-04";
     }
 
     private void LogInfo(string message, params object[]? arguments)
