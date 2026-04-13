@@ -157,7 +157,7 @@
                                             DisplayDate="{Binding ReceiptDateTime}"
                                             SelectedDateFormat="Custom"
                                             HorizontalAlignment="Stretch"
-                                            Watermark="12/31/2025"
+                                            Watermark="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).DataGridDateFormatWatermark}"
                                             CustomDateFormatString="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).DataGridDateFormat}"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>

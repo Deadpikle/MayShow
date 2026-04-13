@@ -28,6 +28,7 @@ using SixLabors.ImageSharp.Processing;
 using System.Reflection.Metadata.Ecma335;
 using Docnet.Core.Readers;
 using MigraDoc.DocumentObjectModel.Visitors;
+using System.Collections.Generic;
 
 namespace MayShow.ViewModels;
 
@@ -44,6 +45,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     private DateTime? _lastGeneratedTime;
 
     private Settings _settings;
+    private List<DateDisplayFormat> _dateDisplayFormats;
 
     private bool _hasUnsavedWork;
 
@@ -66,7 +68,9 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         _reportTitle = "";
         _lastGeneratedTime = null;
         _settings = Settings.LoadSettings();
+        _dateDisplayFormats = Constants.GetDateDisplayFormats();
         NotifyPropertyChanged(nameof(DataGridDateFormat));
+        NotifyPropertyChanged(nameof(DataGridDateFormatWatermark));
         if (!string.IsNullOrWhiteSpace(_settings.LastUsedPath))
         {
             LogInfo("Loading data at last used path of {0}", _settings.LastUsedPath);
@@ -176,6 +180,11 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
     public string DataGridDateFormat
     {
         get => _settings.DataGridDateFormat;
+    }
+
+    public string DataGridDateFormatWatermark
+    {
+        get => _dateDisplayFormats.Where(x => x.Value == _settings.DataGridDateFormat).FirstOrDefault()?.Example ?? "2025-12-04";
     }
 
     private void LogInfo(string message, params object[]? arguments)
@@ -305,6 +314,7 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
             await _settings.SaveSettingsAsync();
             LogInfo("Saved updated settings!");
             NotifyPropertyChanged(nameof(DataGridDateFormat));
+            NotifyPropertyChanged(nameof(DataGridDateFormatWatermark));
         }
     }
 
