@@ -29,6 +29,7 @@ using System.Reflection.Metadata.Ecma335;
 using Docnet.Core.Readers;
 using MigraDoc.DocumentObjectModel.Visitors;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace MayShow.ViewModels;
 
@@ -58,7 +59,9 @@ class MainViewModel : BaseViewModel, IFontResolver, ICanCheckShutdown
         var quotes = Constants.GetQuotes();
         Random random = new Random();
         var quoteIndex = random.Next(0, quotes.Length);
-        _programLog = "----- MayShow v" + Constants.AppVersion + " ------" + Environment.NewLine;
+        var compDetails = RuntimeInformation.OSDescription + " | " +
+            RuntimeInformation.OSArchitecture.ToString();
+        _programLog = "----- MayShow v" + Constants.AppVersion + " | " + compDetails + " ------" + Environment.NewLine;
         _programLog += quotes[quoteIndex] + Environment.NewLine;
         _programLog += "---------------------------------------" + Environment.NewLine;
         _programLog += "Loaded and ready to create report!" + Environment.NewLine;
