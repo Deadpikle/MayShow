@@ -11,47 +11,52 @@
              xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:DataType="vm:EditFileViewModel"
              MaxWidth="350">
-    <ScrollViewer AllowAutoHide="False">
-        <StackPanel Orientation="Vertical"
-                    Spacing="4"
-                    Margin="12,4,12,0">
-            <Label Content="Edit File Details"
-                    HorizontalAlignment="Center"
-                    FontSize="16"
-                    FontWeight="Bold" />
-            <Label Content="Title" />
-            <TextBox Watermark="Title"
-                        Text="{Binding ClonedFile.Title}"
-                        VerticalAlignment="Stretch"
-                        TextWrapping="Wrap" />
-            <Label Content="Notes" />
-            <TextBox Watermark="Notes"
-                        Text="{Binding ClonedFile.Notes}"
-                        VerticalAlignment="Stretch"
-                        AcceptsReturn="True"
-                        ScrollViewer.AllowAutoHide="False"
-                        Height="75" />
-            <Label Content="Receipt Date" />
-            <Calendar SelectionMode="SingleDate"
-                        SelectedDate="{Binding ClonedFile.ReceiptDateTime}" 
-                        DisplayDate="{Binding ClonedFile.ReceiptDateTime}"
-                        IsTodayHighlighted="False" />
-            <StackPanel Orientation="Horizontal"
-                        Spacing="12"
-                        Margin="0,4,0,0"
-                        HorizontalAlignment="Right">
-                <Button Command="{Binding Cancel}">
-                    <TextBlock>
-                        <Run Text="&#xf0e2;"
-                            FontFamily="{StaticResource FontAwesomeSolid}" /> Cancel</TextBlock>
-                </Button>
-                <Button Command="{Binding Save}"
-                        Classes="accent">
-                    <TextBlock>
-                        <Run Text="&#xf0c7;"
-                            FontFamily="{StaticResource FontAwesomeSolid}" /> Save</TextBlock>
-                </Button>
+    <Grid RowDefinitions="Auto, *, Auto">
+        <Label Content="Edit File Details"
+               Grid.Row="0"
+               HorizontalAlignment="Center"
+               FontSize="16"
+               FontWeight="Bold" />
+        <ScrollViewer AllowAutoHide="False"
+                      Grid.Row="1">
+            <StackPanel Orientation="Vertical"
+                        Spacing="4"
+                        Margin="12,4,12,0">
+                <Label Content="Title" />
+                <TextBox Watermark="Title"
+                            Text="{Binding ClonedFile.Title}"
+                            VerticalAlignment="Stretch"
+                            TextWrapping="Wrap" />
+                <Label Content="Notes" />
+                <TextBox Watermark="Notes"
+                            Text="{Binding ClonedFile.Notes}"
+                            VerticalAlignment="Stretch"
+                            AcceptsReturn="True"
+                            ScrollViewer.AllowAutoHide="False"
+                            Height="75" />
+                <Label Content="Receipt Date" />
+                <Calendar SelectionMode="SingleDate"
+                            SelectedDate="{Binding ClonedFile.ReceiptDateTime}" 
+                            DisplayDate="{Binding ClonedFile.ReceiptDateTime}"
+                            IsTodayHighlighted="False" />
             </StackPanel>
+        </ScrollViewer>
+        <StackPanel Orientation="Horizontal"
+                    Spacing="12"
+                    Margin="0,8,0,0"
+                    Grid.Row="2"
+                    HorizontalAlignment="Right">
+            <Button Command="{Binding Cancel}">
+                <TextBlock>
+                    <Run Text="&#xf0e2;"
+                        FontFamily="{StaticResource FontAwesomeSolid}" /> Cancel</TextBlock>
+            </Button>
+            <Button Command="{Binding Save}"
+                    Classes="accent">
+                <TextBlock>
+                    <Run Text="&#xf0c7;"
+                        FontFamily="{StaticResource FontAwesomeSolid}" /> Save</TextBlock>
+            </Button>
         </StackPanel>
-    </ScrollViewer>
+    </Grid>
 </UserControl>

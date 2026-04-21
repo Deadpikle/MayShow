@@ -15,20 +15,16 @@
   </UserControl.Resources>
   <Grid ColumnDefinitions="*"
         RowDefinitions="Auto, 2*, Auto, Auto, *">
-    <Button Command="{Binding ReturnToMainMenu}"
-            Grid.Row="0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="4,4,0,4">
-        <TextBlock><Run Text="&#xf060;" FontFamily="{StaticResource FontAwesomeSolid}"/> Return to Main Menu</TextBlock>
-    </Button>
     <StackPanel Orientation="Vertical"
                 Spacing="2"
                 Margin="0,4,0,0">
-        <Label Content="MayShow: Report Builder"
-               FontSize="20"
-               FontWeight="Bold"
-               HorizontalAlignment="Center"/>
+        <Button Command="{Binding ReturnToMainMenu}"
+                Grid.Row="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="4,4,0,4">
+            <TextBlock><Run Text="&#xf060;" FontFamily="{StaticResource FontAwesomeSolid}"/> Return to Main Menu</TextBlock>
+        </Button>
         <Grid ColumnDefinitions="Auto, *"
               Margin="4,0,0,0">
             <Button Content="Choose Receipt Folder"
