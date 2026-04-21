@@ -7,7 +7,6 @@ using DialogHostAvalonia;
 using MayShow.Interfaces;
 using MayShow.Models;
 using MayShow.Helpers;
-using MayShows.Helpers;
 using System;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;

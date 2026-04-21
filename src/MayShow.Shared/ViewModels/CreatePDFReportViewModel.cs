@@ -11,7 +11,6 @@ using DialogHostAvalonia;
 using MayShow.Helpers;
 using MayShow.Interfaces;
 using MayShow.Models;
-using MayShows.Helpers;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 

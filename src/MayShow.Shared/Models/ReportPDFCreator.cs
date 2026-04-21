@@ -12,7 +12,6 @@ using ImageMagick;
 using MayShow.Helpers;
 using MayShow.Interfaces;
 using MayShow.ViewModels;
-using MayShows.Helpers;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.Rendering;
 using PdfSharp.Fonts;
