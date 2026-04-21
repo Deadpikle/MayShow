@@ -16,7 +16,9 @@ namespace MayShow.ViewModels;
 
 class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 {
+    #pragma warning disable CS0414
     private bool _isPerformingInitialLoad;
+    #pragma warning restore CS0414
     private string _processDir;
     private string _programLog;
     private bool _isCreatingPDF;
