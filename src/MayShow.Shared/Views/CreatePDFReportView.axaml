@@ -15,6 +15,13 @@
   </UserControl.Resources>
   <Grid ColumnDefinitions="*"
         RowDefinitions="Auto, 2*, Auto, Auto, *">
+    <Button Command="{Binding ReturnToMainMenu}"
+            Grid.Row="0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Margin="4,4,0,4">
+        <TextBlock><Run Text="&#xf060;" FontFamily="{StaticResource FontAwesomeSolid}"/> Return to Main Menu</TextBlock>
+    </Button>
     <StackPanel Orientation="Vertical"
                 Spacing="2"
                 Margin="0,4,0,0">

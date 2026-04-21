@@ -111,9 +111,10 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         set 
         { 
             _pdfReport.Title = value;
-            NotifyPropertyChanged(); 
-            NotifyPropertyChanged(nameof(IsTitleBoxVisible)); 
-            NotifyPropertyChanged(nameof(CanAddItem)); 
+            NotifyPropertyChanged();
+            NotifyPropertyChanged(nameof(IsTitleBoxVisible));
+            NotifyPropertyChanged(nameof(CanAddItem));
+            HasUnsavedWork = true;
         }
     }
 
@@ -339,19 +340,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             LogInfo("Error: The directory {0} does not exist. Please select another folder.", path);
         }
         NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
-    }
-
-    public async Task ShowSettings()
-    {
-        var updatedSettings = await DialogHost.Show(new SettingsViewModel(_settings, TopLevelGrabber));
-        if (updatedSettings != null)
-        {
-            _settings = (Settings)updatedSettings;
-            await _settings.SaveSettingsAsync();
-            LogInfo("Saved updated settings!");
-            NotifyPropertyChanged(nameof(DataGridDateFormat));
-            NotifyPropertyChanged(nameof(DataGridDateFormatWatermark));
-        }
     }
 
     // https://github.com/AvaloniaUI/Avalonia/issues/10075
@@ -632,6 +620,15 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             OpenFolderForFileInFileViewer(outputPdfFile);
         }
         IsCreatingPDF = false;
+    }
+
+    public async void ReturnToMainMenu()
+    {
+        bool isSafeToReturn = await CheckIsSafeToShutdown();
+        if (isSafeToReturn)
+        {
+            PopViewModel();
+        }
     }
 
     public async Task<bool> CheckIsSafeToShutdown()
