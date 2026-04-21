@@ -1,9 +1,5 @@
-﻿using Avalonia.Controls;
-using MayShow.Helpers;
+﻿using MayShow.Helpers;
 using MayShow.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MayShow.ViewModels;
 

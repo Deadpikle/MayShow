@@ -1,5 +1,3 @@
-#nullable enable
-
 using DialogHostAvalonia;
 using MayShow.Helpers;
 
