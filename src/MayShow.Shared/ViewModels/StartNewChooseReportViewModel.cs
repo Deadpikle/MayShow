@@ -130,6 +130,21 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
             await _settings.SaveSettingsAsync(); // update saved items list
         }
     }
+    
+    public void ShowAbout()
+    {
+        DialogHost.Show(new AboutViewModel());
+    }
+
+    public async Task ShowSettings()
+    {
+        var updatedSettings = await DialogHost.Show(new SettingsViewModel(_settings, TopLevelGrabber));
+        if (updatedSettings != null)
+        {
+            _settings = (Settings)updatedSettings;
+            await _settings.SaveSettingsAsync();
+        }
+    }
 
     public async Task<bool> CheckIsSafeToShutdown()
     {

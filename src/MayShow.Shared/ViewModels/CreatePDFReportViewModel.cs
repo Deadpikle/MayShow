@@ -340,11 +340,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
         NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
     }
-    
-    public void ShowAbout()
-    {
-        DialogHost.Show(new AboutViewModel());
-    }
 
     public async Task ShowSettings()
     {
