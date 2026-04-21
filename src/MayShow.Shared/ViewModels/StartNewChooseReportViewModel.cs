@@ -60,7 +60,8 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
         // now update UI
         ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
         {
-            UpdateRecentlyUsed = this
+            UpdateRecentlyUsed = this,
+            TopLevelGrabber = TopLevelGrabber
         });
         CreatingReportTitle = ""; // when user comes back they can start another new report
     }
@@ -89,7 +90,8 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
                 };
                 ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
                 {
-                    UpdateRecentlyUsed = this
+                    UpdateRecentlyUsed = this,
+                    TopLevelGrabber = TopLevelGrabber
                 });
             }
         }
@@ -98,7 +100,11 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
     public void LoadExistingReport(object info) => LoadExistingReportImpl((PDFReportInfo) info);
     public void LoadExistingReportImpl(PDFReportInfo reportInfo)
     {
-        ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger));
+        ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
+        {
+            UpdateRecentlyUsed = this,
+            TopLevelGrabber = TopLevelGrabber
+        });
     }
 
     public void DeleteExistingReport(object info) => DeleteExistingReportImpl((PDFReportInfo) info);
