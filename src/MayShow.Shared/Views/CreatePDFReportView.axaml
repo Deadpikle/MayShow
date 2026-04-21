@@ -169,7 +169,7 @@
                     <DataTemplate>
                         <TextBlock Text="{Binding FileName}" 
                                    VerticalAlignment="Center"
-                                   TextTrimming="PrefixCharacterEllipsis"
+                                   TextTrimming="CharacterEllipsis"
                                    ToolTip.Tip="{Binding FileName}"
                                    Margin="8,0,8,0"
                                    HorizontalAlignment="Left"/>
