@@ -194,7 +194,7 @@ class ReportPDFCreator : ChangeNotifier
             }
             var imageTitle = string.IsNullOrWhiteSpace(file.Title) ? file.FileName : file.Title;
             var imageTitlePar = MakeParagraph(section, imageTitle, true, 12, "ReceiptTitlePar");
-            MakeParagraph(section, file.ReceiptDate.ToString("yyyy-MM-dd"), true, 12, "ReceiptDatePar");
+            MakeParagraph(section, file.ReceiptDate.ToString(appSettings.ReportDateFormat), true, 12, "ReceiptDatePar");
             if (!string.IsNullOrWhiteSpace(file.Notes))
             {
                 var imageNotesPar = MakeParagraph(section, file.Notes, false, 10, "ReceiptNotesPar");

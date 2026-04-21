@@ -12,6 +12,8 @@ using MayShow.Helpers;
 using MayShow.Interfaces;
 using MayShow.Models;
 using MayShows.Helpers;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace MayShow.ViewModels;
 
@@ -25,6 +27,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     private PDFReport _pdfReport;
 
     private Settings _settings;
+    private List<DateDisplayFormat> _dateDisplayFormats;
     private bool _hasUnsavedWork;
 
     private CreatePDFReportViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
@@ -36,6 +39,9 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         ReportFiles = [];
         _programLog = "";
         _settings = Settings.LoadSettings();
+        _dateDisplayFormats = Constants.GetDateDisplayFormats();
+        NotifyPropertyChanged(nameof(DataGridDateFormat));
+        NotifyPropertyChanged(nameof(DataGridDateFormatWatermark));
         HasUnsavedWork = false;
         // setup initial quote and program log data
         InitializeProgramLog();
@@ -199,6 +205,16 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
     }
 
+    public string DataGridDateFormat
+    {
+        get => _settings.DataGridDateFormat;
+    }
+
+    public string DataGridDateFormatWatermark
+    {
+        get => _dateDisplayFormats.FirstOrDefault(x => x.Value == _settings.DataGridDateFormat)?.Example ?? "2025-12-04";
+    }
+
     private void SetupFileCollectionChangedWatcher()
     {
         _pdfReport.Files.CollectionChanged += ( sender, e ) => 
@@ -213,7 +229,9 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         var quotes = Constants.GetQuotes();
         var random = new Random();
         var quoteIndex = random.Next(0, quotes.Length);
-        _programLog = "----- MayShow v" + Constants.AppVersion + " ------" + Environment.NewLine;
+        var compDetails = RuntimeInformation.OSDescription + " | " +
+            RuntimeInformation.OSArchitecture.ToString();
+        _programLog = "----- MayShow v" + Constants.AppVersion + " | " + compDetails + " ------" + Environment.NewLine;
         _programLog += quotes[quoteIndex] + Environment.NewLine;
         _programLog += "---------------------------------------" + Environment.NewLine;
         _programLog += "Loaded and ready to create report!" + Environment.NewLine;
@@ -337,6 +355,8 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             _settings = (Settings)updatedSettings;
             await _settings.SaveSettingsAsync();
             LogInfo("Saved updated settings!");
+            NotifyPropertyChanged(nameof(DataGridDateFormat));
+            NotifyPropertyChanged(nameof(DataGridDateFormatWatermark));
         }
     }
 
@@ -552,13 +572,15 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                 {
                     LogInfo(e.StackTrace);
                 }
-                if (e.InnerException != null)
+                var otherException = e.InnerException;
+                while (otherException != null)
                 {
-                    LogInfo("Inner exception: " + e.InnerException.Message);
-                    if (e.InnerException.StackTrace != null)
+                    LogInfo(">> Inner exception: " + otherException.Message);
+                    if (otherException.StackTrace != null)
                     {
-                        LogInfo(e.InnerException.StackTrace);
+                        LogInfo(otherException.StackTrace);
                     }
+                    otherException = otherException.InnerException;
                 }
                 LogInfo("Please report this error to a programmer or fix the issue listed above.");
                 IsCreatingPDF = false;
