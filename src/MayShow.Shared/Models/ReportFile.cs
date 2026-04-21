@@ -23,7 +23,7 @@ class ReportFile : ChangeNotifier
     public ReportFile(ReportFile other)
     {
         Title = _title = other.Title;
-        ReceiptDateTime = _receiptDateTime = other.ReceiptDateTime;
+        ReceiptDateTime = _receiptDateTime = other.ReceiptDateTime ?? DateTime.Now;
         Notes = _notes = other.Notes;
         FilePath = _filePath = other.FilePath;
     }
@@ -34,12 +34,12 @@ class ReportFile : ChangeNotifier
         set { _title = value; NotifyPropertyChanged(); }
     }
 
-    public DateTime ReceiptDateTime
+    public DateTime? ReceiptDateTime
     {
         get => _receiptDateTime;
         set 
-        { 
-            _receiptDateTime = value; 
+        {
+            _receiptDateTime = value ?? DateTime.Now; 
             NotifyPropertyChanged(); 
             NotifyPropertyChanged(nameof(ReceiptDate));
         }

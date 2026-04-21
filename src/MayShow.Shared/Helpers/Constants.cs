@@ -1,14 +1,33 @@
 
+using System.Collections.Generic;
+using MayShow.Models;
+
 namespace MayShow.Helpers;
 
 class Constants
 {
-    public static string AppVersion = "1.4.2";
+    public static string AppVersion = "1.4.3";
 
     public static string[] AllowedFileExtensionPatterns = [ "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp", "*.pdf", "*.heic", ];
     public static string[] AllowedFileExtensionsNoStar = [ "png", "jpg", "jpeg", "gif", "bmp", "webp", "pdf", "heic", ];
 
     public static string ReportSavedDataFileName = "report_data.json";
+
+    public static List<DateDisplayFormat> GetDateDisplayFormats()
+    {
+        return [
+            new DateDisplayFormat("Month/Day/Year", "4/5/2026", "M/d/yyyy"),
+            new DateDisplayFormat("Year-Month-Day", "2026-04-05", "yyyy-MM-dd"),
+            new DateDisplayFormat("Month Day, Year", "April 5, 2026", "MMMM d, yyyy"),
+            new DateDisplayFormat("DOW, Month Day, Year", "Sunday, April 5, 2026", "dddd, MMMM d, yyyy"),
+            new DateDisplayFormat("Abbreviated-Month Day, Year", "Apr 5, 2026", "MMM d, yyyy"),
+            new DateDisplayFormat("DOW, Abbreviated-Month Day, Year", "Sunday, Apr 5, 2026", "dddd, MMM d, yyyy"),
+            new DateDisplayFormat("Day Month, Year", "5 April 2026", "d MMMM yyyy"),
+            new DateDisplayFormat("Day Abbreviated-Month, Year", "5 Apr 2026", "d MMM yyyy"),
+            new DateDisplayFormat("Day Month, Year", "05 April 2026", "dd MMMM yyyy"),
+            new DateDisplayFormat("Day Abbreviated-Month, Year", "05 Apr 2026", "dd MMM yyyy"),
+        ];
+    }
 
     public static string[] GetQuotes()
     {

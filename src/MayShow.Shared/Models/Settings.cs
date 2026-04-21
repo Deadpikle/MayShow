@@ -7,7 +7,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using MayShow.Helpers;
-using MayShows.Helpers;
 
 namespace MayShow.Models;
 
@@ -21,6 +20,8 @@ class Settings : ChangeNotifier
     private bool _saveReportJsonDataInInternalDir;
     private Dictionary<string, string> _workingFolderToInternalFolderName; // obsolete
     private List<PDFReportInfo> _allReportInfo;
+    public string _dataGridDateFormat;
+    public string _reportDateFormat;
     public int _settingsVersion;
 
     public Settings() : base()
@@ -34,6 +35,8 @@ class Settings : ChangeNotifier
         _workingFolderToInternalFolderName = [];
         _allReportInfo = [];
         _settingsVersion = 2;
+        _dataGridDateFormat = "dd/MM/yyyy";
+        _reportDateFormat = "yyyy-MM-dd";
     }
 
     public Settings(Settings other)
@@ -47,6 +50,8 @@ class Settings : ChangeNotifier
         _workingFolderToInternalFolderName = other.WorkingFolderToInternalFolderName;
         _settingsVersion = other.SettingsVersion;
         _allReportInfo = other.AllReportInfo;
+        _dataGridDateFormat = other.DataGridDateFormat;
+        _reportDateFormat = other.ReportDateFormat;
     }
 
     [JsonInclude]
@@ -111,6 +116,20 @@ class Settings : ChangeNotifier
     {
         get => _settingsVersion;
         set { _settingsVersion = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
+    public string DataGridDateFormat
+    {
+        get => _dataGridDateFormat;
+        set { _dataGridDateFormat = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
+    public string ReportDateFormat
+    {
+        get => _reportDateFormat;
+        set { _reportDateFormat = value; NotifyPropertyChanged(); }
     }
 
     public static string SettingsFileName = "settings.json";

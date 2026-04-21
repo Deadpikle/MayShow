@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using MayShow.Models;
 using Tmds.DBus.Protocol;
 
-namespace MayShows.Helpers;
+namespace MayShow.Helpers;
 
 class Utilities
 {

@@ -10,6 +10,9 @@
              xmlns:vm="clr-namespace:MayShow.ViewModels"
              xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
              x:DataType="vm:CreatePDFReportViewModel">
+  <UserControl.Resources>
+    <helpers:DateFormatConverter x:Key="DateFormatter" />
+  </UserControl.Resources>
   <Grid ColumnDefinitions="*"
         RowDefinitions="Auto, 2*, Auto, Auto, *">
     <Button Command="{Binding ShowSettings}"
@@ -97,7 +100,7 @@
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Grid ColumnDefinitions="Auto, *">
-                            <Button Command="{Binding $parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).LocateFile}"
+                            <Button Command="{Binding $parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).LocateFile}"
                                     CommandParameter="{Binding}"
                                     IsVisible="{Binding !IsFileFoundOnDisk}"
                                     Margin="2"
@@ -107,7 +110,7 @@
                                     Grid.Column="0"
                                     FontFamily="{StaticResource FontAwesomeSolid}"
                                     ToolTip.Tip="File not found; click to locate..."
-                                    IsEnabled="{Binding !$parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF}"/>
+                                    IsEnabled="{Binding !$parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF}"/>
                             <TextBlock Text="{Binding Title}" 
                                        TextTrimming="CharacterEllipsis"
                                        TextWrapping="NoWrap"
@@ -133,19 +136,29 @@
             </DataGridTemplateColumn>
             <DataGridTemplateColumn Header="Receipt Date"
                                     IsReadOnly="False"
-                                    Width="125">
+                                    Width="150">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <Label Content="{Binding ReceiptDate}" 
-                               VerticalAlignment="Center"
+                        <Label VerticalAlignment="Center"
                                Margin="8,0,8,0"
-                               HorizontalAlignment="Left"/>
+                               HorizontalAlignment="Left">
+                               <Label.Content>
+                                    <MultiBinding Converter="{StaticResource DateFormatter}">
+                                        <Binding Path="ReceiptDate" />
+                                        <Binding Path="$parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).DataGridDateFormat" />
+                                    </MultiBinding>
+                               </Label.Content>
+                        </Label>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
                 <DataGridTemplateColumn.CellEditingTemplate>
                     <DataTemplate DataType="models:ReportFile">
                         <CalendarDatePicker SelectedDate="{Binding ReceiptDateTime}"
-                                            DisplayDate="{Binding ReceiptDateTime}"/>
+                                            DisplayDate="{Binding ReceiptDateTime}"
+                                            SelectedDateFormat="Custom"
+                                            HorizontalAlignment="Stretch"
+                                            Watermark="{Binding $parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).DataGridDateFormatWatermark}"
+                                            CustomDateFormatString="{Binding $parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).DataGridDateFormat}"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>
             </DataGridTemplateColumn>
@@ -156,6 +169,7 @@
                     <DataTemplate>
                         <TextBlock Text="{Binding FileName}" 
                                    VerticalAlignment="Center"
+                                   TextTrimming="PrefixCharacterEllipsis"
                                    ToolTip.Tip="{Binding FileName}"
                                    Margin="8,0,8,0"
                                    HorizontalAlignment="Left"/>
@@ -164,25 +178,27 @@
             </DataGridTemplateColumn>
             <DataGridTemplateColumn Header=""
                                     IsReadOnly="True"
-                                    Width="*">
+                                    Width="200">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal"
                                     Spacing="4">
-                            <Button Command="{Binding $parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).EditFileProperties}"
+                            <Button Command="{Binding $parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).EditFileProperties}"
                                     CommandParameter="{Binding}"
                                     Classes="accent"
                                     Margin="2"
-                                    IsEnabled="{Binding !$parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF}">
+                                    FontSize="12"
+                                    IsEnabled="{Binding !$parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF}">
                                 <Button.Content>
                                     <TextBlock><Run Text="&#xf044;" FontFamily="{StaticResource FontAwesomeSolid}"/> Edit</TextBlock>
                                 </Button.Content>
                             </Button>
-                            <Button Command="{Binding $parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).RemoveFile}"
+                            <Button Command="{Binding $parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).RemoveFile}"
                                     CommandParameter="{Binding}"
                                     Classes="Danger"
                                     Margin="2"
-                                    IsEnabled="{Binding !$parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF}">
+                                    FontSize="12"
+                                    IsEnabled="{Binding !$parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF}">
                                 <Button.Content>
                                     <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove</TextBlock>
                                 </Button.Content>
@@ -206,13 +222,13 @@
                                 Spacing="8"
                                 Margin="4"
                                 Grid.Row="2">
-                        <Button Command="{Binding $parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).OpenFileLocation}" 
+                        <Button Command="{Binding $parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).OpenFileLocation}" 
                                 CommandParameter="{Binding}">
                             <Button.Content>
                                 <TextBlock FontSize="12"><Run Text="&#xf07c;" FontFamily="{StaticResource FontAwesomeSolid}"/> Open File Location</TextBlock>
                             </Button.Content>
                         </Button>
-                        <Button Command="{Binding $parent[DataGrid].((vm:CreatePDFReportViewModel)DataContext).OpenFile}" 
+                        <Button Command="{Binding $parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).OpenFile}" 
                                 CommandParameter="{Binding}">
                             <Button.Content>
                                 <TextBlock FontSize="12"><Run Text="&#xf07c;" FontFamily="{StaticResource FontAwesomeSolid}"/> Open File</TextBlock>

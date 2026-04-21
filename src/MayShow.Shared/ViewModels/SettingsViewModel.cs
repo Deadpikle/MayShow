@@ -18,7 +18,7 @@ using PdfSharp.Snippets.Font;
 using MayShow.Interfaces;
 using MayShow.Models;
 using MayShow.Helpers;
-using MayShows.Helpers;
+using System.Collections.Generic;
 
 namespace MayShow.ViewModels;
 
@@ -28,6 +28,9 @@ class SettingsViewModel: ChangeNotifier
     private Settings _settings;
     private string _errorMessage;
     private ITopLevelGrabber? _topLevelGrabber;
+    private List<DateDisplayFormat> _dateFormats;
+    private int _gridDisplayDateFormatSelectedIndex;
+    private int _reportDisplayDateFormatSelectedIndex;
 
     public SettingsViewModel(Settings settingsToEdit, ITopLevelGrabber? topLevelGrabber): base()
     {
@@ -35,6 +38,17 @@ class SettingsViewModel: ChangeNotifier
         _settings = new Settings(settingsToEdit); // clone it
         _errorMessage = "";
         _topLevelGrabber = topLevelGrabber;
+        _dateFormats = Constants.GetDateDisplayFormats();
+        _gridDisplayDateFormatSelectedIndex = _dateFormats.FindIndex(x => x.Value == _previousSettings.DataGridDateFormat);
+        if (_gridDisplayDateFormatSelectedIndex == -1)
+        {
+            _gridDisplayDateFormatSelectedIndex = 0;
+        }
+        _reportDisplayDateFormatSelectedIndex = _dateFormats.FindIndex(x => x.Value == _previousSettings.ReportDateFormat);
+        if (_reportDisplayDateFormatSelectedIndex == -1)
+        {
+            _reportDisplayDateFormatSelectedIndex = 0;
+        }
     }
 
     public bool UseDocnetPDFImageRendering
@@ -105,6 +119,33 @@ class SettingsViewModel: ChangeNotifier
         set
         {
             _settings.SaveReportJsonDataInInternalDir = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public List<DateDisplayFormat> DateFormats
+    {
+        get => _dateFormats;
+    }
+
+    public int DataGridDisplayDateFormatSelectedIndex
+    {
+        get => _gridDisplayDateFormatSelectedIndex;
+        set
+        {
+            _gridDisplayDateFormatSelectedIndex = value;
+            _settings.DataGridDateFormat = _dateFormats[value].Value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public int ReportDisplayDateFormatSelectedIndex
+    {
+        get => _reportDisplayDateFormatSelectedIndex;
+        set
+        {
+            _reportDisplayDateFormatSelectedIndex = value;
+            _settings.ReportDateFormat = _dateFormats[value].Value;
             NotifyPropertyChanged();
         }
     }

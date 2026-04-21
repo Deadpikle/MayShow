@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace MayShows.Helpers;
+namespace MayShow.Helpers;
 
 public static class ThreadSafeRandom
 {
