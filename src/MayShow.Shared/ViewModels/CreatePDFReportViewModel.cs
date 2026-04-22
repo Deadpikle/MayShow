@@ -94,7 +94,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         { 
             _pdfReport.Title = value;
             NotifyPropertyChanged();
-            NotifyPropertyChanged(nameof(CanAddItem));
             HasUnsavedWork = true;
         }
     }
