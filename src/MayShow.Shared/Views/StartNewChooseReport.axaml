@@ -76,10 +76,10 @@
                HorizontalAlignment="Left"
                Margin="0,16,0,0"
                Grid.Column="1"
-               Grid.Row="6"/>
+               Grid.Row="4"/>
         <ScrollViewer Margin="0,8,0,32"
                       Grid.Column="1"
-                      Grid.Row="7"
+                      Grid.Row="5"
                       VerticalScrollBarVisibility="Visible"
                       AllowAutoHide="False"
                       HorizontalScrollBarVisibility="Disabled">
