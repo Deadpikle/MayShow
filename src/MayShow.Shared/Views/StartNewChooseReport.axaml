@@ -11,7 +11,7 @@
              xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:DataType="vm:StartNewChooseReportViewModel">
     <Grid ColumnDefinitions="100, *, 100"
-          RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, *">
+          RowDefinitions="Auto, Auto, Auto, Auto, Auto, *">
         <Button Command="{Binding ShowSettings}"
                 Grid.Row="0"
                 Grid.Column="0"
@@ -70,21 +70,6 @@
                         FontFamily="{StaticResource FontAwesomeSolid}" /> Create Blank Report</TextBlock>
             </Button>
         </Grid>
-        <Label Content="Start New Report From Existing Files"
-               HorizontalAlignment="Left"
-               FontSize="16"
-               FontWeight="Bold"
-               Margin="0,8,0,0"
-               Grid.Column="1"
-               Grid.Row="4"/>
-        <Button Command="{Binding StartReportFromFolder}"
-                Classes="accent"
-                Grid.Row="5"
-                Grid.Column="1">
-            <TextBlock>
-                <Run Text="&#xe494;"
-                    FontFamily="{StaticResource FontAwesomeSolid}" /> Create Report from Existing Folder</TextBlock>
-        </Button>
         <Label Content="Load Previously Saved Report"
                FontSize="16"
                FontWeight="Bold"

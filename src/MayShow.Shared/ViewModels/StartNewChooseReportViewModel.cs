@@ -1,15 +1,12 @@
 #nullable enable
 
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using DialogHostAvalonia;
 using MayShow.Interfaces;
 using MayShow.Models;
 using MayShow.Helpers;
-using System;
 using System.Threading.Tasks;
-using Avalonia.Platform.Storage;
 
 namespace MayShow.ViewModels;
 
@@ -56,7 +53,7 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
             LastSaved = null,
             UUID = Utilities.GetUniqueReportGuid(_settings).ToString()
         };
-        reportInfo.BaseFolder = Path.Combine(Utilities.GetInternalDataPath(), reportInfo.UUID); // default to internal directory
+        reportInfo.UpdateBaseFolder();
         // now update UI
         ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
         {
@@ -64,37 +61,6 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
             TopLevelGrabber = TopLevelGrabber
         });
         CreatingReportTitle = ""; // when user comes back they can start another new report
-    }
-
-    public async void StartReportFromFolder()
-    {
-        // pick folder, then create new report based on folder
-        // use folder name as report title for now
-        var topLevel = TopLevelGrabber?.GetTopLevel();
-        if (topLevel is not null)
-        {
-            var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()
-            {
-                Title = "Pick a folder of files...",
-                AllowMultiple = false,
-            });
-            if (folders.Count == 1)
-            {
-                var folder = folders[0];
-                var reportInfo = new PDFReportInfo()
-                {
-                    Title = Path.GetDirectoryName(folder.Path.LocalPath) ?? "",
-                    LastSaved = null,
-                    UUID = Utilities.GetUniqueReportGuid(_settings).ToString(),
-                    BaseFolder = folder.Path.LocalPath
-                };
-                ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
-                {
-                    UpdateRecentlyUsed = this,
-                    TopLevelGrabber = TopLevelGrabber
-                });
-            }
-        }
     }
 
     public void LoadExistingReport(object info) => LoadExistingReportImpl((PDFReportInfo) info);

@@ -11,20 +11,21 @@ namespace MayShow.Models;
 
 class PDFReportInfo : ChangeNotifier
 {
-    private string? _baseFolder; // might be null; if set, use this to know where (initial) working dir is
+    private string _baseFolder;
     private string _uuid;
     private string _title;
     private DateTime? _lastSaved;
 
     public PDFReportInfo() : base()
     {
-        _baseFolder = null;
         _uuid = Guid.NewGuid().ToString();
+        _baseFolder = "";
+        UpdateBaseFolder();
         _title = "";
         _lastSaved = null;
     }
 
-    public string? BaseFolder
+    public string BaseFolder
     {
         get => _baseFolder;
         set { _baseFolder = value; NotifyPropertyChanged(); }
@@ -46,6 +47,11 @@ class PDFReportInfo : ChangeNotifier
     {
         get => _lastSaved;
         set { _lastSaved = value; NotifyPropertyChanged(); }
+    }
+
+    public void UpdateBaseFolder()
+    {
+        _baseFolder = Path.Combine(Utilities.GetInternalDataPath(), _uuid);
     }
 
     public void ResetUUID()

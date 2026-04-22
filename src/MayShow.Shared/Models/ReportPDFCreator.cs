@@ -83,10 +83,10 @@ class ReportPDFCreator : ChangeNotifier
     }
 
     // https://forum.pdfsharp.net/viewtopic.php?f=2&t=1025
-    public async Task<string?> CreatePDF(List<ReportFile> reportFiles, string reportTitle, string workingDirPath, PDFFontResolver fontResolver, Settings appSettings)
+    public async Task<string?> CreatePDF(List<ReportFile> reportFiles, string reportTitle, string outputFolderPath, PDFFontResolver fontResolver, Settings appSettings)
     {
         // safety checks
-        var outputDir = appSettings.SaveOutputPdfInWorkingDir ? workingDirPath : appSettings.OutputPdfDir;
+        var outputDir = appSettings.SaveOutputPdfInWorkingDir ? outputFolderPath : appSettings.OutputPdfDir;
         if (!Directory.Exists(outputDir))
         {
             await DialogHost.Show(new WarningViewModel("Output directory not found! Please adjust your application Settings before continuing. Output directory: " + outputDir));
@@ -111,7 +111,7 @@ class ReportPDFCreator : ChangeNotifier
         // start making PDF!
         var outputFileName = reportTitle + ".pdf";
         var convertedDir = Utilities.GetTempConvertedImagesFolderPath();
-        var folderName = new DirectoryInfo(workingDirPath).Name;
+        var folderName = new DirectoryInfo(outputFolderPath).Name;
         if (folderName.Contains('-'))
         {
             // see if year/month format
@@ -170,7 +170,7 @@ class ReportPDFCreator : ChangeNotifier
         var pdfRenderer = new PdfDocumentRenderer
         {
             Document = pdfDoc,
-            WorkingDirectory = workingDirPath
+            WorkingDirectory = outputFolderPath
         };
         var hasAddedData = false;
         for (var i = 0; i < reportFiles.Count; i++)

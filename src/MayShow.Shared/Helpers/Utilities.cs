@@ -1,3 +1,4 @@
+#nullable enable
 
 using System;
 using System.Collections.Generic;
@@ -7,9 +8,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
-using Avalonia.Utilities;
+using System.Threading.Tasks;
 using MayShow.Models;
-using Tmds.DBus.Protocol;
 
 namespace MayShow.Helpers;
 
@@ -115,7 +115,7 @@ class Utilities
     {
         if (context == null)
         {
-            var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
+            var jsonContext = new SourceGenerationContext(GetSerializerOptions());
             context = jsonContext.PDFReport;
         }
         using var memoryStream = new MemoryStream();
@@ -124,5 +124,20 @@ class Utilities
         using var reader = new StreamReader(memoryStream);
         var updatedJson = reader.ReadToEnd();
         File.WriteAllText(path, updatedJson);
+    }
+
+    public static async Task SaveReportDataAsync(PDFReport reportData, string path, JsonTypeInfo<PDFReport>? context = null)
+    {
+        if (context == null)
+        {
+            var jsonContext = new SourceGenerationContext(GetSerializerOptions());
+            context = jsonContext.PDFReport;
+        }
+        using var memoryStream = new MemoryStream();
+        await JsonSerializer.SerializeAsync(memoryStream, reportData, context);
+        memoryStream.Position = 0;
+        using var reader = new StreamReader(memoryStream);
+        var json = await reader.ReadToEndAsync();
+        await File.WriteAllTextAsync(path, json);
     }
 }

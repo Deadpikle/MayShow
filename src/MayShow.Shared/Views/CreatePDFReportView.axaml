@@ -25,23 +25,8 @@
                 Margin="4,4,0,4">
             <TextBlock><Run Text="&#xf060;" FontFamily="{StaticResource FontAwesomeSolid}"/> Return to Main Menu</TextBlock>
         </Button>
-        <Grid ColumnDefinitions="Auto, *"
-              Margin="4,0,0,0">
-            <Button Content="Choose Receipt Folder"
-                    Command="{Binding ChooseFolder}"
-                    IsEnabled="{Binding !IsCreatingPDF}"
-                    Grid.Column="0" />
-            <TextBlock Text="{Binding WorkingFolder}"
-                       VerticalAlignment="Center"
-                       TextWrapping="NoWrap"
-                       Margin="4,0,4,0"
-                       TextTrimming="PrefixCharacterEllipsis"
-                       Grid.Column="1"/>
-        </Grid>
-        <Label Content="Report Title"
-               IsVisible="{Binding IsTitleBoxVisible}" />
+        <Label Content="Report Title" />
         <TextBox Text="{Binding ReportTitle}"
-                 IsVisible="{Binding IsTitleBoxVisible}"
                  Watermark="Receipts December 2024"
                  Margin="2,0,2,4"
                  Classes="clearButton"
@@ -249,7 +234,7 @@
                 <TextBlock><Run Text="&#xf162;" FontFamily="{StaticResource FontAwesomeSolid}"/> Re-sort PDF Items</TextBlock>
             </Button>
             <Button Command="{Binding SaveInterimReportInfo}"
-                    IsEnabled="{Binding HasWorkingFolderAndNotMakingPDF}">
+                    IsEnabled="{Binding !IsCreatingPDF}">
                 <TextBlock><Run Text="&#xf0c7;" FontFamily="{StaticResource FontAwesomeSolid}"/> Save Report Info</TextBlock>
             </Button>
         </StackPanel>

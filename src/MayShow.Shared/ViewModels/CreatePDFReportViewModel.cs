@@ -46,23 +46,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         InitializeProgramLog();
     }
 
-    // this is the "normal path" into the pdf report view
-    // pathToLoad is presumably _settings.LastUsedPath but doesn't have to be
-    // public CreatePDFReportViewModel(string pathToLoad, IChangeViewModel viewModelChanger) : this(viewModelChanger)
-    // {
-    //     _isPerformingInitialLoad = true;
-    //     if (!string.IsNullOrWhiteSpace(pathToLoad))
-    //     {
-    //         LogInfo("Loading report data at path: {0}", pathToLoad);
-    //         ScanFolder(pathToLoad);
-    //     }
-    //     else
-    //     {
-    //         LogInfo("Choose a receipt folder to begin...");
-    //     }
-    //     _isPerformingInitialLoad = false;
-    // }
-
     public CreatePDFReportViewModel(PDFReportInfo reportInfo, IChangeViewModel viewModelChanger) : this(viewModelChanger)
     {
         _isPerformingInitialLoad = true;
@@ -75,15 +58,15 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
         else
         {
-            // load data file in internal dir + UUID
-            var path = Path.Combine(Utilities.GetInternalDataPath(), _pdfReport.UUID);
-            if (Directory.Exists(path))
+            // load data file in internal data report dir
+            _pdfReport.BaseFolder = Path.Combine(Utilities.GetInternalDataPath(), _pdfReport.UUID);
+            if (Directory.Exists(_pdfReport.BaseFolder))
             {
-                ScanFolder(path); // even if points entirely to internal folder, we will be A-OK loading here
+                ScanFolder(_pdfReport.BaseFolder); // even if points entirely to internal folder, we will be A-OK loading here
             }
             else
             {
-                LogInfo("Erorr loading report! Folder does not exist: {0}", path);
+                LogInfo("Erorr loading report! Folder does not exist: {0}", _pdfReport.BaseFolder);
             }
         }
         _isPerformingInitialLoad = false;
@@ -99,7 +82,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             _pdfReport = value;
             NotifyPropertyChanged(nameof(ReportTitle));
             NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
-            NotifyPropertyChanged(nameof(WorkingFolder));
             NotifyPropertyChanged(nameof(ReportFiles));
             SetupFileCollectionChangedWatcher();
         }
@@ -112,20 +94,14 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         { 
             _pdfReport.Title = value;
             NotifyPropertyChanged();
-            NotifyPropertyChanged(nameof(IsTitleBoxVisible));
             NotifyPropertyChanged(nameof(CanAddItem));
             HasUnsavedWork = true;
         }
     }
 
-    public bool IsTitleBoxVisible
-    {
-        get => !string.IsNullOrWhiteSpace(WorkingFolder);
-    }
-
     public bool CanAddItem
     {
-        get => IsTitleBoxVisible && !IsCreatingPDF;
+        get => !IsCreatingPDF;
     }
 
     public bool IsCreatingPDF
@@ -136,7 +112,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             _isCreatingPDF = value; 
             NotifyPropertyChanged();
             NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); 
-            NotifyPropertyChanged(nameof(HasWorkingFolderAndNotMakingPDF));
             NotifyPropertyChanged(nameof(CanAddItem)); 
         }
     }
@@ -144,38 +119,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     public bool IsCreatePDFButtonEnabled
     {
         get => !_isCreatingPDF && _pdfReport.Files.Count > 0;
-    }
-
-    public bool HasWorkingFolder
-    {
-        get => !string.IsNullOrWhiteSpace(WorkingFolder) && Directory.Exists(WorkingFolder);
-    }
-
-    public bool HasWorkingFolderAndNotMakingPDF
-    {
-        get => !string.IsNullOrWhiteSpace(WorkingFolder) && Directory.Exists(WorkingFolder) && !_isCreatingPDF;
-    }
-
-    public string WorkingFolder
-    {
-        get 
-        {
-            if (string.IsNullOrWhiteSpace(_pdfReport.BaseFolder))
-            {
-                return Path.Combine(Utilities.GetInternalDataPath(), _pdfReport.UUID);
-            }
-            else
-            {
-                return _pdfReport.BaseFolder;
-            }
-        }
-        set
-        {
-            _pdfReport.BaseFolder = value;
-            NotifyPropertyChanged();
-            NotifyPropertyChanged(nameof(HasWorkingFolder));
-            NotifyPropertyChanged(nameof(HasWorkingFolderAndNotMakingPDF));
-        }
     }
 
     public string ProgramLog
@@ -269,25 +212,20 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
     }
 
-    private string GetReportSavedDataPath(string workingFolder)
+    private string GetReportSavedDataPath()
     {
-        var internalPath = Utilities.GetInternalDataPath();
-        var internalReportDataDir = Path.Combine(internalPath, _pdfReport.UUID);
-        if (!Directory.Exists(internalReportDataDir))
+        if (!Directory.Exists(_pdfReport.BaseFolder))
         {
-            Directory.CreateDirectory(internalReportDataDir);
+            Directory.CreateDirectory(_pdfReport.BaseFolder);
         }
-        return Path.Combine(internalReportDataDir, Constants.ReportSavedDataFileName);
+        return Path.Combine(_pdfReport.BaseFolder, Constants.ReportSavedDataFileName);
     }
 
     private void ScanFolder(string path)
     {
         if (Directory.Exists(path))
         {
-            WorkingFolder = path;
-            NotifyPropertyChanged(nameof(IsTitleBoxVisible));
-            NotifyPropertyChanged(nameof(CanAddItem));
-            var reportFilePath = GetReportSavedDataPath(path);
+            var reportFilePath = GetReportSavedDataPath();
             var successfullyLoadedPriorReportFile = false;
             if (File.Exists(reportFilePath))
             {
@@ -307,19 +245,19 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                 // Scan folder for files and display in DataGrid
                 if (path != PDFReport.BaseFolder)
                 {
-                    // in this case, there is essentially no report existing, 
+                    // in this case, there is essentially no existing report, 
                     // so we need to make a new one.
                     PDFReport = new PDFReport()
                     {
                         Title = Path.GetDirectoryName(path) ?? "",
                         LastSaved = null,
                         UUID = Utilities.GetUniqueReportGuid(_settings).ToString(),
-                        BaseFolder = path
                     };
+                    PDFReport.UpdateBaseFolder();
                 }
                 ReportFiles.Clear();
                 ReportTitle = "";
-                var filePaths = Directory.GetFiles(WorkingFolder);
+                var filePaths = Directory.GetFiles(path);
                 foreach (var filePath in filePaths)
                 {
                     AddFileBasedOnPath(filePath);
@@ -539,7 +477,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         {
             try
             {
-                await Task.Run(() => CreatePDF(WorkingFolder));
+                await Task.Run(() => CreatePDF(outputFolderPath: _pdfReport.BaseFolder));
             } catch (Exception e)
             {
                 LogInfo("PDF process failed! Reason: " + e.Message);
@@ -578,14 +516,8 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     private async Task SavePDFReportDataToDisk(PDFReport report)
     {
-        var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
-        using var memoryStream = new MemoryStream();
-        await JsonSerializer.SerializeAsync(memoryStream, report, jsonContext.PDFReport);
-        memoryStream.Position = 0;
-        using var reader = new StreamReader(memoryStream);
-        var json = await reader.ReadToEndAsync();
-        var savePath = GetReportSavedDataPath(WorkingFolder);
-        await File.WriteAllTextAsync(savePath, json);
+        var savePath = GetReportSavedDataPath();
+        await Utilities.SaveReportDataAsync(report, savePath);
         LogInfo("Saved report information to {0}", savePath);
         HasUnsavedWork = false;
         UpdateRecentlyUsed?.UpdateRecentlyUsed(report);
@@ -602,11 +534,11 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
     }
 
-    private async Task CreatePDF(string folderPath)
+    private async Task CreatePDF(string outputFolderPath)
     {
         IsCreatingPDF = true;
         var reportCreator = new ReportPDFCreator(this);
-        var outputPdfFile = await reportCreator.CreatePDF(ReportFiles.ToList(), ReportTitle, folderPath, new PDFFontResolver(_processDir, this), _settings);
+        var outputPdfFile = await reportCreator.CreatePDF(ReportFiles.ToList(), ReportTitle, outputFolderPath, new PDFFontResolver(_processDir, this), _settings);
         if (!string.IsNullOrWhiteSpace(outputPdfFile))
         {
             await CreateAndSaveReportObjectAfterReportCreation();
@@ -617,8 +549,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     public async void ReturnToMainMenu()
     {
-        bool isSafeToReturn = await CheckIsSafeToShutdown();
-        if (isSafeToReturn)
+        if (await CheckIsSafeToShutdown())
         {
             PopViewModel();
         }
@@ -626,7 +557,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     public async Task<bool> CheckIsSafeToShutdown()
     {
-        if (!HasUnsavedWork || string.IsNullOrWhiteSpace(WorkingFolder))
+        if (!HasUnsavedWork)
         {
             return true;
         }
