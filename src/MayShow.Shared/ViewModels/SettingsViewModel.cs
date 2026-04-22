@@ -115,12 +115,12 @@ class SettingsViewModel: ChangeNotifier
 
     public bool SaveReportJsonDataInInternalDir
     {
-        get => _settings.SaveReportJsonDataInInternalDir;
-        set
-        {
-            _settings.SaveReportJsonDataInInternalDir = value;
-            NotifyPropertyChanged();
-        }
+        get => true; // _settings.SaveReportJsonDataInInternalDir;
+        //set
+        //{
+        //    _settings.SaveReportJsonDataInInternalDir = value;
+        //    NotifyPropertyChanged();
+        //}
     }
 
     public List<DateDisplayFormat> DateFormats

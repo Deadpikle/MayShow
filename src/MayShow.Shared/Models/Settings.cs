@@ -217,6 +217,7 @@ class Settings : ChangeNotifier
             }
             settings.AllReportInfo = list.OrderBy(x => x.Title).ToList();
             settings.WorkingFolderToInternalFolderName = []; // clear this list; it is no longer going to be used
+            settings.SaveReportJsonDataInInternalDir = true; // this is now always true
             settings.SettingsVersion = 2;
             settings.SaveSettingsNotAsync(); // saves all data; UUIDs should be in sync if user has toggled settings
         }

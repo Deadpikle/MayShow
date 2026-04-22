@@ -72,7 +72,7 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <CheckBox IsChecked="{Binding SaveReportJsonDataInInternalDir}">Save report data (names, notes, etc.) in MayShow settings directory (saves in working directory by default)</CheckBox>
+            <!-- <CheckBox IsChecked="{Binding SaveReportJsonDataInInternalDir}">Save report data (names, notes, etc.) in MayShow settings directory (saves in working directory by default)</CheckBox> -->
             <Button Command="{Binding OpenSettingsDir}">
                 <TextBlock>
                     <Run Text="&#xf07c;"
