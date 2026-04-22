@@ -17,7 +17,6 @@ class Settings : ChangeNotifier
     private bool _saveOutputPdfInWorkingDir;
     private string _outputPdfDir;
     private decimal _imageResizeThreshold;
-    private bool _saveReportJsonDataInInternalDir;
     private Dictionary<string, string> _workingFolderToInternalFolderName; // obsolete
     private List<PDFReportInfo> _allReportInfo;
     public string _dataGridDateFormat;
@@ -31,7 +30,6 @@ class Settings : ChangeNotifier
         _saveOutputPdfInWorkingDir = true;
         _outputPdfDir = "";
         _imageResizeThreshold = 1.5m;
-        _saveReportJsonDataInInternalDir = false;
         _workingFolderToInternalFolderName = [];
         _allReportInfo = [];
         _settingsVersion = 2;
@@ -46,7 +44,6 @@ class Settings : ChangeNotifier
         _saveOutputPdfInWorkingDir = other.SaveOutputPdfInWorkingDir;
         _outputPdfDir = other.OutputPdfDir;
         _imageResizeThreshold = other.ImageResizeThreshold;
-        _saveReportJsonDataInInternalDir = other.SaveReportJsonDataInInternalDir;
         _workingFolderToInternalFolderName = other.WorkingFolderToInternalFolderName;
         _settingsVersion = other.SettingsVersion;
         _allReportInfo = other.AllReportInfo;
@@ -88,13 +85,6 @@ class Settings : ChangeNotifier
     {
         get => _imageResizeThreshold;
         set { _imageResizeThreshold = value; NotifyPropertyChanged(); }
-    }
-
-    [JsonInclude]
-    public bool SaveReportJsonDataInInternalDir
-    {
-        get => _saveReportJsonDataInInternalDir;
-        set { _saveReportJsonDataInInternalDir = value; NotifyPropertyChanged(); }
     }
 
     [JsonInclude]
@@ -217,7 +207,6 @@ class Settings : ChangeNotifier
             }
             settings.AllReportInfo = list.OrderBy(x => x.Title).ToList();
             settings.WorkingFolderToInternalFolderName = []; // clear this list; it is no longer going to be used
-            settings.SaveReportJsonDataInInternalDir = true; // this is now always true
             settings.SettingsVersion = 2;
             settings.SaveSettingsNotAsync(); // saves all data; UUIDs should be in sync if user has toggled settings
         }

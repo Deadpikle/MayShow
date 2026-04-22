@@ -113,16 +113,6 @@ class SettingsViewModel: ChangeNotifier
         }
     }
 
-    public bool SaveReportJsonDataInInternalDir
-    {
-        get => true; // _settings.SaveReportJsonDataInInternalDir;
-        //set
-        //{
-        //    _settings.SaveReportJsonDataInInternalDir = value;
-        //    NotifyPropertyChanged();
-        //}
-    }
-
     public List<DateDisplayFormat> DateFormats
     {
         get => _dateFormats;

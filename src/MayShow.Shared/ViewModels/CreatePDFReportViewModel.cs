@@ -271,20 +271,13 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     private string GetReportSavedDataPath(string workingFolder)
     {
-        if (_settings.SaveReportJsonDataInInternalDir)
+        var internalPath = Utilities.GetInternalDataPath();
+        var internalReportDataDir = Path.Combine(internalPath, _pdfReport.UUID);
+        if (!Directory.Exists(internalReportDataDir))
         {
-            var internalPath = Utilities.GetInternalDataPath();
-            var internalReportDataDir = Path.Combine(internalPath, _pdfReport.UUID);
-            if (!Directory.Exists(internalReportDataDir))
-            {
-                Directory.CreateDirectory(internalReportDataDir);
-            }
-            return Path.Combine(internalReportDataDir, Constants.ReportSavedDataFileName);
+            Directory.CreateDirectory(internalReportDataDir);
         }
-        else
-        {
-            return Path.Combine(workingFolder, Constants.ReportSavedDataFileName);
-        }
+        return Path.Combine(internalReportDataDir, Constants.ReportSavedDataFileName);
     }
 
     private void ScanFolder(string path)
