@@ -5,22 +5,33 @@
 -duplicate existing report with new name
 -cleanup empty uuid folders in case user gets an internal folder created but never saves
 
--add dropdown to Add Items button to have add items from folder and remove choose working folder option (data always saved internally)
 *-always save report data (file locations, title, etc.) to internal dir (might already be done?)
     -no more option to save data internally -> ALWAYS save report_data.json internally
--Now that the BaseFolder is not really set...update option for PDF output
-    -output in internal dir
-    -always ask me every time
-    -always put in X folder
--update project title -> should update recently used data
+*-update project title -> should update recently used data
     -this sort of works, something is wrong with the upgrade process where the UUID is not brought over properly; need to test and fix (maybe fixed already and my dataset is wrong?)
--add option to backup added files to internal data directory
+-Now that the BaseFolder is always internal...update options for PDF output location
+    -output in internal dir (default)
+    -always ask me every time (opens save file picker after generating PDF to ask user where they want it)
+    -always put in X folder (uses existing option)
+-add dropdown to Add Items button to have add items from folder and remove choose working folder option (data always saved internally)
+    -don't re-add already-existing files?
+-add option to backup added files to internal data directory (always on for iOS)
 -make backup of last generated PDF somewhere
 -iOS-specific (MAUI essentials?)
+    -maui community essentials https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/get-started?tabs=CommunityToolkitMaui
+        -I don't think this is what we are looking for ultimately....?
+        -https://github.com/AvaloniaUI/Avalonia.Essentials
+        -https://github.com/AvaloniaUI/AvaloniaMauiHybrid -- this may have to be the way to go or perhaps grab code from https://github.com/AvaloniaUI/Avalonia.Controls.Maui/tree/main/src/Avalonia.Controls.Maui.Essentials because we don't need the avalonia tie in stuff if it "just works"...but don't know if it will "just work" yet. apparently native APIs are available through net10.0-ios or whatnot but I'd rather use the existing wrappers/tutorials since those will just work just like we want...
+    -auto save on every action
     -Take picture
+        -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/device-media/picker?view=net-maui-10.0&tabs=macios
     -Add pic from gallery
-    -Add file (uses Files picking)
+        -see above link
+    -Add file (uses Files picking, I think this already mostly works just need to copy to internal data dir)
     -Generate PDF -> Share/print screen to share/print
+        -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios
+    -Make sure clipboard works (not sure if it will out of the box or not)
+        -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/clipboard?view=net-maui-10.0
 
 -----------
 
