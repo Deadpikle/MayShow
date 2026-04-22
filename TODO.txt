@@ -1,9 +1,19 @@
 ----iOS----
 
 -quickstart for loading last edited report on main menu
--option/setting to put picture data into internal data dir for backup (always on for mobile)
+-option/setting to put copy/duplicate picture data into internal data dir for backup (always on for mobile)
 -duplicate existing report with new name
 -cleanup empty uuid folders in case user gets an internal folder created but never saves
+
+-always save report data (file locations, title, etc.) to internal dir (might already be done?)
+-add dropdown to Add Items button to have add items from folder and remove choose working folder option (data always saved internally)
+-update project title -> should update recently used data
+    -this sort of works, something is wrong with the upgrade process where the UUID is not brought over properly; need to test and fix (maybe fixed already and my dataset is wrong?)
+-iOS-specific (MAUI essentials?)
+    -Take picture
+    -Add pic from gallery
+    -Add file (uses Files picking)
+    -Generate PDF -> Share/print screen to share/print
 
 -----------
 

@@ -188,11 +188,37 @@ class Settings : ChangeNotifier
                     LastSaved = lastSaved,
                     BaseFolder = data.Key,
                 };
+                // if UUID exists in BaseFolder/(Constants.ReportSavedDataFileName), use that UUID instead.
+                var existingReportDataPath = Path.Combine(reportInfo.BaseFolder, Constants.ReportSavedDataFileName);
+                if (File.Exists(existingReportDataPath))
+                {
+                    var originalReportData = JsonSerializer.Deserialize(File.ReadAllText(existingReportDataPath), jsonContext.PDFReport);
+                    if (originalReportData != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(originalReportData.UUID))
+                        {
+                            Directory.Move(Path.Combine(internalPath, uuid), Path.Combine(internalPath, originalReportData.UUID));
+                            reportInfo.UUID = originalReportData.UUID;
+                        }
+                        else
+                        {
+                            // update UUID so they are in sync between internal and external folders
+                            originalReportData.UUID = reportInfo.UUID;
+                            using var memoryStream = new MemoryStream();
+                            JsonSerializer.Serialize(memoryStream, report, jsonContext.PDFReport);
+                            memoryStream.Position = 0;
+                            using var reader = new StreamReader(memoryStream);
+                            var updatedJson = reader.ReadToEnd();
+                            File.WriteAllText(existingReportDataPath, updatedJson);
+                        }
+                    }
+                }
                 list.Add(reportInfo);
             }
             settings.AllReportInfo = list.OrderBy(x => x.Title).ToList();
-            settings.WorkingFolderToInternalFolderName = []; // clear this list; it is no longer used
+            settings.WorkingFolderToInternalFolderName = []; // clear this list; it is no longer going to be used
             settings.SettingsVersion = 2;
+            settings.SaveSettingsNotAsync(); // saves all data; UUIDs should be in sync if user has toggled settings
         }
         return settings;
     }
