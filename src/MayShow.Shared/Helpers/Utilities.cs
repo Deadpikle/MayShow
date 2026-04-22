@@ -5,7 +5,9 @@ using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
+using Avalonia.Utilities;
 using MayShow.Models;
 using Tmds.DBus.Protocol;
 
@@ -107,5 +109,20 @@ class Utilities
             }
         }
         return guid;
+    }
+
+    public static void SaveReportDataSync(PDFReport reportData, string path, JsonTypeInfo<PDFReport>? context)
+    {
+        if (context == null)
+        {
+            var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
+            context = jsonContext.PDFReport;
+        }
+        using var memoryStream = new MemoryStream();
+        JsonSerializer.Serialize(memoryStream, reportData, context);
+        memoryStream.Position = 0;
+        using var reader = new StreamReader(memoryStream);
+        var updatedJson = reader.ReadToEnd();
+        File.WriteAllText(path, updatedJson);
     }
 }
