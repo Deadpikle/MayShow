@@ -1,7 +1,6 @@
 ----iOS----
 
 -quickstart for loading last edited report on main menu
--option/setting to put copy/duplicate picture data into internal data dir for backup (always on for mobile)
 -duplicate existing report with new name
 -cleanup empty uuid folders in case user gets an internal folder created but never saves
 
@@ -14,7 +13,6 @@
     -always ask me every time (opens save file picker after generating PDF to ask user where they want it)
     -always put in X folder (uses existing option)
 -add dropdown to Add Items button to have add items from folder and remove choose working folder option (data always saved internally)
-    -don't re-add already-existing files?
 -add option to backup added files to internal data directory (always on for iOS)
 -make backup of last generated PDF somewhere
 -iOS-specific (MAUI essentials?)
