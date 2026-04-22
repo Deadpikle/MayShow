@@ -11,6 +11,9 @@ class Constants
     public static string[] AllowedFileExtensionPatterns = [ "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp", "*.pdf", "*.heic", ];
     public static string[] AllowedFileExtensionsNoStar = [ "png", "jpg", "jpeg", "gif", "bmp", "webp", "pdf", "heic", ];
 
+    public static string[] FilePickerMimeTypes = [ "image/*", "application/pdf", "image/heic" ];
+    public static string[] FilePickerAppleTypeIdentifiers = [ "public.image", "com.adobe.pdf", "public.heic" ];
+
     public static string ReportSavedDataFileName = "report_data.json";
 
     public static List<DateDisplayFormat> GetDateDisplayFormats()

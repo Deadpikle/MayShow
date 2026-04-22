@@ -296,22 +296,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             {
                 Title = "Choose image or PDF files...",
                 AllowMultiple = true,
-                FileTypeFilter = [
-                    new FilePickerFileType("All Types")
-                    {
-                        Patterns = Constants.AllowedFileExtensionPatterns,
-                        AppleUniformTypeIdentifiers = [ "public.image", "com.adobe.pdf", "public.heic" ],
-                        MimeTypes = [ "image/*", "application/pdf", "image/heic" ]
-                    },
-                    FilePickerFileTypes.ImageAll, 
-                    new FilePickerFileType("HEIC Images")
-                    {
-                        Patterns = [ "*.heic" ],
-                        AppleUniformTypeIdentifiers = [ "public.heic" ],
-                        MimeTypes = [ "image/heic" ]
-                    },
-                    FilePickerFileTypes.Pdf,
-                ],
+                FileTypeFilter = Utilities.GetReportFilePickerFileTypes(),
             });
             if (files.Count > 0)
             {
@@ -401,22 +386,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             {
                 Title = "Choose image or PDF file...",
                 AllowMultiple = false,
-                FileTypeFilter = [
-                    new FilePickerFileType("All Types")
-                    {
-                        Patterns = Constants.AllowedFileExtensionPatterns,
-                        AppleUniformTypeIdentifiers = [ "public.image", "com.adobe.pdf", "public.heic" ],
-                        MimeTypes = [ "image/*", "application/pdf", "image/heic" ]
-                    },
-                    FilePickerFileTypes.ImageAll, 
-                    new FilePickerFileType("HEIC Images")
-                    {
-                        Patterns = [ "*.heic" ],
-                        AppleUniformTypeIdentifiers = [ "public.heic" ],
-                        MimeTypes = [ "image/heic" ]
-                    },
-                    FilePickerFileTypes.Pdf,
-                ],
+                FileTypeFilter = Utilities.GetReportFilePickerFileTypes(),
             });
             if (files.Count > 0)
             {

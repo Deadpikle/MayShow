@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Avalonia.Platform.Storage;
 using MayShow.Models;
 
 namespace MayShow.Helpers;
@@ -139,5 +140,25 @@ class Utilities
         using var reader = new StreamReader(memoryStream);
         var json = await reader.ReadToEndAsync();
         await File.WriteAllTextAsync(path, json);
+    }
+
+    public static FilePickerFileType[] GetReportFilePickerFileTypes()
+    {
+        return [
+            new FilePickerFileType("All Types")
+            {
+                Patterns = Constants.AllowedFileExtensionPatterns,
+                AppleUniformTypeIdentifiers = Constants.FilePickerAppleTypeIdentifiers,
+                MimeTypes = Constants.FilePickerMimeTypes,
+            },
+            FilePickerFileTypes.ImageAll, 
+            new FilePickerFileType("HEIC Images")
+            {
+                Patterns = [ "*.heic" ],
+                AppleUniformTypeIdentifiers = [ "public.heic" ],
+                MimeTypes = [ "image/heic" ]
+            },
+            FilePickerFileTypes.Pdf,
+        ];
     }
 }
