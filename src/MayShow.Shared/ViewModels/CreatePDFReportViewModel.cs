@@ -111,8 +111,14 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             _isCreatingPDF = value; 
             NotifyPropertyChanged();
             NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled)); 
-            NotifyPropertyChanged(nameof(CanAddItem)); 
+            NotifyPropertyChanged(nameof(CanAddItem));
+            NotifyPropertyChanged(nameof(IsSaveButtonAccentOn));
         }
+    }
+
+    public bool IsSaveButtonAccentOn
+    {
+        get => !_isCreatingPDF && HasUnsavedWork;
     }
 
     public bool IsCreatePDFButtonEnabled
@@ -133,6 +139,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         {
             _hasUnsavedWork = value;
             NotifyPropertyChanged();
+            NotifyPropertyChanged(nameof(IsSaveButtonAccentOn));
         }
     }
 

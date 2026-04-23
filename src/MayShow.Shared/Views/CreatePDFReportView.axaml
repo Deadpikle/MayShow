@@ -222,7 +222,7 @@
                     Spacing="4">
             <Button Command="{Binding AddItem}"
                     IsEnabled="{Binding CanAddItem}">
-                <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item(s)</TextBlock>
+                <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item(s)...</TextBlock>
             </Button>
             <Button Command="{Binding RemoveAllItems}"
                     IsEnabled="{Binding IsCreatePDFButtonEnabled}"
@@ -234,6 +234,7 @@
                 <TextBlock><Run Text="&#xf162;" FontFamily="{StaticResource FontAwesomeSolid}"/> Re-sort PDF Items</TextBlock>
             </Button>
             <Button Command="{Binding SaveInterimReportInfo}"
+                    Classes.accent="{Binding IsSaveButtonAccentOn}"
                     IsEnabled="{Binding !IsCreatingPDF}">
                 <TextBlock><Run Text="&#xf0c7;" FontFamily="{StaticResource FontAwesomeSolid}"/> Save Report Info</TextBlock>
             </Button>
