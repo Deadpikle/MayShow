@@ -85,15 +85,6 @@ class ReportPDFCreator : ChangeNotifier
     // https://forum.pdfsharp.net/viewtopic.php?f=2&t=1025
     public async Task<string?> CreatePDF(List<ReportFile> reportFiles, string reportTitle, string outputFolderPath, PDFFontResolver fontResolver, Settings appSettings)
     {
-        // safety checks
-        var outputDir = appSettings.PDFOutputSaveLocation == Enums.PDFSaveLocation.BaseFolder 
-            ? outputFolderPath 
-            : appSettings.OutputPdfDir; // TODO: adjust for new logic
-        if (!Directory.Exists(outputDir))
-        {
-            await DialogHost.Show(new WarningViewModel("Output directory not found! Please adjust your application Settings before continuing. Output directory: " + outputDir));
-            return null;
-        }
         // setup globals and consts...
         GlobalFontSettings.FontResolver = fontResolver;
         GlobalFontSettings.FallbackFontResolver = new FailsafeFontResolver();
@@ -403,7 +394,7 @@ class ReportPDFCreator : ChangeNotifier
         pdfRenderer.DocumentRenderer.PrepareDocument(); // needed if you make edits after first PrepareDocument() is called
         pdfRenderer.RenderDocument();
         // actually save to disk now
-        string outputPDFFilePath = Path.Join(outputDir, outputFileName);
+        string outputPDFFilePath = Path.Join(outputFolderPath, outputFileName);
         _logger?.LogInfo("Saving PDF document to disk...");
         pdfRenderer.PdfDocument.Save(outputPDFFilePath);
         _logger?.LogInfo("Finished saving PDF output to: " + outputPDFFilePath);

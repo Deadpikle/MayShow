@@ -11,6 +11,7 @@ using MayShow.Interfaces;
 using MayShow.Models;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Avalonia.Threading;
 
 namespace MayShow.ViewModels;
 
@@ -453,7 +454,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         {
             try
             {
-                await Task.Run(() => CreatePDF(outputFolderPath: _pdfReport.BaseFolder));
+                await Task.Run(() => CreatePDF());
             } catch (Exception e)
             {
                 LogInfo("PDF process failed! Reason: " + e.Message);
@@ -510,15 +511,58 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
     }
 
-    private async Task CreatePDF(string outputFolderPath)
+    private async Task CreatePDF()
     {
         IsCreatingPDF = true;
         var reportCreator = new ReportPDFCreator(this);
-        var outputPdfFile = await reportCreator.CreatePDF(ReportFiles.ToList(), ReportTitle, outputFolderPath, new PDFFontResolver(_processDir, this), _settings);
-        if (!string.IsNullOrWhiteSpace(outputPdfFile))
+        var outputDir = "";
+        switch (_settings.PDFOutputSaveLocation)
         {
-            await CreateAndSaveReportObjectAfterReportCreation();
-            OpenFolderForFileInFileViewer(outputPdfFile);
+            case Enums.PDFSaveLocation.BaseFolder:
+                outputDir = _pdfReport.BaseFolder;
+                break;
+            case Enums.PDFSaveLocation.AlwaysAsk:
+                await Dispatcher.UIThread.InvokeAsync(async () => 
+                {
+                    var topLevel = TopLevelGrabber?.GetTopLevel();
+                    if (topLevel != null)
+                    {
+                        var result = await topLevel.StorageProvider.SaveFilePickerWithResultAsync(new FilePickerSaveOptions
+                        {
+                            Title = "Choose PDF save location...",
+                            FileTypeChoices = [FilePickerFileTypes.Pdf],
+                            SuggestedFileType = FilePickerFileTypes.Pdf,
+                            DefaultExtension = "pdf",
+                            ShowOverwritePrompt = true,
+                        });
+
+                        if (result.File is not null)
+                        {
+                            var path = result.File.Path.AbsolutePath;
+                            Console.WriteLine(path); // <--- this is what I want
+                        }
+                    }
+                });
+                IsCreatingPDF = false;
+                return;
+                break;
+            case Enums.PDFSaveLocation.OtherChosenDir:
+                outputDir = _settings.OutputPdfDir;
+                break;
+        }
+        // safety checks
+        if (!Directory.Exists(outputDir))
+        {
+            await DialogHost.Show(new WarningViewModel("Output directory not found! Please adjust your application Settings before continuing. Output directory: " + outputDir));
+        }
+        else
+        {
+            var outputPdfFile = await reportCreator.CreatePDF(ReportFiles.ToList(), ReportTitle, outputDir, new PDFFontResolver(_processDir, this), _settings);
+            if (!string.IsNullOrWhiteSpace(outputPdfFile))
+            {
+                await CreateAndSaveReportObjectAfterReportCreation();
+                OpenFolderForFileInFileViewer(outputPdfFile);
+            }
         }
         IsCreatingPDF = false;
     }
