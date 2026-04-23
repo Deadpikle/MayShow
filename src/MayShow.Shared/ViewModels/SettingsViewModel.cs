@@ -8,6 +8,7 @@ using MayShow.Interfaces;
 using MayShow.Models;
 using MayShow.Helpers;
 using System.Collections.Generic;
+using MayShow.Enums;
 
 namespace MayShow.ViewModels;
 
@@ -50,13 +51,19 @@ class SettingsViewModel: ChangeNotifier
         }
     }
 
-    public bool SaveOutputPdfInWorkingDir
+    public bool SaveOutputPdfInChosenDir
     {
-        get => _settings.SaveOutputPdfInWorkingDir;
+        get => PDFOutputSaveLocation == PDFSaveLocation.OtherChosenDir;
+    }
+
+    public PDFSaveLocation PDFOutputSaveLocation
+    {
+        get => _settings.PDFOutputSaveLocation;
         set
         {
-            _settings.SaveOutputPdfInWorkingDir = value;
+            _settings.PDFOutputSaveLocation = value;
             NotifyPropertyChanged();
+            NotifyPropertyChanged(nameof(SaveOutputPdfInChosenDir));
         }
     }
 
@@ -73,7 +80,7 @@ class SettingsViewModel: ChangeNotifier
 
     public bool IsOutputPdfDirValid
     {
-        get => SaveOutputPdfInWorkingDir || (!SaveOutputPdfInWorkingDir && Directory.Exists(OutputPdfDirPath));
+        get => !SaveOutputPdfInChosenDir || (SaveOutputPdfInChosenDir && Directory.Exists(OutputPdfDirPath));
     }
 
     public bool HasErrorMessage

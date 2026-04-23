@@ -86,7 +86,9 @@ class ReportPDFCreator : ChangeNotifier
     public async Task<string?> CreatePDF(List<ReportFile> reportFiles, string reportTitle, string outputFolderPath, PDFFontResolver fontResolver, Settings appSettings)
     {
         // safety checks
-        var outputDir = appSettings.SaveOutputPdfInWorkingDir ? outputFolderPath : appSettings.OutputPdfDir;
+        var outputDir = appSettings.PDFOutputSaveLocation == Enums.PDFSaveLocation.BaseFolder 
+            ? outputFolderPath 
+            : appSettings.OutputPdfDir; // TODO: adjust for new logic
         if (!Directory.Exists(outputDir))
         {
             await DialogHost.Show(new WarningViewModel("Output directory not found! Please adjust your application Settings before continuing. Output directory: " + outputDir));

@@ -7,9 +7,14 @@
              d:DesignHeight="450"
              x:Class="MayShow.Views.SettingsView"
              xmlns:models="clr-namespace:MayShow.Models"
+             xmlns:enums="clr-namespace:MayShow.Enums"
              xmlns:vm="clr-namespace:MayShow.ViewModels"
+             xmlns:converters="using:Avalonia.Controls.Converters"
              x:DataType="vm:SettingsViewModel"
              MaxWidth="450">
+    <UserControl.Resources>
+        <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+    </UserControl.Resources>
     <ScrollViewer AllowAutoHide="False">
         <StackPanel Orientation="Vertical"
                     Spacing="8"
@@ -32,10 +37,26 @@
                            HorizontalAlignment="Left"
                            Margin="0,0,0,4" />
             <CheckBox IsChecked="{Binding !UseDocnetPDFImageRendering}">Use legacy PDF handling (does not work with macOS annotations)</CheckBox>
-            <CheckBox IsChecked="{Binding SaveOutputPdfInWorkingDir}">Always save report PDF in working directory</CheckBox>
+            <StackPanel Spacing="0">
+                <Label HorizontalAlignment="Left">
+                    Save created PDF Report in the following location:
+                </Label>
+                <RadioButton Content="MayShow application directory"
+                             IsChecked="{Binding PDFOutputSaveLocation,
+                                Converter={StaticResource EnumToBoolConverter},
+                                ConverterParameter={x:Static enums:PDFSaveLocation.BaseFolder}}" />
+                <RadioButton Content="Ask me where to save the PDF file every time"
+                             IsChecked="{Binding PDFOutputSaveLocation,
+                                Converter={StaticResource EnumToBoolConverter},
+                                ConverterParameter={x:Static enums:PDFSaveLocation.AlwaysAsk}}" />
+                <RadioButton Content="Always save PDF file in the same folder of my choice"
+                             IsChecked="{Binding PDFOutputSaveLocation,
+                                Converter={StaticResource EnumToBoolConverter},
+                                ConverterParameter={x:Static enums:PDFSaveLocation.OtherChosenDir}}" />
+            </StackPanel>
             <Grid ColumnDefinitions="Auto, *"
-                IsVisible="{Binding !SaveOutputPdfInWorkingDir}">
-                <Button Content="Choose report output folder..."
+                  IsVisible="{Binding SaveOutputPdfInChosenDir}">
+                <Button Content="Choose PDF report output folder..."
                         Grid.Column="0"
                         Command="{Binding ChooseOutputFolder}"
                         VerticalAlignment="Top"/>

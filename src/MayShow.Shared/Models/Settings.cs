@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using MayShow.Enums;
 using MayShow.Helpers;
 
 namespace MayShow.Models;
@@ -14,7 +15,7 @@ class Settings : ChangeNotifier
 {
     private string _lastUsedPath;
     private bool _useDocnetPDFImageRendering;
-    private bool _saveOutputPdfInWorkingDir;
+    private bool _saveOutputPdfInWorkingDir; // obsolete
     private string _outputPdfDir;
     private decimal _imageResizeThreshold;
     private Dictionary<string, string> _workingFolderToInternalFolderName; // obsolete
@@ -22,6 +23,7 @@ class Settings : ChangeNotifier
     public string _dataGridDateFormat;
     public string _reportDateFormat;
     public int _settingsVersion;
+    private PDFSaveLocation _pdfOutputSaveLocation;
 
     public Settings() : base()
     {
@@ -32,9 +34,10 @@ class Settings : ChangeNotifier
         _imageResizeThreshold = 1.5m;
         _workingFolderToInternalFolderName = [];
         _allReportInfo = [];
-        _settingsVersion = 2;
+        _settingsVersion = 3;
         _dataGridDateFormat = "dd/MM/yyyy";
         _reportDateFormat = "yyyy-MM-dd";
+        _pdfOutputSaveLocation = PDFSaveLocation.BaseFolder;
     }
 
     public Settings(Settings other)
@@ -49,6 +52,7 @@ class Settings : ChangeNotifier
         _allReportInfo = other.AllReportInfo;
         _dataGridDateFormat = other.DataGridDateFormat;
         _reportDateFormat = other.ReportDateFormat;
+        _pdfOutputSaveLocation = other.PDFOutputSaveLocation;
     }
 
     [JsonInclude]
@@ -71,6 +75,13 @@ class Settings : ChangeNotifier
     {
         get => _saveOutputPdfInWorkingDir;
         set { _saveOutputPdfInWorkingDir = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
+    public PDFSaveLocation PDFOutputSaveLocation
+    {
+        get => _pdfOutputSaveLocation;
+        set { _pdfOutputSaveLocation = value; NotifyPropertyChanged(); }
     }
 
     [JsonInclude]
@@ -272,6 +283,15 @@ class Settings : ChangeNotifier
             settings.WorkingFolderToInternalFolderName = []; // clear this list; it is no longer going to be used
             settings.SettingsVersion = 2;
             settings.SaveSettingsNotAsync(); // saves all data; UUIDs should be in sync if user has toggled settings
+        }
+        if (settings.SettingsVersion == 2)
+        {
+            if (!settings.SaveOutputPdfInWorkingDir)
+            {
+                settings.PDFOutputSaveLocation = PDFSaveLocation.OtherChosenDir;
+            }
+            settings.SettingsVersion = 3;
+            settings.SaveSettingsNotAsync();
         }
         return settings;
     }
