@@ -37,22 +37,28 @@
                            HorizontalAlignment="Left"
                            Margin="0,0,0,4" />
             <CheckBox IsChecked="{Binding !UseDocnetPDFImageRendering}">Use legacy PDF handling (does not work with macOS annotations)</CheckBox>
-            <StackPanel Spacing="0">
+            <StackPanel Spacing="4">
                 <Label HorizontalAlignment="Left">
                     Save created PDF Report in the following location:
                 </Label>
-                <RadioButton Content="MayShow application directory"
-                             IsChecked="{Binding PDFOutputSaveLocation,
+                <RadioButton IsChecked="{Binding PDFOutputSaveLocation,
                                 Converter={StaticResource EnumToBoolConverter},
-                                ConverterParameter={x:Static enums:PDFSaveLocation.BaseFolder}}" />
-                <RadioButton Content="Ask me where to save the PDF file every time"
-                             IsChecked="{Binding PDFOutputSaveLocation,
+                                ConverterParameter={x:Static enums:PDFSaveLocation.BaseFolder}}">
+                    <TextBlock TextWrapping="Wrap"
+                               Text="MayShow application directory (uses report title as file name)"/>
+                </RadioButton>
+                <RadioButton IsChecked="{Binding PDFOutputSaveLocation,
                                 Converter={StaticResource EnumToBoolConverter},
-                                ConverterParameter={x:Static enums:PDFSaveLocation.AlwaysAsk}}" />
-                <RadioButton Content="Always save PDF file in the same folder of my choice"
-                             IsChecked="{Binding PDFOutputSaveLocation,
+                                ConverterParameter={x:Static enums:PDFSaveLocation.AlwaysAsk}}">
+                    <TextBlock TextWrapping="Wrap"
+                               Text="Ask me where and with what file name I want to save the PDF file every time"/>
+                </RadioButton>
+                <RadioButton IsChecked="{Binding PDFOutputSaveLocation,
                                 Converter={StaticResource EnumToBoolConverter},
-                                ConverterParameter={x:Static enums:PDFSaveLocation.OtherChosenDir}}" />
+                                ConverterParameter={x:Static enums:PDFSaveLocation.OtherChosenDir}}">
+                    <TextBlock TextWrapping="Wrap"
+                               Text="Always save PDF file in the same folder of my choice (uses report title as file name)"/>
+                </RadioButton>
             </StackPanel>
             <Grid ColumnDefinitions="Auto, *"
                   IsVisible="{Binding SaveOutputPdfInChosenDir}">

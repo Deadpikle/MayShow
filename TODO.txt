@@ -10,7 +10,7 @@
     -this sort of works, something is wrong with the upgrade process where the UUID is not brought over properly; need to test and fix (maybe fixed already and my dataset is wrong?)
 *-add dropdown to Add Items button to have add items from folder and remove choose working folder option (data always saved internally)
     -not going to do this; they can always select multiple items from the current picker
--Now that the BaseFolder is always internal...update options for PDF output location
+*-Now that the BaseFolder is always internal...update options for PDF output location
     -output in internal dir (default)
     -always ask me every time (opens save file picker after generating PDF to ask user where they want it)
     -always put in X folder (uses existing option)
