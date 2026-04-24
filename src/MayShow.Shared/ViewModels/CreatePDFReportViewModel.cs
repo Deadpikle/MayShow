@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -545,6 +547,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                             SuggestedFileType = FilePickerFileTypes.Pdf,
                             DefaultExtension = "pdf",
                             ShowOverwritePrompt = true,
+                            SuggestedFileName = ReportTitle + ".pdf"
                         });
 
                         if (result.File is not null)
