@@ -549,7 +549,13 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
                         if (result.File is not null)
                         {
-                            var path = result.File.Path.AbsolutePath;
+                            // Console.WriteLine("1: {0}", result.File.Path.AbsolutePath); // HTML escaped?!
+                            // Console.WriteLine("2: {0}", result.File.Path.AbsoluteUri); // starts with file://
+                            // Console.WriteLine("3: {0}", result.File.Path.LocalPath); // path for OS
+                            // Console.WriteLine("4: {0}", result.File.Path.OriginalString); // starts with file://
+                            // Console.WriteLine("5: {0}", result.File.Path.UserEscaped); // bool
+                            // Console.WriteLine("6: {0}", result.File.Name); // just file name, no path
+                            var path = result.File.Path.LocalPath;
                             if (!path.EndsWith(".pdf"))
                             {
                                 // should be fine, but juuuust in case...
