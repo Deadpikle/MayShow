@@ -458,8 +458,9 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             try
             {
                 var outputFilePath = await DeterminePDFSaveLocation();
-                if (outputFilePath == null)
+                if (outputFilePath == null && _settings.PDFOutputSaveLocation != PDFSaveLocation.AlwaysAsk)
                 {
+                    // if always ask and output is null, they probably hit cancel.
                     await DialogHost.Show(new WarningViewModel("Error: Output file path could not be determined. Current save location set in settings: " + Enum.GetName(_settings.PDFOutputSaveLocation)));
                 }
                 else if (_settings.PDFOutputSaveLocation == PDFSaveLocation.OtherChosenDir &&
@@ -467,7 +468,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                 {
                     await DialogHost.Show(new WarningViewModel("Error: Output directory not found! Please adjust the application Settings before continuing. Output directory: " + _settings.OutputPdfDir));
                 }
-                else
+                else if (outputFilePath != null)
                 {
                     await Task.Run(() => CreatePDF(outputFilePath));
                 }
@@ -550,7 +551,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                             SuggestedFileName = ReportTitle + ".pdf"
                         });
 
-                        if (result.File is not null)
+                        if (result.File != null)
                         {
                             // Console.WriteLine("1: {0}", result.File.Path.AbsolutePath); // HTML escaped?!
                             // Console.WriteLine("2: {0}", result.File.Path.AbsoluteUri); // starts with file://
