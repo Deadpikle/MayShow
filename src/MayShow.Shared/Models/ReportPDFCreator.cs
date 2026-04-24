@@ -83,7 +83,7 @@ class ReportPDFCreator : ChangeNotifier
     }
 
     // https://forum.pdfsharp.net/viewtopic.php?f=2&t=1025
-    public async Task<string?> CreatePDF(List<ReportFile> reportFiles, string reportTitle, string outputFolderPath, PDFFontResolver fontResolver, Settings appSettings)
+    public async Task<string?> CreatePDF(List<ReportFile> reportFiles, string reportTitle, string outputFilePathWithName, PDFFontResolver fontResolver, Settings appSettings)
     {
         // setup globals and consts...
         GlobalFontSettings.FontResolver = fontResolver;
@@ -102,23 +102,7 @@ class ReportPDFCreator : ChangeNotifier
             Width = Unit.FromPoint(2),
         };;
         // start making PDF!
-        var outputFileName = reportTitle + ".pdf";
         var convertedDir = Utilities.GetTempConvertedImagesFolderPath();
-        var folderName = new DirectoryInfo(outputFolderPath).Name;
-        if (folderName.Contains('-'))
-        {
-            // see if year/month format
-            var parts = folderName.Split('-');
-            if (parts[0].Length == 4 &&
-                parts[1].Length <= 2 &&
-                int.TryParse(parts[0], out int year) && int.TryParse(parts[1], out int month))
-            {
-                outputFileName = string.Format("{0} {1} Receipts.pdf", 
-                    CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month), 
-                    year);
-                _logger?.LogInfo("Auto-changed output file name to " + outputFileName);
-            }
-        }
         // create doc and setup initial section (for page characteristics)
         var pdfDoc = new Document();
         var section = pdfDoc.AddSection();
@@ -160,10 +144,12 @@ class ReportPDFCreator : ChangeNotifier
         // First page only: add report title
         MakeParagraph(section, reportTitle, true, 16, "TitlePar");
         //
+        var outputFilePathNoName = Path.GetDirectoryName(outputFilePathWithName) ?? Utilities.GetInternalDataPath(); 
+        var outputFileName = Path.GetFileName(outputFilePathWithName);
         var pdfRenderer = new PdfDocumentRenderer
         {
             Document = pdfDoc,
-            WorkingDirectory = outputFolderPath
+            WorkingDirectory = outputFilePathNoName
         };
         var hasAddedData = false;
         for (var i = 0; i < reportFiles.Count; i++)
@@ -394,13 +380,12 @@ class ReportPDFCreator : ChangeNotifier
         pdfRenderer.DocumentRenderer.PrepareDocument(); // needed if you make edits after first PrepareDocument() is called
         pdfRenderer.RenderDocument();
         // actually save to disk now
-        string outputPDFFilePath = Path.Join(outputFolderPath, outputFileName);
         _logger?.LogInfo("Saving PDF document to disk...");
-        pdfRenderer.PdfDocument.Save(outputPDFFilePath);
-        _logger?.LogInfo("Finished saving PDF output to: " + outputPDFFilePath);
+        pdfRenderer.PdfDocument.Save(outputFilePathWithName);
+        _logger?.LogInfo("Finished saving PDF output to: " + outputFilePathWithName);
         // clean up converted files data dir
         Directory.Delete(convertedDir, true);
         // return output path
-        return outputPDFFilePath;
+        return outputFilePathWithName;
     }
 }

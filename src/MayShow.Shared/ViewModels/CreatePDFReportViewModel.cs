@@ -12,6 +12,7 @@ using MayShow.Models;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Avalonia.Threading;
+using MayShow.Enums;
 
 namespace MayShow.ViewModels;
 
@@ -454,7 +455,20 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         {
             try
             {
-                await Task.Run(() => CreatePDF());
+                var outputFilePath = await DeterminePDFSaveLocation();
+                if (outputFilePath == null)
+                {
+                    await DialogHost.Show(new WarningViewModel("Error: Output file path could not be determined. Current save location set in settings: " + Enum.GetName(_settings.PDFOutputSaveLocation)));
+                }
+                else if (_settings.PDFOutputSaveLocation == PDFSaveLocation.OtherChosenDir &&
+                    !Directory.Exists(_settings.OutputPdfDir))
+                {
+                    await DialogHost.Show(new WarningViewModel("Error: Output directory not found! Please adjust the application Settings before continuing. Output directory: " + _settings.OutputPdfDir));
+                }
+                else
+                {
+                    await Task.Run(() => CreatePDF(outputFilePath));
+                }
             } catch (Exception e)
             {
                 LogInfo("PDF process failed! Reason: " + e.Message);
@@ -511,18 +525,15 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
     }
 
-    private async Task CreatePDF()
+    private async Task<string?> DeterminePDFSaveLocation()
     {
-        IsCreatingPDF = true;
-        var reportCreator = new ReportPDFCreator(this);
-        var outputDir = "";
+        var fileName = ReportTitle + ".pdf";
         switch (_settings.PDFOutputSaveLocation)
         {
-            case Enums.PDFSaveLocation.BaseFolder:
-                outputDir = _pdfReport.BaseFolder;
-                break;
-            case Enums.PDFSaveLocation.AlwaysAsk:
-                await Dispatcher.UIThread.InvokeAsync(async () => 
+            case PDFSaveLocation.BaseFolder:
+                return Path.Combine(_pdfReport.BaseFolder, fileName);
+            case PDFSaveLocation.AlwaysAsk:
+                Func<Task<string?>> getSaveFilePath = async () =>
                 {
                     var topLevel = TopLevelGrabber?.GetTopLevel();
                     if (topLevel != null)
@@ -539,30 +550,34 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                         if (result.File is not null)
                         {
                             var path = result.File.Path.AbsolutePath;
-                            Console.WriteLine(path); // <--- this is what I want
+                            if (!path.EndsWith(".pdf"))
+                            {
+                                // should be fine, but juuuust in case...
+                                path += ".pdf";
+                            }
+                            // Console.WriteLine(path);
+                            return path;
                         }
                     }
-                });
-                IsCreatingPDF = false;
-                return;
-                break;
-            case Enums.PDFSaveLocation.OtherChosenDir:
-                outputDir = _settings.OutputPdfDir;
-                break;
+                    return null;
+                };
+                // must invoke on UI thread because getting file picker
+                return await Dispatcher.UIThread.InvokeAsync(getSaveFilePath);
+            case PDFSaveLocation.OtherChosenDir:
+                return Path.Combine(_settings.OutputPdfDir, fileName);
         }
-        // safety checks
-        if (!Directory.Exists(outputDir))
+        return null;
+    } 
+
+    private async Task CreatePDF(string outputFilePath)
+    {
+        IsCreatingPDF = true;
+        var reportCreator = new ReportPDFCreator(this);
+        var outputPdfFile = await reportCreator.CreatePDF(ReportFiles.ToList(), ReportTitle, outputFilePath, new PDFFontResolver(_processDir, this), _settings);
+        if (!string.IsNullOrWhiteSpace(outputPdfFile))
         {
-            await DialogHost.Show(new WarningViewModel("Output directory not found! Please adjust your application Settings before continuing. Output directory: " + outputDir));
-        }
-        else
-        {
-            var outputPdfFile = await reportCreator.CreatePDF(ReportFiles.ToList(), ReportTitle, outputDir, new PDFFontResolver(_processDir, this), _settings);
-            if (!string.IsNullOrWhiteSpace(outputPdfFile))
-            {
-                await CreateAndSaveReportObjectAfterReportCreation();
-                OpenFolderForFileInFileViewer(outputPdfFile);
-            }
+            await CreateAndSaveReportObjectAfterReportCreation();
+            OpenFolderForFileInFileViewer(outputPdfFile);
         }
         IsCreatingPDF = false;
     }
