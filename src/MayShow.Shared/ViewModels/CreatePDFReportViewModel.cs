@@ -344,6 +344,24 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             else
             {
                 var date = Utilities.CheckValidDateInString(filePath);
+                if (_settings.CopyFilesToInternalDir)
+                {
+                    // copy file to internal folder, then add report file based on that path
+                    // make sure file names are not conflicting with one another, too.
+                    var fileName = Path.GetFileName(filePath);
+                    var fileNameNoExt = Path.GetFileNameWithoutExtension(filePath);
+                    var extension = Path.GetExtension(filePath);
+                    var copyToPath = Path.Combine(_pdfReport.BaseFolder, fileName);
+                    var rnd = new Random();
+                    // TODO: test to make sure this works
+                    while (File.Exists(copyToPath))
+                    {
+                        fileName = fileNameNoExt + rnd.Next(1, 999999) + "." + extension;
+                        copyToPath = Path.Combine(_pdfReport.BaseFolder, fileName);
+                    }
+                    File.Copy(filePath, copyToPath);
+                    filePath = copyToPath;
+                }
                 ReportFiles.Add(new ReportFile()
                 {
                     Title = Path.GetFileName(filePath),

@@ -14,8 +14,14 @@
     -output in internal dir (default)
     -always ask me every time (opens save file picker after generating PDF to ask user where they want it)
     -always put in X folder (uses existing option)
--add option to backup added files to internal data directory (always on for iOS)
--make backup of last generated PDF somewhere
+~-add option to backup added files to internal data directory (always on for iOS)
+    *-add option
+    -add to settings view
+    -add logic to CreatePDFReportViewModel
+        -programmed in but not tested yet
+-make backup of last generated PDF somewhere (another internal folder, most likely);
+    -save to PDF report data somewhere for safe-keeping
+    -allow loading by user
 -iOS-specific (MAUI essentials?)
     -maui community essentials https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/get-started?tabs=CommunityToolkitMaui
         -I don't think this is what we are looking for ultimately....?
@@ -31,6 +37,8 @@
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios
     -Make sure clipboard works (not sure if it will out of the box or not)
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/clipboard?view=net-maui-10.0
+    -show report file size in recent list
+    -make sure setting for backup files is not available (always backs up files on iOS)
 
 -----------
 

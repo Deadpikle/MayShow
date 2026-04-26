@@ -24,6 +24,7 @@ class Settings : ChangeNotifier
     public string _reportDateFormat;
     public int _settingsVersion;
     private PDFSaveLocation _pdfOutputSaveLocation;
+    public bool _copyFilesToInternalDir;
 
     public Settings() : base()
     {
@@ -38,6 +39,10 @@ class Settings : ChangeNotifier
         _dataGridDateFormat = "dd/MM/yyyy";
         _reportDateFormat = "yyyy-MM-dd";
         _pdfOutputSaveLocation = PDFSaveLocation.BaseFolder;
+        _copyFilesToInternalDir = false;
+        #if IOS
+        _copyFilesToInternalDir = true;
+        #endif
     }
 
     public Settings(Settings other)
@@ -53,6 +58,7 @@ class Settings : ChangeNotifier
         _dataGridDateFormat = other.DataGridDateFormat;
         _reportDateFormat = other.ReportDateFormat;
         _pdfOutputSaveLocation = other.PDFOutputSaveLocation;
+        _copyFilesToInternalDir = other.CopyFilesToInternalDir;
     }
 
     [JsonInclude]
@@ -131,6 +137,13 @@ class Settings : ChangeNotifier
     {
         get => _reportDateFormat;
         set { _reportDateFormat = value; NotifyPropertyChanged(); }
+    }
+
+    [JsonInclude]
+    public bool CopyFilesToInternalDir
+    {
+        get => _copyFilesToInternalDir;
+        set { _copyFilesToInternalDir = value; NotifyPropertyChanged(); }
     }
 
     public static string SettingsFileName = "settings.json";
