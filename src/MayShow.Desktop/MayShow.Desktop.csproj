@@ -10,7 +10,7 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <PublishTrimmed>true</PublishTrimmed>
-    <PublishAot>true</PublishAot>
+    <PublishAot Condition="'$(Configuration)' != 'Debug'">true</PublishAot>
     <AssemblyName>MayShow.Desktop</AssemblyName>
     <AssemblyVersion>1.4.2</AssemblyVersion> <!-- Also update Constants version -->
     <ApplicationIcon>MayShow-icon.ico</ApplicationIcon>
