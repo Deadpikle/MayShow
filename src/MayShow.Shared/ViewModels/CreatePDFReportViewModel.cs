@@ -353,10 +353,9 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                     var extension = Path.GetExtension(filePath);
                     var copyToPath = Path.Combine(_pdfReport.BaseFolder, fileName);
                     var rnd = new Random();
-                    // TODO: test to make sure this works
                     while (File.Exists(copyToPath))
                     {
-                        fileName = fileNameNoExt + rnd.Next(1, 999999) + "." + extension;
+                        fileName = fileNameNoExt + "-" + rnd.Next(1, 999_999) + extension;
                         copyToPath = Path.Combine(_pdfReport.BaseFolder, fileName);
                     }
                     File.Copy(filePath, copyToPath);
