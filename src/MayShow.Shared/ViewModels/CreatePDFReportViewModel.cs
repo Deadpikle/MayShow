@@ -55,8 +55,8 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     public CreatePDFReportViewModel(PDFReport reportInfo, IChangeViewModel viewModelChanger) : this(viewModelChanger)
     {
         _isPerformingInitialLoad = true;
-        _pdfReport = reportInfo;
-        _pdfReport.LoadDataFileInfo(); // make sure file information is loaded
+        PDFReport = reportInfo;
+        PDFReport.LoadDataFileInfo(); // make sure file information is loaded
         _isPerformingInitialLoad = false;
     }
 
@@ -156,6 +156,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     {
         _pdfReport.Files.CollectionChanged += ( sender, e ) => 
         { 
+            Console.WriteLine("Coll changed");
             NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
             HasUnsavedWork = true;
         };
@@ -286,6 +287,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             if (idx != -1)
             {
                 ReportFiles.RemoveAt(idx);
+                NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
                 _deletedFiles.Add(file);
                 HasUnsavedWork = true;
             }
@@ -301,6 +303,10 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         });
         if (result != null && (bool)result)
         {
+            foreach (var item in ReportFiles)
+            {
+                _deletedFiles.Add(item);
+            }
             ReportFiles.Clear();
             HasUnsavedWork = true;
             NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
