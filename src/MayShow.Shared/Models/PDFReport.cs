@@ -127,21 +127,28 @@ class PDFReport : ChangeNotifier
         return Path.Combine(BaseFolder, Constants.ReportSavedFileInfoFileName);
     }
 
-    public void LoadDataFileInfo()
+    /// <summary>
+    /// Loads data file information and returns said data.
+    /// Does NOT set internal <seealso cref="Files"/> member
+    /// so that you are forced to set it externally so any
+    /// collection watchers, etc. can be setup properly.
+    /// </summary>
+    /// <returns></returns>
+    public ObservableCollection<ReportFile> GetDataFileInfo()
     {
         var dataFilePath = GetReportFileDataPath();
         if (File.Exists(dataFilePath))
         {
             var json = File.ReadAllText(dataFilePath);
             var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
-            Files = JsonSerializer.Deserialize(json, jsonContext.ObservableCollectionReportFile) ?? [];
+            return JsonSerializer.Deserialize(json, jsonContext.ObservableCollectionReportFile) ?? [];
         }
-        else
-        {
-            Files = [];
-        }
+        return [];
     }
 
+    /// <summary>
+    /// Assumes Files member has data in it
+    /// </summary>
     public void SaveDataFileInfo()
     {
         var sourceGenContext = new SourceGenerationContext(Utilities.GetSerializerOptions());

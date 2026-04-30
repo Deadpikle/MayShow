@@ -71,7 +71,7 @@ class Utilities
     {
         var path = Path.Combine(
             GetInternalDataPath(),
-            "PDF-Backups"
+            "PDF Backups"
         );
         if (!Directory.Exists(path))
         {

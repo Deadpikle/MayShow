@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Avalonia.Threading;
 using MayShow.Enums;
+using System.Collections.Specialized;
 
 namespace MayShow.ViewModels;
 
@@ -56,7 +57,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     {
         _isPerformingInitialLoad = true;
         PDFReport = reportInfo;
-        PDFReport.LoadDataFileInfo(); // make sure file information is loaded
+        ReportFiles = PDFReport.GetDataFileInfo(); // make sure file information is loaded
         _isPerformingInitialLoad = false;
     }
 
@@ -136,6 +137,10 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         get => _pdfReport.Files;
         set 
         { 
+            if (_pdfReport.Files != null)
+            {
+                PDFReport.Files.CollectionChanged -= ProcessFilesCollectionChanges;
+            }
             _pdfReport.Files = value;
             NotifyPropertyChanged();
             SetupFileCollectionChangedWatcher();
@@ -154,12 +159,15 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     private void SetupFileCollectionChangedWatcher()
     {
-        _pdfReport.Files.CollectionChanged += ( sender, e ) => 
-        { 
-            Console.WriteLine("Coll changed");
-            NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
-            HasUnsavedWork = true;
-        };
+        // remove juuuuust in case it was set before...
+        PDFReport.Files.CollectionChanged -= ProcessFilesCollectionChanges;
+        PDFReport.Files.CollectionChanged += ProcessFilesCollectionChanges;
+    }
+
+    private void ProcessFilesCollectionChanges(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
+        HasUnsavedWork = true;
     }
 
     private void InitializeProgramLog()
