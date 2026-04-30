@@ -14,10 +14,10 @@
     -output in internal dir (default)
     -always ask me every time (opens save file picker after generating PDF to ask user where they want it)
     -always put in X folder (uses existing option)
-~-add option to backup added files to internal data directory (always on for iOS)
+*-add option to backup added files to internal data directory (always on for iOS)
     *-add option
-    -add to settings view
-    -add logic to CreatePDFReportViewModel
+    *-add to settings view
+    *-add logic to CreatePDFReportViewModel
         -programmed in but not tested yet
 -make backup of last generated PDF somewhere (another internal folder, most likely);
     -save to PDF report data somewhere for safe-keeping
