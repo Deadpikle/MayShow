@@ -85,7 +85,7 @@
                       HorizontalScrollBarVisibility="Disabled">
             <ItemsControl ItemsSource="{Binding SavedReports}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="models:PDFReportInfo">
+                    <DataTemplate x:DataType="models:PDFReport">
                         <StackPanel Orientation="Vertical"
                                     Margin="12,4,4,8"
                                     Spacing="4">

@@ -19,7 +19,7 @@ class Settings : ChangeNotifier
     private string _outputPdfDir;
     private decimal _imageResizeThreshold;
     private Dictionary<string, string> _workingFolderToInternalFolderName; // obsolete
-    private List<PDFReportInfo> _allReportInfo;
+    private List<PDFReport> _allReportInfo;
     public string _dataGridDateFormat;
     public string _reportDateFormat;
     public int _settingsVersion;
@@ -35,7 +35,7 @@ class Settings : ChangeNotifier
         _imageResizeThreshold = 1.5m;
         _workingFolderToInternalFolderName = [];
         _allReportInfo = [];
-        _settingsVersion = 3;
+        _settingsVersion = 4;
         _dataGridDateFormat = "dd/MM/yyyy";
         _reportDateFormat = "yyyy-MM-dd";
         _pdfOutputSaveLocation = PDFSaveLocation.BaseFolder;
@@ -112,7 +112,7 @@ class Settings : ChangeNotifier
     }
 
     [JsonInclude]
-    public List<PDFReportInfo> AllReportInfo
+    public List<PDFReport> AllReportInfo
     {
         get => _allReportInfo;
         set { _allReportInfo = value; NotifyPropertyChanged(); }
@@ -183,9 +183,9 @@ class Settings : ChangeNotifier
     {
         if (settings.SettingsVersion == 1)
         {
-            // update settings
+            // update settings -- move all report data info to internal settings folder data structure
             var internalPath = Utilities.GetInternalDataPath();
-            var list = new List<PDFReportInfo>();
+            var list = new List<PDFReport>();
             foreach (var data in settings.WorkingFolderToInternalFolderName)
             {
                 var uuid = data.Value;
@@ -193,14 +193,15 @@ class Settings : ChangeNotifier
                 var json = File.ReadAllText(path);
                 var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
                 var report = File.Exists(path) ? JsonSerializer.Deserialize(json, jsonContext.PDFReport) : null;
-                var reportTitle = report?.Title ?? "";
-                var lastSaved = report?.LastSaved;
-                var reportInfo = new PDFReportInfo()
+                var reportInfo = new PDFReport()
                 {
-                    Title = reportTitle,
+                    Title = report?.Title ?? "",
                     UUID = uuid,
-                    LastSaved = lastSaved,
+                    LastSaved = report?.LastSaved,
                     BaseFolder = data.Key,
+                    LastGenerated = report?.LastGenerated,
+                    LastGeneratedBackupPath = report?.LastGeneratedBackupPath,
+                    Files = report?.Files ?? []
                 };
                 // sync UUIDs
                 // if UUID exists in BaseFolder/(Constants.ReportSavedDataFileName), use that UUID instead.
@@ -304,6 +305,31 @@ class Settings : ChangeNotifier
                 settings.PDFOutputSaveLocation = PDFSaveLocation.OtherChosenDir;
             }
             settings.SettingsVersion = 3;
+            settings.SaveSettingsNotAsync();
+        }
+        if (settings.SettingsVersion == 3)
+        {
+            // migrating from big report_data.json files in internal dir for each report to just saving file data
+            // everything else is saved in settings.json in the PDFReport data, basically.
+            foreach (var item in settings.AllReportInfo)
+            {
+                if (item.Files.Count > 0)
+                {
+                    item.SaveDataFileInfo();
+                }
+                else
+                {
+                    // try loading data file info and then save it again
+                    var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
+                    var path = item.GetReportSavedDataPath();
+                    if (File.Exists(path))
+                    {
+                        var report = JsonSerializer.Deserialize(File.ReadAllText(path), jsonContext.PDFReport);
+                        report?.SaveDataFileInfo();
+                    }
+                }
+            }
+            settings.SettingsVersion = 4;
             settings.SaveSettingsNotAsync();
         }
         return settings;

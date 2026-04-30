@@ -138,6 +138,7 @@ class Utilities
         using var reader = new StreamReader(memoryStream);
         var updatedJson = reader.ReadToEnd();
         File.WriteAllText(path, updatedJson);
+        reportData.SaveDataFileInfo();
     }
 
     public static async Task SaveReportDataAsync(PDFReport reportData, string path, JsonTypeInfo<PDFReport>? context = null)
@@ -153,6 +154,7 @@ class Utilities
         using var reader = new StreamReader(memoryStream);
         var json = await reader.ReadToEndAsync();
         await File.WriteAllTextAsync(path, json);
+        await reportData.SaveDataFileInfoAsync();
     }
 
     public static FilePickerFileType[] GetReportFilePickerFileTypes()

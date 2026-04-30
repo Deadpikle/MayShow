@@ -52,29 +52,11 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         InitializeProgramLog();
     }
 
-    public CreatePDFReportViewModel(PDFReportInfo reportInfo, IChangeViewModel viewModelChanger) : this(viewModelChanger)
+    public CreatePDFReportViewModel(PDFReport reportInfo, IChangeViewModel viewModelChanger) : this(viewModelChanger)
     {
         _isPerformingInitialLoad = true;
-        _pdfReport = new PDFReport(reportInfo);
-        // always default to using BaseFolder, which will always be set in the general case
-        if (!string.IsNullOrWhiteSpace(_pdfReport.BaseFolder))
-        {
-            LogInfo("Loading report data at path: {0}", _pdfReport.BaseFolder);
-            ScanFolder(_pdfReport.BaseFolder);
-        }
-        else
-        {
-            // load data file in internal data report dir
-            _pdfReport.BaseFolder = Path.Combine(Utilities.GetInternalDataPath(), _pdfReport.UUID);
-            if (Directory.Exists(_pdfReport.BaseFolder))
-            {
-                ScanFolder(_pdfReport.BaseFolder); // even if points entirely to internal folder, we will be A-OK loading here
-            }
-            else
-            {
-                LogInfo("Erorr loading report! Folder does not exist: {0}", _pdfReport.BaseFolder);
-            }
-        }
+        _pdfReport = reportInfo;
+        _pdfReport.LoadDataFileInfo(); // make sure file information is loaded
         _isPerformingInitialLoad = false;
     }
 
@@ -198,91 +180,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         var timestamp = string.Format("[{0:s}]", DateTime.Now);
         Console.WriteLine(timestamp + " " + message, arguments);
         ProgramLog += Environment.NewLine + string.Format(message, arguments ?? []);
-    }
-
-    public async void ChooseFolder()
-    {
-        var topLevel = TopLevelGrabber?.GetTopLevel();
-        if (topLevel is not null)
-        {
-            var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()
-            {
-                Title = "Pick a folder of files...",
-                AllowMultiple = false,
-            });
-            if (folders.Count == 1)
-            {
-                var folder = folders[0];
-                LogInfo("Clearing existing list and loading items in folder: " + folder.Path.LocalPath);
-                ReportFiles.Clear();
-                ScanFolder(folder.Path.LocalPath);
-                _settings.LastUsedPath = folder.Path.LocalPath;
-                await _settings.SaveSettingsAsync();
-                ResortPDFItemsByDate();
-                HasUnsavedWork = true;
-            }
-        }
-    }
-
-    private string GetReportSavedDataPath()
-    {
-        if (!Directory.Exists(_pdfReport.BaseFolder))
-        {
-            Directory.CreateDirectory(_pdfReport.BaseFolder);
-        }
-        return Path.Combine(_pdfReport.BaseFolder, Constants.ReportSavedDataFileName);
-    }
-
-    private void ScanFolder(string path)
-    {
-        if (Directory.Exists(path))
-        {
-            var reportFilePath = GetReportSavedDataPath();
-            var successfullyLoadedPriorReportFile = false;
-            if (File.Exists(reportFilePath))
-            {
-                // load prior report
-                var jsonContext = new SourceGenerationContext(Utilities.GetSerializerOptions());
-                var report = JsonSerializer.Deserialize(File.ReadAllText(reportFilePath), jsonContext.PDFReport);
-                if (report != null)
-                {
-                    PDFReport = report;
-                    Console.WriteLine("Loading prior report data at {0}", reportFilePath);
-                    LogInfo("Reloaded report last saved at {0}", report.LastSaved ?? DateTime.Now);
-                    successfullyLoadedPriorReportFile = true;
-                }
-            }
-            if (!successfullyLoadedPriorReportFile)
-            {
-                // Scan folder for files and display in DataGrid
-                if (path != PDFReport.BaseFolder)
-                {
-                    // in this case, there is essentially no existing report, 
-                    // so we need to make a new one.
-                    PDFReport = new PDFReport()
-                    {
-                        Title = Path.GetDirectoryName(path) ?? "",
-                        LastSaved = null,
-                        UUID = Utilities.GetUniqueReportGuid(_settings).ToString(),
-                    };
-                    PDFReport.UpdateBaseFolder();
-                }
-                ReportFiles.Clear();
-                ReportTitle = "";
-                var filePaths = Directory.GetFiles(path);
-                foreach (var filePath in filePaths)
-                {
-                    AddFileBasedOnPath(filePath);
-                }
-                ResortPDFItemsByDate();
-                HasUnsavedWork = true;
-            }
-        }
-        else
-        {
-            LogInfo("Error: The directory {0} does not exist. Please select another folder.", path);
-        }
-        NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
     }
 
     // https://github.com/AvaloniaUI/Avalonia/issues/10075
@@ -530,7 +427,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     private async Task SavePDFReportDataToDisk(PDFReport report)
     {
-        var savePath = GetReportSavedDataPath();
+        var savePath = _pdfReport.GetReportSavedDataPath();
         await Utilities.SaveReportDataAsync(report, savePath);
         LogInfo("Saved report information to {0}", savePath);
         HasUnsavedWork = false;

@@ -15,6 +15,7 @@ class Constants
     public static string[] FilePickerAppleTypeIdentifiers = [ "public.image", "com.adobe.pdf", "public.heic" ];
 
     public static string ReportSavedDataFileName = "report_data.json";
+    public static string ReportSavedFileInfoFileName = "report_file_data.json";
 
     public static List<DateDisplayFormat> GetDateDisplayFormats()
     {

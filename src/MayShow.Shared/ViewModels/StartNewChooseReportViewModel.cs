@@ -13,14 +13,14 @@ namespace MayShow.ViewModels;
 class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateRecentlyUsed
 {
     private string _creatingReportTitle;
-    private ObservableCollection<PDFReportInfo> _savedReports;
+    private ObservableCollection<PDFReport> _savedReports;
     private Settings _settings;
 
     public StartNewChooseReportViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
         _creatingReportTitle = "";
         _settings = Settings.LoadSettings();
-        _savedReports = new ObservableCollection<PDFReportInfo>(_settings.AllReportInfo.OrderBy(x => x.Title));
+        _savedReports = new ObservableCollection<PDFReport>(_settings.AllReportInfo.OrderBy(x => x.Title));
     }
 
     public static string Version
@@ -34,7 +34,7 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
         set { _creatingReportTitle = value; NotifyPropertyChanged(); }
     }
 
-    public ObservableCollection<PDFReportInfo> SavedReports
+    public ObservableCollection<PDFReport> SavedReports
     {
         get => _savedReports;
         set { _savedReports = value; NotifyPropertyChanged(); }
@@ -47,7 +47,7 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
             await DialogHost.Show(new WarningViewModel("Report title cannot be blank!"));
             return;
         }
-        var reportInfo = new PDFReportInfo()
+        var reportInfo = new PDFReport()
         {
             Title = CreatingReportTitle,
             LastSaved = null,
@@ -63,8 +63,8 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
         CreatingReportTitle = ""; // when user comes back they can start another new report
     }
 
-    public void LoadExistingReport(object info) => LoadExistingReportImpl((PDFReportInfo) info);
-    public void LoadExistingReportImpl(PDFReportInfo reportInfo)
+    public void LoadExistingReport(object info) => LoadExistingReportImpl((PDFReport) info);
+    public void LoadExistingReportImpl(PDFReport reportInfo)
     {
         ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
         {
@@ -73,8 +73,8 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
         });
     }
 
-    public void DeleteExistingReport(object info) => DeleteExistingReportImpl((PDFReportInfo) info);
-    public async void DeleteExistingReportImpl(PDFReportInfo reportInfo)
+    public void DeleteExistingReport(object info) => DeleteExistingReportImpl((PDFReport) info);
+    public async void DeleteExistingReportImpl(PDFReport reportInfo)
     {
         var message = string.IsNullOrWhiteSpace(reportInfo.BaseFolder)
             ? "Are you sure you want to delete this report and its associated data? It will be gone forever!"
@@ -129,6 +129,8 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
                 existing.LastSaved = report.LastSaved;
                 existing.Title = report.Title;
                 existing.BaseFolder = report.BaseFolder;
+                existing.LastGenerated = report.LastGenerated;
+                existing.LastGeneratedBackupPath = report.LastGeneratedBackupPath;
             }
         }
         if (!didFind)
@@ -136,7 +138,7 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
             _settings.AllReportInfo.Add(report);
         }
         // ... this sort and save is slow, technically, but we're not going to have millions of items here, so...
-        SavedReports = new ObservableCollection<PDFReportInfo>(_settings.AllReportInfo.OrderBy(x => x.Title));
+        SavedReports = new ObservableCollection<PDFReport>(_settings.AllReportInfo.OrderBy(x => x.Title));
         await _settings.SaveSettingsAsync();
     }
 }
