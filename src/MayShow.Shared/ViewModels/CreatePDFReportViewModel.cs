@@ -251,6 +251,10 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                     var fileNameNoExt = Path.GetFileNameWithoutExtension(filePath);
                     var extension = Path.GetExtension(filePath);
                     var copyToPath = Path.Combine(_pdfReport.BaseFolder, fileName);
+                    if (!Directory.Exists(_pdfReport.BaseFolder))
+                    {
+                        Directory.CreateDirectory(_pdfReport.BaseFolder);
+                    }
                     var rnd = new Random();
                     while (File.Exists(copyToPath))
                     {

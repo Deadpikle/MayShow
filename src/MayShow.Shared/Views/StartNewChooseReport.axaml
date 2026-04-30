@@ -89,7 +89,9 @@
                         <StackPanel Orientation="Vertical"
                                     Margin="12,4,4,8"
                                     Spacing="4">
-                            <TextBlock Text="{Binding Title}" />
+                            <TextBlock Text="{Binding Title}"
+                                       FontWeight="Bold"
+                                       FontSize="16" />
                             <!-- <TextBlock Text="{Binding BaseFolder}" 
                                        Foreground="Gray"
                                        TextWrapping="Wrap" /> -->
@@ -116,6 +118,19 @@
                                             FontFamily="{StaticResource FontAwesomeSolid}" /> Delete Report</TextBlock>
                                 </Button>
                             </StackPanel>
+                            <TextBlock Foreground="Gray"
+                                       TextWrapping="Wrap"
+                                       IsVisible="{Binding HasLastGenerated}">
+                                Report last generated on: <Run Text="{Binding LastGenerated, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}"/>
+                            </TextBlock>
+                            <Button Command="{Binding $parent[UserControl].((vm:StartNewChooseReportViewModel)DataContext).ShowPreviouslyGeneratedReportLocation}"
+                                    CommandParameter="{Binding}"
+                                    Grid.Column="1"
+                                    IsVisible="{Binding HasLastGenerated}">
+                                <TextBlock>
+                                    <Run Text="&#xf07c;"
+                                        FontFamily="{StaticResource FontAwesomeSolid}" /> Show Previously Generated Report</TextBlock>
+                            </Button>
                             <Rectangle Fill="Gray" Height="2" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
                         </StackPanel>
                     </DataTemplate>

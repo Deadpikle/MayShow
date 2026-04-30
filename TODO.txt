@@ -20,9 +20,10 @@
     *-add logic to CreatePDFReportViewModel
         -programmed in but not tested yet
 *-Save all report data but files to Settings object and save report files separately
--make backup of last generated PDF somewhere (another internal folder, most likely);
+*-make backup of last generated PDF somewhere (another internal folder, most likely);
     *-save to PDF report data somewhere for safe-keeping
-    -allow loading by user
+    *-allow loading by user
+-cleanup of abandonded reports (e.g. backing up files but ultimately did not save report)
 -iOS-specific (MAUI essentials?)
     -maui community essentials https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/get-started?tabs=CommunityToolkitMaui
         -I don't think this is what we are looking for ultimately....?

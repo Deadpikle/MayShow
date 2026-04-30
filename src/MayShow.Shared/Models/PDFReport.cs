@@ -62,10 +62,20 @@ class PDFReport : ChangeNotifier
         set { _lastGenerated = value; NotifyPropertyChanged(); }
     }
 
+    public bool HasLastGenerated
+    {
+        get => File.Exists(LastGeneratedBackupPath);
+    }
+
     public string? LastGeneratedBackupPath
     {
         get => _lastGeneratedBackupPath;
-        set { _lastGeneratedBackupPath = value; NotifyPropertyChanged(); }
+        set 
+        { 
+            _lastGeneratedBackupPath = value;
+            NotifyPropertyChanged();
+            NotifyPropertyChanged(nameof(HasLastGenerated));
+        }
     }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWriting)]

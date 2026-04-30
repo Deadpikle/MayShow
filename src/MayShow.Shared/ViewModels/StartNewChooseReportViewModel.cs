@@ -7,6 +7,8 @@ using MayShow.Interfaces;
 using MayShow.Models;
 using MayShow.Helpers;
 using System.Threading.Tasks;
+using System.IO;
+using System;
 
 namespace MayShow.ViewModels;
 
@@ -71,6 +73,22 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
             UpdateRecentlyUsed = this,
             TopLevelGrabber = TopLevelGrabber
         });
+    }
+
+    public void ShowPreviouslyGeneratedReportLocation(object info) => ShowPreviouslyGeneratedReportLocationImpl((PDFReport) info);
+
+    private void ShowPreviouslyGeneratedReportLocationImpl(PDFReport reportInfo)
+    {
+        var topLevel = TopLevelGrabber?.GetTopLevel();
+        if (topLevel != null && File.Exists(reportInfo.LastGeneratedBackupPath))
+        {
+            var lastGenPathDir = Path.GetDirectoryName(reportInfo.LastGeneratedBackupPath);
+            if (!string.IsNullOrWhiteSpace(lastGenPathDir))
+            {
+                var launcher = topLevel.Launcher;
+                launcher.LaunchUriAsync(new Uri(lastGenPathDir));
+            }
+        }
     }
 
     public void DeleteExistingReport(object info) => DeleteExistingReportImpl((PDFReport) info);
