@@ -73,32 +73,42 @@
                            HorizontalAlignment="Left"
                            VerticalAlignment="Top"/>
             </Grid>
-            <Label Content="File List Date Format"
-                   HorizontalAlignment="Left"
-                   FontSize="14" />
-            <ComboBox SelectedIndex="{Binding DataGridDisplayDateFormatSelectedIndex}" 
-                      ItemsSource="{Binding DateFormats}"
-                      MaxDropDownHeight="300">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="models:DateDisplayFormat">
-                        <TextBlock Text="{Binding Example}" 
-                                TextWrapping="Wrap"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-            <Label Content="PDF Report Date Format"
-                   HorizontalAlignment="Left"
-                   FontSize="14" />
-            <ComboBox SelectedIndex="{Binding ReportDisplayDateFormatSelectedIndex}" 
-                      ItemsSource="{Binding DateFormats}"
-                      MaxDropDownHeight="300">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="models:DateDisplayFormat">
-                        <TextBlock Text="{Binding Example}" 
-                                TextWrapping="Wrap"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+            <Grid ColumnDefinitions="*, 50, *">
+                <StackPanel Orientation="Vertical"
+                            Grid.Column="0">
+                    <Label Content="File List Date Format"
+                        HorizontalAlignment="Left"
+                        FontSize="14" />
+                    <ComboBox SelectedIndex="{Binding DataGridDisplayDateFormatSelectedIndex}" 
+                            ItemsSource="{Binding DateFormats}"
+                            MaxDropDownHeight="300"
+                            HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:DateDisplayFormat">
+                                <TextBlock Text="{Binding Example}" 
+                                        TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Vertical"
+                            Grid.Column="2">
+                    <Label Content="PDF Report Date Format"
+                        HorizontalAlignment="Left"
+                        FontSize="14" />
+                    <ComboBox SelectedIndex="{Binding ReportDisplayDateFormatSelectedIndex}" 
+                            ItemsSource="{Binding DateFormats}"
+                            MaxDropDownHeight="300"
+                            HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:DateDisplayFormat">
+                                <TextBlock Text="{Binding Example}" 
+                                        TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
             <Button Command="{Binding OpenSettingsDir}">
                 <TextBlock>
                     <Run Text="&#xf07c;"
