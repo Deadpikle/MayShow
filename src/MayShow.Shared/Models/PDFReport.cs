@@ -7,17 +7,20 @@ class PDFReport : PDFReportInfo
 {
     private ObservableCollection<ReportFile> _files;
     private DateTime? _lastGenerated;
+    private string? _lastGeneratedBackupPath;
 
     public PDFReport() : base()
     {
         _files = [];
         _lastGenerated = null;
+        _lastGeneratedBackupPath = null;
     }
 
     public PDFReport(PDFReportInfo info) : base()
     {
         _files = [];
         _lastGenerated = null;
+        _lastGeneratedBackupPath = null;
         BaseFolder = info.BaseFolder;
         UUID = info.UUID;
         Title = info.Title;
@@ -34,5 +37,11 @@ class PDFReport : PDFReportInfo
     {
         get => _lastGenerated;
         set { _lastGenerated = value; NotifyPropertyChanged(); }
+    }
+
+    public string? LastGeneratedBackupPath
+    {
+        get => _lastGeneratedBackupPath;
+        set { _lastGeneratedBackupPath = value; NotifyPropertyChanged(); }
     }
 }

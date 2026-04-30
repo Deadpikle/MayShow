@@ -617,6 +617,18 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         var outputPdfFile = await reportCreator.CreatePDF(ReportFiles.ToList(), ReportTitle, outputFilePath, new PDFFontResolver(_processDir, this), _settings);
         if (!string.IsNullOrWhiteSpace(outputPdfFile))
         {
+            // backup PDF file just in case
+            var backupFilePath = Utilities.GetPDFBackupDataPath();
+            var backupFilePathAndName = Path.Combine(backupFilePath, ReportTitle + 
+                " - Generated on " + DateTime.Now.ToString("yyyy-MM-dd \\a\\t HH-mm-ss") + ".pdf");
+            File.Copy(outputFilePath, backupFilePathAndName);
+            // if there is a prior backup, remove it
+            if (_pdfReport.LastGeneratedBackupPath != null && File.Exists(_pdfReport.LastGeneratedBackupPath))
+            {
+                File.Delete(_pdfReport.LastGeneratedBackupPath);
+            }
+            _pdfReport.LastGeneratedBackupPath = backupFilePathAndName;
+            // save report data automatically for user
             await CreateAndSaveReportObjectAfterReportCreation();
             OpenFolderForFileInFileViewer(outputPdfFile);
         }

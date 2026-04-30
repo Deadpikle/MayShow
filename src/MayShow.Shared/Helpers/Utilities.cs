@@ -67,6 +67,19 @@ class Utilities
         return path;
     }
 
+    public static string GetPDFBackupDataPath()
+    {
+        var path = Path.Combine(
+            GetInternalDataPath(),
+            "PDF-Backups"
+        );
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        return path;
+    }
+
     public static string GetTempConvertedImagesFolderPath()
     {
         // get converted files directory path and create it if necessary
