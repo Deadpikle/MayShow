@@ -37,6 +37,7 @@
                            HorizontalAlignment="Left"
                            Margin="0,0,0,4" />
             <CheckBox IsChecked="{Binding !UseDocnetPDFImageRendering}">Use legacy PDF handling (does not work with macOS annotations)</CheckBox>
+            <CheckBox IsChecked="{Binding CopyFilesToInternalDir}">Backup files for safe keeping to internal MayShow directory when adding to report</CheckBox>
             <StackPanel Spacing="4">
                 <Label HorizontalAlignment="Left">
                     Save created PDF Report in the following location:

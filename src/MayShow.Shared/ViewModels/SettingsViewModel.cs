@@ -78,6 +78,16 @@ class SettingsViewModel: ChangeNotifier
         }
     }
 
+    public bool CopyFilesToInternalDir
+    {
+        get => _settings.CopyFilesToInternalDir;
+        set
+        {
+            _settings.CopyFilesToInternalDir = value;
+            NotifyPropertyChanged();
+        }
+    }
+
     public bool IsOutputPdfDirValid
     {
         get => !SaveOutputPdfInChosenDir || (SaveOutputPdfInChosenDir && Directory.Exists(OutputPdfDirPath));
