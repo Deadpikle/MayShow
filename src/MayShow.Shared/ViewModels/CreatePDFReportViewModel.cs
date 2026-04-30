@@ -32,6 +32,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     private Settings _settings;
     private List<DateDisplayFormat> _dateDisplayFormats;
     private bool _hasUnsavedWork;
+    private List<ReportFile> _deletedFiles;
 
     private CreatePDFReportViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
@@ -46,6 +47,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         NotifyPropertyChanged(nameof(DataGridDateFormat));
         NotifyPropertyChanged(nameof(DataGridDateFormatWatermark));
         HasUnsavedWork = false;
+        _deletedFiles = [];
         // setup initial quote and program log data
         InitializeProgramLog();
     }
@@ -383,6 +385,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             if (idx != -1)
             {
                 ReportFiles.RemoveAt(idx);
+                _deletedFiles.Add(file);
                 HasUnsavedWork = true;
             }
         }
@@ -532,6 +535,17 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         LogInfo("Saved report information to {0}", savePath);
         HasUnsavedWork = false;
         UpdateRecentlyUsed?.UpdateRecentlyUsed(report);
+        foreach (var item in _deletedFiles)
+        {
+            // any items that have been deleted off the report
+            // that are internal to the report should also be deleted
+            // off of disk
+            if (item.FilePath.StartsWith(_pdfReport.BaseFolder) && !Directory.Exists(item.FilePath) /* sanity check */)
+            {
+                File.Delete(item.FilePath);
+            }
+        }
+        _deletedFiles.Clear();
     }
 
     // called from UI button
