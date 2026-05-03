@@ -43,7 +43,7 @@ class ReportPDFCreator : ChangeNotifier
         footerPar.AddNumPagesField();
         footerPar.AddText("--");
         footerPar.AddLineBreak();
-        footerPar.AddText("Report generated on " + DateTime.Now.ToString("f"));
+        footerPar.AddText("Report generated on " + DateTime.Now.ToString("f") + " with MayShow v" + Constants.AppVersion);
         footerPar.Tag = "FooterPar";
         footerPar.Format.Font.Name = "Noto Sans";
         return footerPar;
