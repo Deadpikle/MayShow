@@ -66,6 +66,19 @@ class Utilities
         }
         return path;
     }
+    
+    public static string GetTmpDataPath()
+    {
+        var path = Path.Combine(
+            GetInternalDataPath(),
+            "Tmp"
+        );
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        return path;
+    }
 
     public static string GetPDFBackupDataPath()
     {
