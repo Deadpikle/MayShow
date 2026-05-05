@@ -104,7 +104,7 @@ class Settings : ChangeNotifier
         set { _imageResizeThreshold = value; NotifyPropertyChanged(); }
     }
 
-    [JsonInclude]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWriting)]
     public Dictionary<string, string> WorkingFolderToInternalFolderName
     {
         get => _workingFolderToInternalFolderName;
