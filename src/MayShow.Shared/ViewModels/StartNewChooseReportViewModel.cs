@@ -22,6 +22,7 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
     {
         _creatingReportTitle = "";
         _settings = Settings.LoadSettings();
+        _settings.CleanupAbandonedFolders();
         _savedReports = new ObservableCollection<PDFReport>(_settings.AllReportInfo.OrderBy(x => x.Title));
     }
 

@@ -354,4 +354,37 @@ class Settings : ChangeNotifier
         var output = await JsonSerializer.DeserializeAsync<Settings>(fileStream, jsonContext.Settings) ?? new Settings();
         return UpgradeSettings(output);
     }
+
+    public void CleanupAbandonedFolders()
+    {
+        var internalDir = Utilities.GetInternalDataPath();
+        var dirs = new DirectoryInfo(internalDir).EnumerateDirectories("*.*", searchOption: SearchOption.TopDirectoryOnly);
+        foreach (var dir in dirs)
+        {
+            bool isValid = Guid.TryParse(dir.Name, out var _);
+            if (internalDir != dir.FullName && isValid)
+            {
+                // ok, this is a candidate for being an internal path
+                var didMatch = false;
+                foreach (var reportInfo in _allReportInfo)
+                {
+                    if (reportInfo.UUID == dir.Name)
+                    {
+                        didMatch = true;
+                        break;
+                    }
+                }
+                if (!didMatch && dir.CreationTime < DateTime.Now.AddMonths(-1))
+                {
+                    Console.WriteLine("Removing dir {0} as it is abandonded and old...", dir.Name);
+                    try
+                    {
+                        // don't want to crash on cleanup so try/catch just in case....
+                        Directory.Delete(dir.FullName, true);
+                    }
+                    catch {}
+                }
+            }
+        }
+    }
 }
