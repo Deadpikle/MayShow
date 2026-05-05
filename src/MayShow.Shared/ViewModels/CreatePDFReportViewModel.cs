@@ -39,7 +39,6 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     {
         _pdfReport = new PDFReport();
         _processDir = Path.GetDirectoryName(Environment.ProcessPath) ?? "";
-        Console.WriteLine("Internal storage directory is: {0}", Utilities.GetInternalDataPath());
         _isCreatingPDF = false;
         ReportFiles = [];
         _programLog = "";
