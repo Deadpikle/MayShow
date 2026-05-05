@@ -144,8 +144,12 @@ class ReportPDFCreator : ChangeNotifier
         // First page only: add report title
         MakeParagraph(section, reportTitle, true, 16, "TitlePar");
         //
-        var outputFilePathNoName = Path.GetDirectoryName(outputFilePathWithName) ?? Utilities.GetInternalDataPath(); 
+        var outputFilePathNoName = Path.GetDirectoryName(outputFilePathWithName) ?? Utilities.GetTmpDataPath(); 
         var outputFileName = Path.GetFileName(outputFilePathWithName);
+        if (string.IsNullOrWhiteSpace(outputFileName))
+        {
+            outputFileName = reportTitle + ".pdf";
+        }
         var pdfRenderer = new PdfDocumentRenderer
         {
             Document = pdfDoc,
