@@ -24,7 +24,7 @@ class PDFReport : ChangeNotifier
     {
         _uuid = Guid.NewGuid().ToString();
         _baseFolder = "";
-        UpdateBaseFolder();
+        SetBaseFolderToInternalWithUUID();
         _title = "";
         _lastSaved = null;
         _lastGenerated = null;
@@ -85,7 +85,7 @@ class PDFReport : ChangeNotifier
         set { _files = value; NotifyPropertyChanged(); }
     }
 
-    public void UpdateBaseFolder()
+    public void SetBaseFolderToInternalWithUUID()
     {
         _baseFolder = Path.Combine(Utilities.GetInternalDataPath(), _uuid);
     }
@@ -94,20 +94,12 @@ class PDFReport : ChangeNotifier
     {
         UUID = Guid.NewGuid().ToString();
     }
-
-    public string GetWorkingPath()
-    {
-        if (string.IsNullOrWhiteSpace(BaseFolder))
-        {
-            return Path.Combine(Utilities.GetInternalDataPath(), UUID);
-        }
-        return BaseFolder;
-    }
     
     public void DeleteInternalFolderFromDisk()
     {
-        var path = Path.Combine(Utilities.GetInternalDataPath(), UUID);
-        if (Directory.Exists(path) && path != Utilities.GetInternalDataPath())
+        var internalPath = Utilities.GetInternalDataPath();
+        var path = Path.Combine(internalPath, UUID);
+        if (Directory.Exists(path) && path != internalPath)
         {
             Directory.Delete(path, true);
         }

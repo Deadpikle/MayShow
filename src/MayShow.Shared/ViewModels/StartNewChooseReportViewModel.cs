@@ -55,7 +55,7 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
             LastSaved = null,
             UUID = Utilities.GetUniqueReportGuid(_settings).ToString()
         };
-        reportInfo.UpdateBaseFolder();
+        reportInfo.SetBaseFolderToInternalWithUUID();
         // now update UI
         ViewModelChanger.PushViewModel(new CreatePDFReportViewModel(reportInfo, ViewModelChanger)
         {
