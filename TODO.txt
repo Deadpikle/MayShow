@@ -22,22 +22,49 @@
 *-cleanup empty uuid folders in case user gets an internal folder created but never saves
     -cleanup of abandonded reports (e.g. backing up files but ultimately did not save report)
 -iOS-specific (MAUI essentials?)
-    -maui community essentials https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/get-started?tabs=CommunityToolkitMaui
+    -sudo dotnet workload install ios --version 10.0.200
+        -to get around old xcode version problem, view the following:
+            -https://learn.microsoft.com/en-in/answers/questions/5625815/maui-application-running-ios-is-requiring-xcode-26
+            -https://github.com/dotnet/macios/releases
+                -https://github.com/dotnet/macios/releases/tag/dotnet-10.0.1xx-xcode26.2-10217
+            -can consider global.json (is that the right name for the file) to pin version:
+                {
+                    "sdk": {
+                        "version": "10.0.200",
+                        "workloadVersion": "10.0.200",
+                        "allowPrerelease": false,
+                        "rollForward": "disable"
+                    }
+                }
+    *-maui community essentials https://learn.microsoft.com/en-us/dotnet/communitytoolkit/maui/get-started?tabs=CommunityToolkitMaui
         -I don't think this is what we are looking for ultimately....?
         -https://github.com/AvaloniaUI/Avalonia.Essentials
         -https://github.com/AvaloniaUI/AvaloniaMauiHybrid -- this may have to be the way to go or perhaps grab code from https://github.com/AvaloniaUI/Avalonia.Controls.Maui/tree/main/src/Avalonia.Controls.Maui.Essentials because we don't need the avalonia tie in stuff if it "just works"...but don't know if it will "just work" yet. apparently native APIs are available through net10.0-ios or whatnot but I'd rather use the existing wrappers/tutorials since those will just work just like we want...
     -auto save on every action
-    -Take picture
+    -check to see if internal data dir fetching is OK on mobile (probably need to use iOS/mobile specific function?)
+        -yes looks like we need this!!
+    -add System.Drawing reference so ImageMagick works?
+        -or Magick.NET.SystemDrawing?
+            https://github.com/dlemstra/Magick.NET#download-extra-libraries
+    -TODO: when saving file paths to things on iOS, don't include base folder -- must reconstruct every time due to app sandbox
+        -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/storage/file-system-helpers?view=net-maui-10.0&tabs=macios
+    ~-Take picture
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/device-media/picker?view=net-maui-10.0&tabs=macios
-    -Add pic from gallery
+    ~-Add pic from gallery
         -see above link
-    -Add file (uses Files picking, I think this already mostly works just need to copy to internal data dir)
-    -Generate PDF -> Share/print screen to share/print
+    ~-Add file (uses Files picking, I think this already mostly works just need to copy to internal data dir)
+    ~-Generate PDF -> Share/print screen to share/print (yes this is available in the essentials package so we're good to go)
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios
-    -Make sure clipboard works (not sure if it will out of the box or not)
+    -Generate PDF -> View PDF? I know there is a view for this on iOS but can't recall the name
+    *-Make sure clipboard works (not sure if it will out of the box or not)
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/clipboard?view=net-maui-10.0
+        -yes, seems to work out of the box, but can use the above if real devices have problems
     -show report file size in recent list
+    -share / view most recent generated on main menu
     -make sure setting for backup files is not available (always backs up files on iOS)
+    -update settings window and hide things not available on mobile, etc.
+    -publishing: https://docs.avaloniaui.net/docs/deployment/ios
+    -test on a real device
 -quickstart for loading last edited report on main menu?
 -duplicate existing report with new name?
 
