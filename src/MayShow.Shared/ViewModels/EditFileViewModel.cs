@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using Avalonia.Themes.Fluent;
 using DialogHostAvalonia;
-using ImageMagick;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.Rendering;
 using PdfSharp.Fonts;

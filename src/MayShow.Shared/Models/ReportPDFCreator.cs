@@ -8,7 +8,6 @@ using DialogHostAvalonia;
 using Docnet.Core;
 using Docnet.Core.Models;
 using Docnet.Core.Readers;
-using ImageMagick;
 using MayShow.Helpers;
 using MayShow.Interfaces;
 using MayShow.ViewModels;
@@ -20,6 +19,15 @@ using PdfSharp.Snippets.Font;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+
+#if !IOS
+using ImageMagick;
+#endif
+
+#if IOS
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Graphics.Platform;
+#endif
 
 namespace MayShow.Models;
 
@@ -98,7 +106,7 @@ class ReportPDFCreator : ChangeNotifier
         var maxItemPxWidth = ((pageWidth - (2 * margin)) * imageResolution) - imageInsertMarginPixels;
         var imageLineFormat = new MigraDoc.DocumentObjectModel.Shapes.LineFormat()
         {
-            Color = Colors.Black,
+            Color = MigraDoc.DocumentObjectModel.Colors.Black,
             Width = Unit.FromPoint(2),
         };;
         // start making PDF!
@@ -204,8 +212,29 @@ class ReportPDFCreator : ChangeNotifier
             var remainingHeightPixels = (remainingHeightInches * imageResolution) - imageInsertMarginPixels;
             if (!isPDF)
             {
-                using var mImage = new MagickImage(info.FullName);
                 var convertedOutputPath = Path.Combine(convertedDir, info.Name + ".jpg");
+                #if IOS
+                using FileStream openImageFileStream = File.OpenRead(info.FullName);
+                var im = PlatformImage.FromStream(openImageFileStream);
+                loadedImageWidth = (uint)im.Width;
+                loadedImageHeight = (uint)im.Height;
+                if (info.Length > appSettings.ImageResizeThreshold * 1024 * 1024)
+                {
+                    if (im.Width >= 400 || im.Height >= 400)
+                    {
+                        loadedImageWidth = (uint)Math.Floor(im.Width * 0.5);
+                        loadedImageHeight = (uint)Math.Floor(im.Height * 0.5);
+                        var resized = im.Resize(loadedImageWidth, loadedImageHeight, Microsoft.Maui.Graphics.ResizeMode.Stretch, true);
+                        _logger?.LogInfo("Image {2} scaled to {0}x{1}", loadedImageWidth, loadedImageHeight, fileName);
+
+                        using FileStream localFileStream = File.OpenWrite(convertedOutputPath);
+                        await resized.SaveAsync(localFileStream, ImageFormat.Jpeg, 0.80f);
+                        filePath = convertedOutputPath;
+                        _logger?.LogInfo(string.Format("Saved adjusted image to JPEG; file path is now {0}", filePath));
+                    }
+                }
+                #else
+                using var mImage = new MagickImage(info.FullName);
                 var didAdjust = false;
                 _logger?.LogInfo("Image orientation of {0} is {1}", fileName, mImage.Orientation);
                 if (mImage.Orientation != OrientationType.TopLeft)
@@ -217,7 +246,7 @@ class ReportPDFCreator : ChangeNotifier
                 loadedImageWidth = mImage.Width;
                 loadedImageHeight = mImage.Height;
                 // perform needed image manipulations
-                if (isHEIC || isWebp || isPNG || (!isPDF && info.Length > appSettings.ImageResizeThreshold * 1024 * 1024))
+                if (isHEIC || isWebp || isPNG || (info.Length > appSettings.ImageResizeThreshold * 1024 * 1024))
                 {
                     // Save image as jpg
                     mImage.Quality = 80;
@@ -241,8 +270,9 @@ class ReportPDFCreator : ChangeNotifier
                 {
                     await mImage.WriteAsync(convertedOutputPath);
                     filePath = convertedOutputPath;
-                    _logger?.LogInfo(string.Format("Saved adjusted image to JPEG; file path is now {0}", filePath));                    
+                    _logger?.LogInfo(string.Format("Saved adjusted image to JPEG; file path is now {0}", filePath));
                 }
+                #endif
                 // write to PDF
                 var paragraph = section.AddParagraph();
                 paragraph.Format.Alignment = ParagraphAlignment.Center;
@@ -306,19 +336,21 @@ class ReportPDFCreator : ChangeNotifier
                         var image = paragraph.AddImage(convertedPdfImagePath);
                         image.LockAspectRatio = true;
                         image.LineFormat = imageLineFormat.Clone();
-                        using (var firstPdfPageImage = new MagickImage(convertedPdfImagePath))
+                        #if IOS
+                        (var pdfPageImageWidth, var pdfPageImageHeight) = MobileUtilities.GetImageWidthHeight(convertedPdfImagePath);
+                        #else
+                        using var firstPdfPageImage = new MagickImage(convertedPdfImagePath);
+                        var pdfPageImageWidth = firstPdfPageImage.Width;
+                        var pdfPageImageHeight = firstPdfPageImage.Height;
+                        #endif
+                        // resize down until it will fit on the page
+                        while (pdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
                         {
-                            var pdfPageImageWidth = firstPdfPageImage.Width;
-                            var pdfPageImageHeight = firstPdfPageImage.Height;
-                            // resize down until it will fit on the page
-                            while (pdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
-                            {
-                                pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * reduceImageSizeAmount);
-                                pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * reduceImageSizeAmount);
-                            }
-                            image.Height = pdfPageImageHeight;
-                            image.Width = pdfPageImageWidth;
+                            pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * reduceImageSizeAmount);
+                            pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * reduceImageSizeAmount);
                         }
+                        image.Height = pdfPageImageHeight;
+                        image.Width = pdfPageImageWidth;
                         for (var j = 1; j < pgCount; j++)
                         {
                             section.AddPageBreak();
@@ -329,19 +361,21 @@ class ReportPDFCreator : ChangeNotifier
                             image.LockAspectRatio = true;
                             image.Width = maxImageWidth;
                             image.LineFormat = imageLineFormat.Clone();
-                            using (var otherPdfPageImage = new MagickImage(convertedPdfImagePath))
+                            #if IOS
+                            (var otherPdfPageImageWidth, var otherPdfPageImageHeight) = MobileUtilities.GetImageWidthHeight(convertedPdfImagePath);
+                            #else
+                            using var otherPdfPageImage = new MagickImage(convertedPdfImagePath);
+                            var otherPdfPageImageWidth = otherPdfPageImage.Width;
+                            var otherPdfPageImageHeight = otherPdfPageImage.Height;
+                            #endif
+                            // resize down until it will fit on the page
+                            while (otherPdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
                             {
-                                var pdfPageImageWidth = otherPdfPageImage.Width;
-                                var pdfPageImageHeight = otherPdfPageImage.Height;
-                                // resize down until it will fit on the page
-                                while (pdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
-                                {
-                                    pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * reduceImageSizeAmount);
-                                    pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * reduceImageSizeAmount);
-                                }
-                                image.Height = pdfPageImageHeight;
-                                image.Width = pdfPageImageWidth;
+                                pdfPageImageHeight = (uint)Math.Floor(otherPdfPageImageHeight * reduceImageSizeAmount);
+                                otherPdfPageImageWidth = (uint)Math.Floor(otherPdfPageImageWidth * reduceImageSizeAmount);
                             }
+                            image.Height = otherPdfPageImageHeight;
+                            image.Width = otherPdfPageImageWidth;
                         }
                     }
                 }

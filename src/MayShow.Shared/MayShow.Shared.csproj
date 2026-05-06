@@ -58,9 +58,11 @@
     </PackageReference>
     <PackageReference Include="Tmds.DBus.Protocol" Version="0.21.3" />
     <PackageReference Include="PDFsharp-MigraDoc" Version="6.2.4" />
-    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.12.0" Condition="'$(RuntimeIdentifier)' != 'osx-x64'" />
-    <!-- DO NOT UPDATE BEYOND 14.9.1 OR YOU WILL BREAK macOS MONTEREY USERS -->
-    <PackageReference Include="Magick.NET-Q8-x64" Version="14.9.1" Condition="'$(RuntimeIdentifier)' == 'osx-x64'" />
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.12.0" 
+      Condition="'$(TargetFramework)' == 'net10.0' And '$(RuntimeIdentifier)' != 'osx-x64'" />
+    <!-- DO NOT UPDATE Magick.NET-Q8-x64 BEYOND 14.9.1 OR YOU WILL BREAK macOS MONTEREY USERS -->
+    <PackageReference Include="Magick.NET-Q8-x64" Version="14.9.1" 
+      Condition="'$(TargetFramework)' == 'net10.0' And '$(RuntimeIdentifier)' == 'osx-x64'" />
     <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.10.11-preview20251127001" />
     <PackageReference Include="DialogHost.Avalonia" Version="0.10.4" />
     <PackageReference Include="Xaml.Behaviors.Interactions.DragAndDrop.DataGrid" Version="11.3.9.5" />
@@ -70,4 +72,6 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-ios'">
     <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.60" />
   </ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-ios'">
+  </PropertyGroup>
 </Project>

@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 
 
 #if IOS
 using Microsoft.Maui.ApplicationModel.DataTransfer;
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Graphics.Platform;
 using Microsoft.Maui.Media;
 using Microsoft.Maui.Storage;
 #endif 
@@ -48,6 +51,7 @@ class MobileUtilities
         var outputPath = Path.Combine(saveDir, Guid.NewGuid().ToString() + Path.GetExtension(result.FileName));
         using Stream sourceStream = await result.OpenReadAsync();
         using FileStream localFileStream = File.OpenWrite(outputPath);
+        Console.WriteLine("Writing file result to {0}", outputPath);
         await sourceStream.CopyToAsync(localFileStream);
         return outputPath;
     }
@@ -56,8 +60,10 @@ class MobileUtilities
     {
         var output = new List<string>();
         var fileResults = await PickPhotos();
+        Console.WriteLine("User picked {0} photos", fileResults.Count);
         if (fileResults.Count > 0 && !Directory.Exists(saveDir))
         {
+            Console.WriteLine("Made save directory when picking photos");
             Directory.CreateDirectory(saveDir);
         }
         foreach (var fileResult in fileResults)
@@ -93,16 +99,26 @@ class MobileUtilities
     {
         // if we need to set the location of the popover:
         // https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios#presentation-location
-        await Share.Default.RequestAsync(new ShareFileRequest
+        _ = Dispatcher.UIThread.Invoke(async () =>
         {
-            Title = title,
-            File = new ShareFile(pathToFile)
+            await Share.Default.RequestAsync(new ShareFileRequest
+            {
+                Title = title,
+                File = new ShareFile(pathToFile)
+            });
         });
     }
 
     public static async Task PutTextOntoClipboard(string text)
     {
         await Clipboard.Default.SetTextAsync(text);
+    }
+
+    public static (uint, uint) GetImageWidthHeight(string path)
+    {
+        using FileStream openImageFileStream = File.OpenRead(path);
+        var im = PlatformImage.FromStream(openImageFileStream);
+        return ((uint)im.Width, (uint)im.Height);
     }
 
     #endif
