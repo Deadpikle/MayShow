@@ -56,10 +56,17 @@ class Utilities
 
     public static string GetInternalDataPath()
     {
+        #if IOS
+        var path = Path.Combine(
+            MobileUtilities.GetDataDirBasePath(),
+            "MayShow"
+        );
+        #else
         var path = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "MayShow"
         );
+        #endif
         if (!Directory.Exists(path))
         {
             Directory.CreateDirectory(path);
