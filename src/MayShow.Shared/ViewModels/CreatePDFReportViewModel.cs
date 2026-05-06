@@ -226,6 +226,47 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
     }
 
+    public async void AddPhotoFromGallery()
+    {
+        #if IOS
+        var filePaths = await MobileUtilities.PickPhotosAndSaveToDir(_pdfReport.BaseFolder);
+        foreach (var filePath in filePaths)
+        {
+            ReportFiles.Add(new ReportFile()
+            {
+                Title = Path.GetFileName(filePath),
+                ReceiptDateTime = File.GetCreationTime(filePath),
+                Notes = "",
+                FilePath = filePath,
+            });
+        }
+        #endif
+    }
+
+    public async void TakePhoto()
+    {
+        #if IOS
+        if (MobileUtilities.CanTakePhotos())
+        {
+            var filePath = await MobileUtilities.TakePhoto(_pdfReport.BaseFolder);
+            if (filePath != null)
+            {
+                ReportFiles.Add(new ReportFile()
+                {
+                    Title = Path.GetFileName(filePath),
+                    ReceiptDateTime = File.GetCreationTime(filePath),
+                    Notes = "",
+                    FilePath = filePath,
+                });
+            }
+        }
+        else
+        {
+            await DialogHost.Show(new WarningViewModel("You are not able to take photos on this device! Does this app have permission to use the camera?"));
+        }
+        #endif        
+    }
+
     private void AddFileBasedOnPath(string? filePath)
     {
         if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath) && !filePath.EndsWith(".DS_Store"))
@@ -544,7 +585,11 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             _pdfReport.LastGeneratedBackupPath = backupFilePathAndName;
             // save report data automatically for user
             await CreateAndSaveReportObjectAfterReportCreation();
+            #if IOS
+            await MobileUtilities.ShareFile(outputPdfFile, "Share PDF Report - " + ReportTitle);
+            #else
             OpenFolderForFileInFileViewer(outputPdfFile);
+            #endif
         }
         IsCreatingPDF = false;
     }

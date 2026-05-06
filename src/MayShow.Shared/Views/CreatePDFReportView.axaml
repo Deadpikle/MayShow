@@ -220,10 +220,28 @@
                 Margin="4">
         <StackPanel Orientation="Horizontal"
                     Spacing="4">
-            <Button Command="{Binding AddItem}"
-                    IsEnabled="{Binding CanAddItem}">
-                <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item(s)...</TextBlock>
-            </Button>
+            <OnPlatform>
+                <OnPlatform.Default>
+                    <Button Command="{Binding AddItem}"
+                            IsEnabled="{Binding CanAddItem}">
+                        <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item(s)...</TextBlock>
+                    </Button>
+                </OnPlatform.Default>
+                <OnPlatform.iOS>
+                    <Button>
+                        <TextBlock><Run Text="&#x002b;" FontFamily="{StaticResource FontAwesomeSolid}"/> Add Item(s)...</TextBlock>
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuItem Header="Add Photo from Gallery..." 
+                                          Command="{Binding AddPhotoFromGallery}" />
+                                <MenuItem Header="Take Photo..."
+                                          Command="{Binding TakePhoto}"
+                                 />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </OnPlatform.iOS>
+            </OnPlatform>
             <Button Command="{Binding RemoveAllItems}"
                     IsEnabled="{Binding IsCreatePDFButtonEnabled}"
                     Classes="Danger">
