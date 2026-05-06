@@ -205,8 +205,6 @@ class ReportPDFCreator : ChangeNotifier
             if (!isPDF)
             {
                 using var mImage = new MagickImage(info.FullName);
-                loadedImageWidth = mImage.Width;
-                loadedImageHeight = mImage.Height;
                 var convertedOutputPath = Path.Combine(convertedDir, info.Name + ".jpg");
                 var didAdjust = false;
                 _logger?.LogInfo("Image orientation of {0} is {1}", fileName, mImage.Orientation);
@@ -216,6 +214,8 @@ class ReportPDFCreator : ChangeNotifier
                     mImage.AutoOrient();
                     didAdjust = true;
                 }
+                loadedImageWidth = mImage.Width;
+                loadedImageHeight = mImage.Height;
                 // perform needed image manipulations
                 if (isHEIC || isWebp || isPNG || (!isPDF && info.Length > appSettings.ImageResizeThreshold * 1024 * 1024))
                 {
