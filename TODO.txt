@@ -48,7 +48,8 @@
         -https://github.com/bblanchon/pdfium-binaries/releases
             -https://github.com/bblanchon/pdfium-binaries/releases?page=17 -> https://github.com/bblanchon/pdfium-binaries/releases/tag/chromium%2F5445
         -https://github.com/GowenGit/docnet/pull/98/changes for someone adding in support for other CPUs (may need to add in Windows arm support ourselves, too...)
-        -might require us to do some fernangling or manual copying in of files or something but it looks like the builds exist out there
+        -might require us to do some fernangling or manual copying in of files or forking the lib and rebuilding the nuget ourselves or something, but it looks like the pdfium builds exist out there so it's just a matter of using them
+            -if we build ourselves maybe we can use a newer build of pdfium? idk how much work that would be.
     *-imagemagick does not work
         -add System.Drawing reference so ImageMagick works?
         -or Magick.NET.SystemDrawing?
@@ -71,6 +72,9 @@
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios
         -this works but I need to set the popover location
     -Generate PDF -> View PDF (and let user share from there)? I know there is a view for this on iOS but can't recall the name so that I can google it....
+        -UIDocumentInteractionController?: https://developer.apple.com/documentation/UIKit/UIDocumentInteractionController
+            -it was in xamarin: https://devblogs.microsoft.com/xamarin/previewing-files-with-xamarin-ios/
+        -QLPreviewController? https://developer.apple.com/documentation/quicklook/qlpreviewcontroller
     *-Make sure clipboard works (not sure if it will out of the box or not)
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/clipboard?view=net-maui-10.0
         -yes, seems to work out of the box, but can use the above if real devices have problems
