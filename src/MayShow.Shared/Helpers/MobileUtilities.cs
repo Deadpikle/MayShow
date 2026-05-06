@@ -17,6 +17,11 @@ class MobileUtilities
 {
     #if IOS
 
+    public static string GetDataDirBasePath()
+    {
+        return FileSystem.Current.AppDataDirectory;
+    }
+
     private static async Task<List<FileResult>> PickPhotos()
     {
         var results = await MediaPicker.Default.PickPhotosAsync(new MediaPickerOptions
@@ -51,6 +56,10 @@ class MobileUtilities
     {
         var output = new List<string>();
         var fileResults = await PickPhotos();
+        if (fileResults.Count > 0 && !Directory.Exists(saveDir))
+        {
+            Directory.CreateDirectory(saveDir);
+        }
         foreach (var fileResult in fileResults)
         {
             output.Add(await SaveFileResultToDir(fileResult, saveDir));
@@ -70,6 +79,10 @@ class MobileUtilities
             var photo = await MediaPicker.Default.CapturePhotoAsync();
             if (photo != null)
             {
+                if (!Directory.Exists(saveDir))
+                {
+                    Directory.CreateDirectory(saveDir);
+                }
                 return await SaveFileResultToDir(photo, saveDir);
             }
         }
