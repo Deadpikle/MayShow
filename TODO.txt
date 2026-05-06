@@ -40,27 +40,42 @@
         -I don't think this is what we are looking for ultimately....?
         -https://github.com/AvaloniaUI/Avalonia.Essentials
         -https://github.com/AvaloniaUI/AvaloniaMauiHybrid -- this may have to be the way to go or perhaps grab code from https://github.com/AvaloniaUI/Avalonia.Controls.Maui/tree/main/src/Avalonia.Controls.Maui.Essentials because we don't need the avalonia tie in stuff if it "just works"...but don't know if it will "just work" yet. apparently native APIs are available through net10.0-ios or whatnot but I'd rather use the existing wrappers/tutorials since those will just work just like we want...
-    -auto save on every action
+    -auto save on every action (iOS only)
     -check to see if internal data dir fetching is OK on mobile (probably need to use iOS/mobile specific function?)
         -yes looks like we need this!!
-    -add System.Drawing reference so ImageMagick works?
+    -find solution for pdfium for docnet
+        -https://github.com/paulocoutinhox/pdfium-lib?
+        -https://github.com/bblanchon/pdfium-binaries/releases
+            -https://github.com/bblanchon/pdfium-binaries/releases?page=17 -> https://github.com/bblanchon/pdfium-binaries/releases/tag/chromium%2F5445
+        -https://github.com/GowenGit/docnet/pull/98/changes for someone adding in support for other CPUs (may need to add in Windows arm support ourselves, too...)
+        -might require us to do some fernangling or manual copying in of files or something but it looks like the builds exist out there
+    *-imagemagick does not work
+        -add System.Drawing reference so ImageMagick works?
         -or Magick.NET.SystemDrawing?
             https://github.com/dlemstra/Magick.NET#download-extra-libraries
+        -yeah so it turns out Magick.NET does not yet have compatibility with iOS/Android (MAUI)!
+            -source: https://github.com/dlemstra/Magick.NET/issues/22#issuecomment-600029537
+        -solution: use MAUI image loading/resizing that uses NSData under the hood, so this works now
+    -fix bug where you have to select images 2x...or 3x...from file picker...something is broken (maybe some path isn't set up first time)
     -TODO: when saving file paths to things on iOS, don't include base folder -- must reconstruct every time due to app sandbox
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/storage/file-system-helpers?view=net-maui-10.0&tabs=macios
     ~-Take picture
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/device-media/picker?view=net-maui-10.0&tabs=macios
+        -code is in and works in simulator (other than bug with selecting more than 1x), need to test on real device
     ~-Add pic from gallery
         -see above link
+        -works, need to test on real device to make sure other formats work and all that (HEIC)
     ~-Add file (uses Files picking, I think this already mostly works just need to copy to internal data dir)
+        -need to re-add this feature to dropdown
     ~-Generate PDF -> Share/print screen to share/print (yes this is available in the essentials package so we're good to go)
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios
-    -Generate PDF -> View PDF? I know there is a view for this on iOS but can't recall the name
+        -this works but I need to set the popover location
+    -Generate PDF -> View PDF (and let user share from there)? I know there is a view for this on iOS but can't recall the name so that I can google it....
     *-Make sure clipboard works (not sure if it will out of the box or not)
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/clipboard?view=net-maui-10.0
         -yes, seems to work out of the box, but can use the above if real devices have problems
-    -show report file size in recent list
-    -share / view most recent generated on main menu
+    -show report file size (all images, etc.) in recent list
+    -share / view most recent generated or a report from main menu
     -make sure setting for backup files is not available (always backs up files on iOS)
     -update settings window and hide things not available on mobile, etc.
     -publishing: https://docs.avaloniaui.net/docs/deployment/ios
