@@ -97,6 +97,10 @@ class MobileUtilities
 
     public static async Task ShareFile(string pathToFile, string title)
     {
+        // write it to cache dir per documentation
+        // https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios
+        var cachedDestFilePath = Path.Combine(FileSystem.Current.CacheDirectory, Path.GetFileName(pathToFile));
+        File.Copy(pathToFile, cachedDestFilePath, true);
         // if we need to set the location of the popover:
         // https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios#presentation-location
         _ = Dispatcher.UIThread.Invoke(async () =>
@@ -104,7 +108,7 @@ class MobileUtilities
             await Share.Default.RequestAsync(new ShareFileRequest
             {
                 Title = title,
-                File = new ShareFile(pathToFile)
+                File = new ShareFile(cachedDestFilePath)
             });
         });
     }
