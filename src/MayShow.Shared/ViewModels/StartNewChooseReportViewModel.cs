@@ -24,6 +24,9 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
         _settings = Settings.LoadSettings();
         _settings.CleanupAbandonedFolders();
         _savedReports = new ObservableCollection<PDFReport>(_settings.AllReportInfo.OrderBy(x => x.Title));
+        #if IOS
+        Console.WriteLine("Our internal data dir is: {0}", Utilities.GetInternalDataPath());
+        #endif
     }
 
     public static string Version
