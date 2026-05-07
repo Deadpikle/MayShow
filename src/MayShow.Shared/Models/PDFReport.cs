@@ -12,7 +12,16 @@ namespace MayShow.Models;
 
 class PDFReport : ChangeNotifier
 {
+    /// <summary>
+    /// internal data path can basically change with app updates, etc.,
+    /// so on iOS we don't store the full path -- just the internal path.
+    /// So, on iOS, _baseFolder is just internal;
+    /// BaseFolder is the full path on iOS.
+    /// On Desktop these are the same and are the full full path.
+    /// </summary>
+    #if !IOS
     private string _baseFolder;
+    #endif
     private string _uuid;
     private string _title;
     private DateTime? _lastSaved;
@@ -23,7 +32,9 @@ class PDFReport : ChangeNotifier
     public PDFReport()
     {
         _uuid = Guid.NewGuid().ToString();
+        #if !IOS
         _baseFolder = "";
+        #endif
         SetBaseFolderToInternalWithUUID();
         _title = "";
         _lastSaved = null;
@@ -32,10 +43,23 @@ class PDFReport : ChangeNotifier
         _files = [];
     }
 
+    #if IOS
+    // on iOS, BaseFolder is derived from other items, so don't read/write it to/from JSON
+    [JsonIgnore]
+    #endif
     public string BaseFolder
     {
-        get => _baseFolder;
+        get 
+        {
+            #if IOS
+            return Path.Combine(Utilities.GetInternalDataPath(), UUID);
+            #else
+            return _baseFolder;
+            #endif
+        }
+        #if !IOS
         set { _baseFolder = value; NotifyPropertyChanged(); }
+        #endif
     }
 
     public string UUID
@@ -85,9 +109,14 @@ class PDFReport : ChangeNotifier
         set { _files = value; NotifyPropertyChanged(); }
     }
 
+    /// <summary>
+    /// no-op on iOS as no _baseFolder on iOS
+    /// </summary>
     public void SetBaseFolderToInternalWithUUID()
     {
+        #if !IOS
         _baseFolder = Path.Combine(Utilities.GetInternalDataPath(), _uuid);
+        #endif
     }
 
     public void ResetUUID()

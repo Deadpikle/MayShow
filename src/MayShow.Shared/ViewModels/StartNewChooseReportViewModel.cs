@@ -150,7 +150,9 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
                 // update info on existing object
                 existing.LastSaved = report.LastSaved;
                 existing.Title = report.Title;
+                #if !IOS
                 existing.BaseFolder = report.BaseFolder;
+                #endif
                 existing.LastGenerated = report.LastGenerated;
                 existing.LastGeneratedBackupPath = report.LastGeneratedBackupPath;
             }

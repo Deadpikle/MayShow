@@ -91,7 +91,7 @@ class ReportPDFCreator : ChangeNotifier
     }
 
     // https://forum.pdfsharp.net/viewtopic.php?f=2&t=1025
-    public async Task<string?> CreatePDF(List<ReportFile> reportFiles, string reportTitle, string outputFilePathWithName, PDFFontResolver fontResolver, Settings appSettings)
+    public async Task<string?> CreatePDF(PDFReport reportData, string reportTitle, string outputFilePathWithName, PDFFontResolver fontResolver, Settings appSettings)
     {
         // setup globals and consts...
         GlobalFontSettings.FontResolver = fontResolver;
@@ -164,14 +164,20 @@ class ReportPDFCreator : ChangeNotifier
             WorkingDirectory = outputFilePathNoName
         };
         var hasAddedData = false;
-        for (var i = 0; i < reportFiles.Count; i++)
+        var internalDir = Utilities.GetInternalDataPath();
+        for (var i = 0; i < reportData.Files.Count; i++)
         {
-            var file = reportFiles[i];
+            var file = reportData.Files[i];
             var fileName = file.FileName;
             var filePath = file.FilePath;
+            #if IOS
+            // file.FilePath on iOS is just the file name, so get the full path to the file
+            filePath = Path.Combine(reportData.BaseFolder, filePath);
+            Console.WriteLine("On iOS, set image file path to {0}", filePath);
+            #endif
             if (!File.Exists(filePath))
             {
-                _logger?.LogInfo("ERROR: File \"{0}\" does not exist at path \"{1}\". Please remove it from the report or re-add it using the Add Item button if you still want it to be in this report.", file.Title, file.FilePath);
+                _logger?.LogInfo("ERROR: File \"{0}\" does not exist at path \"{1}\". Please remove it from the report or re-add it using the Add Item button if you still want it to be in this report.", file.Title, filePath);
                 return null;
             }
             if (fileName == ".DS_Store" || fileName == outputFileName)
@@ -199,7 +205,7 @@ class ReportPDFCreator : ChangeNotifier
             var isHEIC = lowerName.EndsWith(".heic");
             var isWebp = lowerName.EndsWith(".webp");
             var isPNG = lowerName.EndsWith(".png");
-            var info = new FileInfo(file.FilePath);
+            var info = new FileInfo(filePath);
             uint loadedImageWidth = 0;
             uint loadedImageHeight = 0;
             // get max pixel height remaining for items on this page
@@ -214,7 +220,7 @@ class ReportPDFCreator : ChangeNotifier
             {
                 var convertedOutputPath = Path.Combine(convertedDir, info.Name + ".jpg");
                 #if IOS
-                using FileStream openImageFileStream = File.OpenRead(info.FullName);
+                using FileStream openImageFileStream = File.OpenRead(filePath);
                 var im = PlatformImage.FromStream(openImageFileStream);
                 loadedImageWidth = (uint)im.Width;
                 loadedImageHeight = (uint)im.Height;

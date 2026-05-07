@@ -78,6 +78,15 @@ class ReportFile : ChangeNotifier
     [JsonIgnore]
     public bool IsFileFoundOnDisk
     {
-        get => File.Exists(FilePath);
+        get
+        {
+            #if IOS
+            // on iOS, files are there until we delete them unless they get corrupted on disk
+            // in which case we have other issues!
+            return true;
+            #else
+            return File.Exists(FilePath);
+            #endif
+        }
     }
 }

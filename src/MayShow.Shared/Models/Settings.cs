@@ -198,7 +198,9 @@ class Settings : ChangeNotifier
                     Title = report?.Title ?? "",
                     UUID = uuid,
                     LastSaved = report?.LastSaved,
+                    #if !IOS
                     BaseFolder = data.Key,
+                    #endif
                     LastGenerated = report?.LastGenerated,
                     LastGeneratedBackupPath = report?.LastGeneratedBackupPath,
                     Files = report?.Files ?? []
@@ -277,7 +279,9 @@ class Settings : ChangeNotifier
                         }
                     }
                 }
+                #if !IOS
                 reportInfo.BaseFolder = internalReportFolderPath;
+                #endif
                 // make sure BaseFolder is set right just in case -- now always points to internal directory.
                 // (it's actually now redundant because all settings are internal...
                 // but for now we'll just let it stick around.)
@@ -286,7 +290,9 @@ class Settings : ChangeNotifier
                     var internalReportData = JsonSerializer.Deserialize(File.ReadAllText(internalDataFilePath), jsonContext.PDFReport);
                     if (internalReportData != null)
                     {
+                        #if !IOS
                         internalReportData.BaseFolder = internalReportFolderPath;
+                        #endif
                         Utilities.SaveReportDataSync(internalReportData, internalDataFilePath, jsonContext.PDFReport);
                     }
                 }

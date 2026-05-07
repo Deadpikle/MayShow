@@ -226,7 +226,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         }
     }
 
-    public async void AddPhotoFromGallery()
+    public async void AddPhotoFromGallery() // iOS method
     {
         #if IOS
         var filePaths = await MobileUtilities.PickPhotosAndSaveToDir(_pdfReport.BaseFolder);
@@ -237,13 +237,13 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                 Title = Path.GetFileName(filePath),
                 ReceiptDateTime = File.GetCreationTime(filePath),
                 Notes = "",
-                FilePath = filePath,
+                FilePath = Path.GetFileName(filePath), // on iOS, just store the file name.
             });
         }
         #endif
     }
 
-    public async void TakePhoto()
+    public async void TakePhoto() // iOS method
     {
         #if IOS
         if (MobileUtilities.CanTakePhotos())
@@ -256,7 +256,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                     Title = Path.GetFileName(filePath),
                     ReceiptDateTime = File.GetCreationTime(filePath),
                     Notes = "",
-                    FilePath = filePath,
+                    FilePath = Path.GetFileName(filePath), // on iOS, just store the file name. the base part could change!
                 });
             }
         }
@@ -318,7 +318,11 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                     Title = Path.GetFileName(filePath),
                     ReceiptDateTime = date.HasValue ? date.Value.ToDateTime(TimeOnly.MinValue) : File.GetCreationTime(filePath),
                     Notes = "",
+                    #if IOS
+                    FilePath = Path.GetFileName(filePath),
+                    #else
                     FilePath = filePath,
+                    #endif
                 });
                 HasUnsavedWork = true;
             }
@@ -574,7 +578,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     {
         IsCreatingPDF = true;
         var reportCreator = new ReportPDFCreator(this);
-        var outputPdfFile = await reportCreator.CreatePDF(ReportFiles.ToList(), ReportTitle, outputFilePath, new PDFFontResolver(_processDir, this), _settings);
+        var outputPdfFile = await reportCreator.CreatePDF(_pdfReport, ReportTitle, outputFilePath, new PDFFontResolver(_processDir, this), _settings);
         if (!string.IsNullOrWhiteSpace(outputPdfFile))
         {
             // backup PDF file just in case
