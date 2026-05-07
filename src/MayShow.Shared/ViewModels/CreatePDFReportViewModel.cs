@@ -506,12 +506,17 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     // called from UI button
     public async Task CopyLogToClipboard()
     {
+        #if IOS
+        await MobileUtilities.PutTextOntoClipboard(ProgramLog);
+        LogInfo("Program log has been copied to the clipboard!");
+        #else
         var clipboard = TopLevelGrabber?.GetTopLevel().Clipboard;
         if (clipboard != null)
         {
             await clipboard.SetTextAsync(ProgramLog);
             LogInfo("Program log has been copied to the clipboard!");
         }
+        #endif
     }
 
     private async Task<string?> DeterminePDFSaveLocation()
