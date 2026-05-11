@@ -89,7 +89,7 @@
         -this works but I need to set the popover location
     -show report file size (all images, etc.) in recent list
     -fix drag and drop (probably use tiny buttons instead)
-    -get rid of datagrid details view
+    -get rid of datagrid details view or otherwise add some other way to view an image/pdf
     -update PDF font resolver to make sure it works to get an internal app resource (there is probably a maui essentials function for this)
     -share / view most recent generated or a report from main menu
     -make sure setting for backup files is not available (always backs up files on iOS)

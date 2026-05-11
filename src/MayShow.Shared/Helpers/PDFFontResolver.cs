@@ -1,4 +1,5 @@
 
+using System;
 using System.IO;
 using MayShow.Interfaces;
 using PdfSharp.Fonts;
@@ -14,6 +15,7 @@ class PDFFontResolver : IFontResolver
     {
         _logger = logger;
         _runningProcessDirectory = runningProcessDirectory;
+        Console.WriteLine("Process directory in font resolver is: {0}", runningProcessDirectory);
     }
 
     public byte[]? GetFont(string faceName)

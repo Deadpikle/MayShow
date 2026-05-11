@@ -25,6 +25,20 @@ class MobileUtilities
         return FileSystem.Current.AppDataDirectory;
     }
 
+    // https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/storage/file-system-helpers?view=net-maui-10.0&tabs=android
+    public async Task CopyFileToAppDataDirectory(string filename)
+    {
+        // Open the source file
+        using Stream inputStream = await FileSystem.Current.OpenAppPackageFileAsync(filename);
+
+        // Create an output filename
+        string targetFile = Path.Combine(FileSystem.Current.AppDataDirectory, filename);
+
+        // Copy the file to the AppDataDirectory
+        using FileStream outputStream = File.Create(targetFile);
+        await inputStream.CopyToAsync(outputStream);
+    }
+
     private static async Task<List<FileResult>> PickPhotos()
     {
         var results = await MediaPicker.Default.PickPhotosAsync(new MediaPickerOptions
