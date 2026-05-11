@@ -50,6 +50,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         _deletedFiles = [];
         // setup initial quote and program log data
         InitializeProgramLog();
+        GetUILocation = null;
     }
 
     public CreatePDFReportViewModel(PDFReport reportInfo, IChangeViewModel viewModelChanger) : this(viewModelChanger)
@@ -145,6 +146,8 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             SetupFileCollectionChangedWatcher();
         }
     }
+
+    public IGetUILocation? GetUILocation { get; set; }
 
     public string DataGridDateFormat
     {
@@ -595,7 +598,13 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             // save report data automatically for user
             await CreateAndSaveReportObjectAfterReportCreation();
             #if IOS
-            await MobileUtilities.ShareFile(outputPdfFile, "Share PDF Report - " + ReportTitle);
+            await Dispatcher.UIThread.InvokeAsync(async () =>
+            {
+                await MobileUtilities.ShareFile(
+                    outputPdfFile, 
+                    "Share PDF Report - " + ReportTitle, 
+                    GetUILocation?.GetUILocation(UIItem.CreatePDFButton));
+                });
             #else
             OpenFolderForFileInFileViewer(outputPdfFile);
             #endif

@@ -109,7 +109,7 @@ class MobileUtilities
         return null;
     }
 
-    public static async Task ShareFile(string pathToFile, string title)
+    public static async Task ShareFile(string pathToFile, string title, Rect? popoverLocation)
     {
         // write it to cache dir per documentation
         // https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios
@@ -117,13 +117,11 @@ class MobileUtilities
         File.Copy(pathToFile, cachedDestFilePath, true);
         // if we need to set the location of the popover:
         // https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios#presentation-location
-        _ = Dispatcher.UIThread.Invoke(async () =>
+        await Share.Default.RequestAsync(new ShareFileRequest
         {
-            await Share.Default.RequestAsync(new ShareFileRequest
-            {
-                Title = title,
-                File = new ShareFile(cachedDestFilePath)
-            });
+            Title = title,
+            File = new ShareFile(cachedDestFilePath),
+            PresentationSourceBounds = popoverLocation ?? Rect.Zero
         });
     }
 

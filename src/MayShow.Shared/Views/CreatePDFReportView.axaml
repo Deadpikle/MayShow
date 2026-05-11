@@ -261,6 +261,7 @@
                   Spacing="6"
                   HorizontalAlignment="Center">
         <Button Command="{Binding BuildPDF}"
+                Name="BuildPDFButton"
                 Classes="accent"
                 IsEnabled="{Binding IsCreatePDFButtonEnabled}">
             <TextBlock><Run Text="&#xf1c1;" FontFamily="{StaticResource FontAwesomeSolid}"/> Create Report PDF</TextBlock>

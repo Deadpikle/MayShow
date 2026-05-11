@@ -84,9 +84,9 @@
         -works, need to test on real device to make sure other formats work and all that (HEIC)
     ~-Add file (uses Files picking, I think this already mostly works just need to copy to internal data dir)
         -need to re-add this feature to dropdown
-    ~-Generate PDF -> Share/print screen to share/print (yes this is available in the essentials package so we're good to go)
+    *-Generate PDF -> Share/print screen to share/print (yes this is available in the essentials package so we're good to go)
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios
-        -this works but I need to set the popover location
+        *-this works but I need to set the popover location
     -show report file size (all images, etc.) in recent list
     -fix drag and drop (probably use tiny buttons instead)
     -get rid of datagrid details view or otherwise add some other way to view an image/pdf
