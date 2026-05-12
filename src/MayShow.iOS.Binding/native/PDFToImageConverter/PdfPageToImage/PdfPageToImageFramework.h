@@ -6,6 +6,7 @@
 #import <Foundation/Foundation.h>
 
 //! Project version number for NewBinding.
+FOUNDATION_EXPORT double PdfPageToImageVersionNumber;
 
 //! Project version string for NewBinding.
 FOUNDATION_EXPORT const unsigned char PdfPageToImageVersionString[];
