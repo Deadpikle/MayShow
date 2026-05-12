@@ -59,8 +59,10 @@
         -yes, seems to work out of the box, but can use the above if real devices have problems
     *-when saving file paths to things on iOS, don't include base folder -- must reconstruct every time due to app sandbox
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/storage/file-system-helpers?view=net-maui-10.0&tabs=macios
-    -auto save on every action (iOS only)
-    -find solution for pdfium for docnet
+    *-Generate PDF -> Share/print screen to share/print (yes this is available in the essentials package so we're good to go)
+        -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios
+        *-this works but I need to set the popover location
+    *-find solution for pdfium for docnet
         -https://github.com/paulocoutinhox/pdfium-lib ?
         -https://github.com/bblanchon/pdfium-binaries/releases
             -https://github.com/bblanchon/pdfium-binaries/releases?page=17 -> https://github.com/bblanchon/pdfium-binaries/releases/tag/chromium%2F5445
@@ -72,6 +74,10 @@
         -https://github.com/GowenGit/docnet/pull/98/changes for someone adding in support for other CPUs (may need to add in Windows arm support ourselves, too...)
         -might require us to do some fernangling or manual copying in of files or forking the lib and rebuilding the nuget ourselves or something, but it looks like the pdfium builds exist out there so it's just a matter of using them
             -if we build ourselves maybe we can use a newer build of pdfium? idk how much work that would be.
+        -went with native library using PDFKit as a solution fully under our control
+    -test to make sure PDF use actually works in the iOS app (should be ok but want to do a full test)
+    -fix bug where previous generated PDF backup is not deleted
+    -auto save on every action (iOS only)
     -fix bug where you have to select images 2x...or 3x...from file picker...something is broken (maybe some path isn't set up first time)
         -It's actually working, but the saving of files is async (and after picker is dismissed) so we need to show the user in the UI that we are processing the files or similar
         -probably can make a "Please wait..." dialog with a spinner and title or something and refactor so that user knows something is going on
@@ -84,16 +90,17 @@
         -works, need to test on real device to make sure other formats work and all that (HEIC)
     ~-Add file (uses Files picking, I think this already mostly works just need to copy to internal data dir)
         -need to re-add this feature to dropdown
-    *-Generate PDF -> Share/print screen to share/print (yes this is available in the essentials package so we're good to go)
-        -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/data/share?view=net-maui-10.0&tabs=macios
-        *-this works but I need to set the popover location
-    -show report file size (all images, etc.) in recent list
-    -fix drag and drop (probably use tiny buttons instead)
+    -see if we can make the dropdown prettier
+    -show report file size (all images, etc.) in recent list so user can delete old ones if they like
+    -fix/remove drag and drop (probably use tiny buttons instead)
     -get rid of datagrid details view or otherwise add some other way to view an image/pdf
+        -probably a dialog that shows the thing; for pdf could always render pages to images and show those I guess...
     -update PDF font resolver to make sure it works to get an internal app resource (there is probably a maui essentials function for this)
+        -seems like it already works? need to test on device.
     -share / view most recent generated or a report from main menu
     -make sure setting for backup files is not available (always backs up files on iOS)
     -update settings window and hide things not available on mobile, etc.
+    -make sure desktop is still OK
     -publishing: https://docs.avaloniaui.net/docs/deployment/ios
     -test on a real device
 -quickstart for loading last edited report on main menu?

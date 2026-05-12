@@ -90,6 +90,43 @@ class ReportPDFCreator : ChangeNotifier
         return par;
     }
 
+    #if !IOS
+    private string RenderPdfPageToImage(IDocReader docReader, int pgNum, string convertedDir, string fileName)
+    {
+        Console.WriteLine("Rendering pg " + pgNum);
+        using var pageReader = docReader.GetPageReader(pgNum);
+        Console.WriteLine("Getting image for page " + pgNum);
+        var rawBytes = pageReader.GetImage(RenderFlags.RenderAnnotations);
+        Console.WriteLine("Getting width & height for page " + pgNum);
+        var width = pageReader.GetPageWidth();
+        var height = pageReader.GetPageHeight();
+        Console.WriteLine("Loading pixel data for page " + pgNum);
+        using var img = Image.LoadPixelData<Bgra32>(rawBytes, width, height);
+        // you are likely going to want this as well otherwise you might end up with transparent parts.
+        img.Mutate(x => x.BackgroundColor(SixLabors.ImageSharp.Color.White));
+        var pdfPageImageOutputPath = Path.Combine(convertedDir, fileName + "-Page-" 
+            + (pgNum + 1).ToString().PadLeft(3, '0') + ".jpg");
+        img.Save(pdfPageImageOutputPath);
+        Console.WriteLine("Done rendering pg " + pgNum);
+        return pdfPageImageOutputPath;
+    }
+    #endif
+
+    #if IOS
+    private string? RenderPdfPageToImage(string inputFilePathAndName, int pageNum, string convertedDir, string fileName)
+    {
+        var pdfPageImageOutputPath = Path.Combine(convertedDir, fileName + "-Page-" 
+            + (pageNum + 1).ToString().PadLeft(3, '0') + ".jpg");
+        var result = iOS.Binding.ConvertPdfPageToImage.ExportPdfPageToImage(inputFilePathAndName, Path.Combine(convertedDir, pdfPageImageOutputPath), pageNum);
+        if (result > 0)
+        {
+            return pdfPageImageOutputPath;
+        }
+        _logger?.LogInfo("Error result of creating PDF image for {0}: {1}", inputFilePathAndName, result);
+        return null;
+    }
+    #endif
+
     // https://forum.pdfsharp.net/viewtopic.php?f=2&t=1025
     public async Task<string?> CreatePDF(PDFReport reportData, string reportTitle, string outputFilePathWithName, PDFFontResolver fontResolver, Settings appSettings)
     {
@@ -302,59 +339,49 @@ class ReportPDFCreator : ChangeNotifier
             else // isPDF
             {
                 // need to render PDF to images
-                if (appSettings.UseDocnetPDFImageRendering)
+                if (appSettings.UseDocnetPDFImageRendering /* or #if IOS */)
                 {
-                    // render using Docnet library (which utilizes pdfium, the chrome renderer)
-                    string RenderPdfPageToImage(IDocReader docReader, int pgNum)
-                    {
-                        Console.WriteLine("Rendering pg " + pgNum);
-                        using var pageReader = docReader.GetPageReader(pgNum);
-                        Console.WriteLine("Getting image for page " + pgNum);
-                        var rawBytes = pageReader.GetImage(RenderFlags.RenderAnnotations);
-                        Console.WriteLine("Getting width & height for page " + pgNum);
-                        var width = pageReader.GetPageWidth();
-                        var height = pageReader.GetPageHeight();
-                        Console.WriteLine("Loading pixel data for page " + pgNum);
-                        using var img = Image.LoadPixelData<Bgra32>(rawBytes, width, height);
-                        // you are likely going to want this as well otherwise you might end up with transparent parts.
-                        img.Mutate(x => x.BackgroundColor(SixLabors.ImageSharp.Color.White));
-                        var pdfPageImageOutputPath = Path.Combine(convertedDir, info.Name + "-Page-" 
-                            + (pgNum + 1).ToString().PadLeft(3, '0') + ".jpg");
-                        img.Save(pdfPageImageOutputPath);
-                        Console.WriteLine("Done rendering pg " + pgNum);
-                        return pdfPageImageOutputPath;
-                    }
-                    // render all pages to images
+                    // render all pages to images using Docnet library (which utilizes pdfium, the chrome renderer)
+                    #if IOS
+                    var pgCount = iOS.Binding.GetPdfPageCount(filePath);
+                    #else
                     var docReader = DocLib.Instance.GetDocReader(
                         filePath,
                         new PageDimensions(1080, 1920)); // TODO: are these dims right?
                     // add to document
                     var pgCount = docReader.GetPageCount();
+                    #endif
                     if (pgCount > 0)
                     {
-                        var convertedPdfImagePath = RenderPdfPageToImage(docReader, 0);
-                        imageTitlePar.AddText(string.Format(" (PDF with {0} page{1}) ", 
-                            pgCount, 
-                            pgCount == 1 ? "" : "s"));
-                        var paragraph = section.AddParagraph();
-                        paragraph.Format.Alignment = ParagraphAlignment.Center;
-                        // get image height/width off of disk so we can resize down if needed
-                        var image = paragraph.AddImage(convertedPdfImagePath);
-                        image.LockAspectRatio = true;
-                        image.LineFormat = imageLineFormat.Clone();
                         #if IOS
+                        var convertedPdfImagePath = RenderPdfPageToImage(filePath, 0, convertedDir, info.Name);
+                        if (convertedPdfImagePath == null)
+                        {
+                            _logger?.LogInfo("Unable to create image from PDF for {0}", filePath);
+                            return null;
+                        }
                         (var pdfPageImageWidth, var pdfPageImageHeight) = MobileUtilities.GetImageWidthHeight(convertedPdfImagePath);
                         #else
+                        var convertedPdfImagePath = RenderPdfPageToImage(docReader, 0, convertedDir, info.Name);
                         using var firstPdfPageImage = new MagickImage(convertedPdfImagePath);
                         var pdfPageImageWidth = firstPdfPageImage.Width;
                         var pdfPageImageHeight = firstPdfPageImage.Height;
                         #endif
+                        // get image height/width off of disk so we can resize down if needed;
                         // resize down until it will fit on the page
                         while (pdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
                         {
                             pdfPageImageHeight = (uint)Math.Floor(pdfPageImageHeight * reduceImageSizeAmount);
                             pdfPageImageWidth = (uint)Math.Floor(pdfPageImageWidth * reduceImageSizeAmount);
                         }
+                        imageTitlePar.AddText(string.Format(" (PDF with {0} page{1}) ", 
+                            pgCount, 
+                            pgCount == 1 ? "" : "s"));
+                        var paragraph = section.AddParagraph();
+                        paragraph.Format.Alignment = ParagraphAlignment.Center;
+                        var image = paragraph.AddImage(convertedPdfImagePath);
+                        image.LockAspectRatio = true;
+                        image.LineFormat = imageLineFormat.Clone();
                         image.Height = pdfPageImageHeight;
                         image.Width = pdfPageImageWidth;
                         for (var j = 1; j < pgCount; j++)
@@ -362,14 +389,16 @@ class ReportPDFCreator : ChangeNotifier
                             section.AddPageBreak();
                             paragraph = section.AddParagraph();
                             paragraph.Format.Alignment = ParagraphAlignment.Center;
-                            convertedPdfImagePath = RenderPdfPageToImage(docReader, j);
-                            image = paragraph.AddImage(convertedPdfImagePath);
-                            image.LockAspectRatio = true;
-                            image.Width = maxImageWidth;
-                            image.LineFormat = imageLineFormat.Clone();
                             #if IOS
+                            convertedPdfImagePath = RenderPdfPageToImage(filePath, 0, convertedDir, info.Name);
+                            if (convertedPdfImagePath == null)
+                            {
+                                _logger?.LogInfo("Unable to create image from PDF for {0}", filePath);
+                                return null;
+                            }
                             (var otherPdfPageImageWidth, var otherPdfPageImageHeight) = MobileUtilities.GetImageWidthHeight(convertedPdfImagePath);
                             #else
+                            convertedPdfImagePath = RenderPdfPageToImage(docReader, j, convertedDir, info.Name);
                             using var otherPdfPageImage = new MagickImage(convertedPdfImagePath);
                             var otherPdfPageImageWidth = otherPdfPageImage.Width;
                             var otherPdfPageImageHeight = otherPdfPageImage.Height;
@@ -380,6 +409,10 @@ class ReportPDFCreator : ChangeNotifier
                                 pdfPageImageHeight = (uint)Math.Floor(otherPdfPageImageHeight * reduceImageSizeAmount);
                                 otherPdfPageImageWidth = (uint)Math.Floor(otherPdfPageImageWidth * reduceImageSizeAmount);
                             }
+                            image = paragraph.AddImage(convertedPdfImagePath);
+                            image.LockAspectRatio = true;
+                            image.Width = maxImageWidth;
+                            image.LineFormat = imageLineFormat.Clone();
                             image.Height = otherPdfPageImageHeight;
                             image.Width = otherPdfPageImageWidth;
                         }
@@ -388,7 +421,7 @@ class ReportPDFCreator : ChangeNotifier
                 else
                 {
                     // use older, not-docnet rendering method.
-                    // uses MigraDoc rendering. Does not work with annotations, and since Migradoc
+                    // uses MigraDoc rendering. Does not work with PDF annotations, and since Migradoc
                     // doesn't let us know how big the image is, we can't do the image resizing, so
                     // we just do our best.
                     // render first page (eventually need to improve code to just do everything in a loop)

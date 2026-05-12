@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-ios'">
     <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.60" />
+    <ProjectReference Include="..\MayShow.iOS.Binding\MayShow.iOS.Binding.csproj" />
   </ItemGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-ios'">
   </PropertyGroup>
