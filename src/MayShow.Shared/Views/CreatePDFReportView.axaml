@@ -26,7 +26,7 @@
             <TextBlock><Run Text="&#xf060;" FontFamily="{StaticResource FontAwesomeSolid}"/> Return to Main Menu</TextBlock>
         </Button>
         <Label Content="Report Title" />
-        <TextBox Text="{Binding ReportTitle}"
+        <TextBox Text="{Binding ReportTitle, UpdateSourceTrigger=LostFocus}"
                  Watermark="Receipts December 2024"
                  Margin="2,0,2,4"
                  Classes="clearButton"

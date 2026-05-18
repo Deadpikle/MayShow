@@ -145,7 +145,7 @@ class Utilities
         return guid;
     }
 
-    public static void SaveReportDataSync(PDFReport reportData, string path, JsonTypeInfo<PDFReport>? context)
+    public static void SaveReportDataSync(PDFReport reportData, string path, JsonTypeInfo<PDFReport>? context = null)
     {
         if (context == null)
         {

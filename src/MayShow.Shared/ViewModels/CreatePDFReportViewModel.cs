@@ -81,9 +81,12 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         get => _pdfReport.Title;
         set 
         { 
-            _pdfReport.Title = value;
-            NotifyPropertyChanged();
-            HasUnsavedWork = true;
+            if (_pdfReport.Title != value)
+            {
+                _pdfReport.Title = value;
+                NotifyPropertyChanged();
+                HasUnsavedWork = true;
+            }
         }
     }
 
@@ -127,6 +130,14 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         set
         {
             _hasUnsavedWork = value;
+            #if IOS
+            if (_hasUnsavedWork)
+            {
+                // always save on every action on iOS
+                SaveInterimReportInfoSync();
+                _hasUnsavedWork = false;
+            }
+            #endif
             NotifyPropertyChanged();
             NotifyPropertyChanged(nameof(IsSaveButtonAccentOn));
         }
@@ -483,6 +494,12 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         await SavePDFReportDataToDisk(_pdfReport);
     }
 
+    public void SaveInterimReportInfoSync()
+    {
+        _pdfReport.LastSaved = DateTime.Now;
+        SavePDFReportDataToDiskSync(_pdfReport);
+    }
+
     private async Task CreateAndSaveReportObjectAfterReportCreation()
     {
         _pdfReport.LastSaved = DateTime.Now;
@@ -494,6 +511,26 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     {
         var savePath = _pdfReport.GetReportSavedDataPath();
         await Utilities.SaveReportDataAsync(report, savePath);
+        LogInfo("Saved report information to {0}", savePath);
+        HasUnsavedWork = false;
+        UpdateRecentlyUsed?.UpdateRecentlyUsed(report);
+        foreach (var item in _deletedFiles)
+        {
+            // any items that have been deleted off the report
+            // that are internal to the report should also be deleted
+            // off of disk
+            if (item.FilePath.StartsWith(_pdfReport.BaseFolder) && !Directory.Exists(item.FilePath) /* sanity check */)
+            {
+                File.Delete(item.FilePath);
+            }
+        }
+        _deletedFiles.Clear();
+    }
+
+    private void SavePDFReportDataToDiskSync(PDFReport report)
+    {
+        var savePath = _pdfReport.GetReportSavedDataPath();
+        Utilities.SaveReportDataSync(report, savePath);
         LogInfo("Saved report information to {0}", savePath);
         HasUnsavedWork = false;
         UpdateRecentlyUsed?.UpdateRecentlyUsed(report);
