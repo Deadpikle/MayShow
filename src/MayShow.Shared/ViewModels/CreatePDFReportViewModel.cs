@@ -586,15 +586,25 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         {
             // backup PDF file just in case
             var backupFilePath = Utilities.GetPDFBackupDataPath();
-            var backupFilePathAndName = Path.Combine(backupFilePath, ReportTitle + 
-                " - Generated on " + DateTime.Now.ToString("yyyy-MM-dd \\a\\t HH-mm-ss") + ".pdf");
+            var backupFileName = ReportTitle + 
+                " - Generated on " + DateTime.Now.ToString("yyyy-MM-dd \\a\\t HH-mm-ss") + ".pdf";
+            var backupFilePathAndName = Path.Combine(backupFilePath, backupFileName);
             File.Copy(outputFilePath, backupFilePathAndName);
             // if there is a prior backup, remove it
-            if (_pdfReport.LastGeneratedBackupPath != null && File.Exists(_pdfReport.LastGeneratedBackupPath))
+            var lastTimeGeneratedBackupPath = _pdfReport.LastGeneratedBackupPath;
+            #if IOS
+             // iOS only stores file name since internal dir may change
+            lastTimeGeneratedBackupPath =  Path.Combine(backupFilePath, _pdfReport.LastGeneratedBackupPath ?? "none.pdf");
+            #endif
+            if (lastTimeGeneratedBackupPath != null && File.Exists(lastTimeGeneratedBackupPath))
             {
-                File.Delete(_pdfReport.LastGeneratedBackupPath);
+                File.Delete(lastTimeGeneratedBackupPath);
             }
+            #if IOS
+            _pdfReport.LastGeneratedBackupPath = backupFileName;
+            #else
             _pdfReport.LastGeneratedBackupPath = backupFilePathAndName;
+            #endif
             // save report data automatically for user
             await CreateAndSaveReportObjectAfterReportCreation();
             #if IOS
