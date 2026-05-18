@@ -390,7 +390,7 @@ class ReportPDFCreator : ChangeNotifier
                             paragraph = section.AddParagraph();
                             paragraph.Format.Alignment = ParagraphAlignment.Center;
                             #if IOS
-                            convertedPdfImagePath = RenderPdfPageToImage(filePath, 0, convertedDir, info.Name);
+                            convertedPdfImagePath = RenderPdfPageToImage(filePath, j, convertedDir, info.Name);
                             if (convertedPdfImagePath == null)
                             {
                                 _logger?.LogInfo("Unable to create image from PDF for {0}", filePath);
@@ -406,7 +406,7 @@ class ReportPDFCreator : ChangeNotifier
                             // resize down until it will fit on the page
                             while (otherPdfPageImageHeight > remainingHeightPixels || pdfPageImageWidth > maxItemPxWidth)
                             {
-                                pdfPageImageHeight = (uint)Math.Floor(otherPdfPageImageHeight * reduceImageSizeAmount);
+                                otherPdfPageImageHeight = (uint)Math.Floor(otherPdfPageImageHeight * reduceImageSizeAmount);
                                 otherPdfPageImageWidth = (uint)Math.Floor(otherPdfPageImageWidth * reduceImageSizeAmount);
                             }
                             image = paragraph.AddImage(convertedPdfImagePath);
