@@ -75,21 +75,22 @@
         -might require us to do some fernangling or manual copying in of files or forking the lib and rebuilding the nuget ourselves or something, but it looks like the pdfium builds exist out there so it's just a matter of using them
             -if we build ourselves maybe we can use a newer build of pdfium? idk how much work that would be.
         -went with native library using PDFKit as a solution fully under our control
-    -test to make sure PDF use actually works in the iOS app (should be ok but want to do a full test)
-    -fix bug where previous generated PDF backup is not deleted
-    -auto save on every action (iOS only)
+    *-fix bug where previous generated PDF backup is not deleted
+    *-test to make sure PDF use actually works in the iOS app (should be ok but want to do a full test)
+    *-auto save on every action (iOS only)
+    -fix save 2x happening when you change report title
     -fix bug where you have to select images 2x...or 3x...from file picker...something is broken (maybe some path isn't set up first time)
         -It's actually working, but the saving of files is async (and after picker is dismissed) so we need to show the user in the UI that we are processing the files or similar
         -probably can make a "Please wait..." dialog with a spinner and title or something and refactor so that user knows something is going on
     ~-Take picture
         -https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/device-media/picker?view=net-maui-10.0&tabs=macios
-        -code is in and works in simulator (other than bug with selecting more than 1x), need to test on real device
+        -code is in and works in simulator, need to test on real device
     -Don't use UUID as user-visible file name on add file? sorta ugly
     ~-Add pic from gallery
         -see above link
         -works, need to test on real device to make sure other formats work and all that (HEIC)
-    ~-Add file (uses Files picking, I think this already mostly works just need to copy to internal data dir)
-        -need to re-add this feature to dropdown
+    *-Add file (uses Files picking, I think this already mostly works just need to copy to internal data dir)
+        *-need to re-add this feature to dropdown
     -see if we can make the dropdown prettier
     -show report file size (all images, etc.) in recent list so user can delete old ones if they like
     -fix/remove drag and drop (probably use tiny buttons instead)
@@ -97,6 +98,7 @@
         -probably a dialog that shows the thing; for pdf could always render pages to images and show those I guess...
     -update PDF font resolver to make sure it works to get an internal app resource (there is probably a maui essentials function for this)
         -seems like it already works? need to test on device.
+        -https://learn.microsoft.com/en-us/answers/questions/1324667/how-can-i-get-a-file-into-an-app-bundle-and-read-i
     -share / view most recent generated or a report from main menu
     -make sure setting for backup files is not available (always backs up files on iOS)
     -update settings window and hide things not available on mobile, etc.
