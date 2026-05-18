@@ -343,7 +343,7 @@ class ReportPDFCreator : ChangeNotifier
                 {
                     // render all pages to images using Docnet library (which utilizes pdfium, the chrome renderer)
                     #if IOS
-                    var pgCount = iOS.Binding.GetPdfPageCount(filePath);
+                    var pgCount = iOS.Binding.ConvertPdfPageToImage.GetPdfPageCount(filePath);
                     #else
                     var docReader = DocLib.Instance.GetDocReader(
                         filePath,
