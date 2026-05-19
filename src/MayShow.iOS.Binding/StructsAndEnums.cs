@@ -1,0 +1,3 @@
+namespace MayShow.iOS.Binding {
+
+}

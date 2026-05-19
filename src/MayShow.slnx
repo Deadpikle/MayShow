@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="MayShow.Desktop/MayShow.Desktop.csproj" />
+  <Project Path="MayShow.iOS/MayShow.iOS.csproj" />
+  <Project Path="MayShow.Shared/MayShow.Shared.csproj" />
+</Solution>

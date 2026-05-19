@@ -1,0 +1,140 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="MayShow.App"
+             xmlns:viewModels="clr-namespace:MayShow.ViewModels"
+             xmlns:views="clr-namespace:MayShow.Views"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:behaviors="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:helpers="clr-namespace:MayShow.Helpers"
+             RequestedThemeVariant="Default"
+             Name="MayShow">
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <dialogHostAvalonia:DialogHostStyles />
+        <StyleInclude Source="avares://Xaml.Behaviors.Interactions.DragAndDrop/Styles.axaml" />
+        <StyleInclude Source="avares://Xaml.Behaviors.Interactions.DragAndDrop.DataGrid/Styles.axaml" />
+
+        <Style Selector="DataGrid.DragAndDrop">
+            <Style.Resources>
+                <helpers:DataGridDropHandler x:Key="DataGridDropHandler" />
+            </Style.Resources>
+            <Setter
+                Property="RowHeaderWidth"
+                Value="24" />
+            <Setter Property="(Interaction.Behaviors)">
+                <BehaviorCollectionTemplate>
+                <BehaviorCollection>
+                    <ContextDropBehavior Handler="{StaticResource DataGridDropHandler}" />
+                </BehaviorCollection>
+                </BehaviorCollectionTemplate>
+            </Setter>
+        </Style>
+
+        <!-- This makes only the DataGridRowHeader available for dragging, instead of making the entire row draggable -->
+        <!-- Which prevents a conflict between text selection in a cell and drag-and-drop -->
+        <Style Selector="DataGrid.DragAndDrop DataGridRowHeader">
+            <Setter Property="(Interaction.Behaviors)">
+                <BehaviorCollectionTemplate>
+                <BehaviorCollection>
+                    <ContextDragBehavior HorizontalDragThreshold="3" VerticalDragThreshold="3" />
+                </BehaviorCollection>
+                </BehaviorCollectionTemplate>
+            </Setter>
+            <Setter Property="Content">
+                <Template>
+                <Image
+                    Margin="12,0,12,0"
+                    Width="12"
+                    Height="12"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                    <Image.Source>
+                    <!-- Use your own image here, I used this: https://www.svgrepo.com/svg/347759/grabber -->
+                    <DrawingImage Drawing="{StaticResource IconGrabber}" />
+                    </Image.Source>
+                </Image>
+                </Template>
+            </Setter>
+        </Style>
+
+        <Style Selector="DataGrid.ItemsDragAndDrop">
+            <Style.Resources>
+                <helpers:DataGridDropHandler x:Key="DataGridDropHandler" />
+            </Style.Resources>
+            <Setter Property="(Interaction.Behaviors)">
+                <BehaviorCollectionTemplate>
+                <BehaviorCollection>
+                    <ContextDropBehavior Handler="{StaticResource DataGridDropHandler}" />
+                </BehaviorCollection>
+                </BehaviorCollectionTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.Danger">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#b00202"/>
+            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="#bd0000"/>
+            </Style>
+            <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="#820202"/>
+            </Style>
+        </Style>
+    </Application.Styles>
+    <Application.DataTemplates>
+        <DataTemplate DataType="{x:Type viewModels:CreatePDFReportViewModel}">
+            <views:CreatePDFReportView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:WarningDeleteItemViewModel}">
+            <views:WarningDeleteItem/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:EditFileViewModel}">
+            <views:EditFile/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:AboutViewModel}">
+            <views:AboutView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:WarningViewModel}">
+            <views:WarningView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ShutdownCheckViewModel}">
+            <views:ShutdownCheckView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ConfirmViewModel}">
+            <views:ConfirmView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
+            <views:SettingsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:StartNewChooseReportViewModel}">
+            <views:StartNewChooseReport/>
+        </DataTemplate>
+    </Application.DataTemplates>
+    <Application.Resources>
+        <ResourceDictionary>
+            <helpers:DataGridDropHandler x:Key="DataGridDropHandler" />
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key='Light'>
+                    <SolidColorBrush x:Key='DragDropBrush'>Black</SolidColorBrush>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key='Dark'>
+                    <SolidColorBrush x:Key='DragDropBrush'>White</SolidColorBrush>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+            <!-- IconGrabber, MIT License, author: Primer, taken from: https://www.svgrepo.com/svg/347759/grabber -->
+            <PathGeometry x:Key="IconGrabberGeometry">M15 18a1 1 0 100-2 1 1 0 000 2zm1-6a1 1 0 11-2 0 1 1 0 012 0zm-7 6a1 1 0 100-2 1 1 0 000 2zm0-5a1 1 0 100-2 1 1 0 000 2zm7-6a1 1 0 11-2 0 1 1 0 012 0zM9 8a1 1 0 100-2 1 1 0 000 2z</PathGeometry>
+            <GeometryDrawing x:Key="IconGrabber" Brush="{DynamicResource DragDropBrush}" Geometry="{StaticResource IconGrabberGeometry}" />
+
+            <FontFamily x:Key="FontAwesomeRegular">avares://MayShow/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Regular-400.otf#Font Awesome 7 Free Regular</FontFamily>
+            <FontFamily x:Key="FontAwesomeSolid">avares://MayShow/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Solid-900.otf#Font Awesome 7 Free Solid</FontFamily>
+        </ResourceDictionary>
+    </Application.Resources>
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="About MayShow" Click="AboutOnClick" />
+        </NativeMenu>
+    </NativeMenu.Menu>
+</Application>
