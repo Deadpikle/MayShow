@@ -21,6 +21,7 @@
     *-allow loading by user
 *-cleanup empty uuid folders in case user gets an internal folder created but never saves
     -cleanup of abandonded reports (e.g. backing up files but ultimately did not save report)
+*-make sure word wrap is on in notes field for a receipt
 -iOS-specific (MAUI essentials?)
     -sudo dotnet workload install ios --version 10.0.200
         -to get around old xcode version problem, view the following:
