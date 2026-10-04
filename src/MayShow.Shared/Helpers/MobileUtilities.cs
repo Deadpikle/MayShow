@@ -63,19 +63,12 @@ class MobileUtilities
         //      To get the file, use the OpenReadAsync method.
         // So, make sure to always use OpenReadAsync() instead.
         var fileCount = Directory.EnumerateFiles(saveDir).Count();
-        var outputPath = "";
-        var didFindUnique = false;
-        while (!didFindUnique)
+        var fileName = "Receipt - Added " + (DateTime.Now.ToString("yy-dd-MM H-mm-ss-fffffff"));
+        var outputPath = Path.Combine(saveDir, fileName + Path.GetExtension(result.FileName));
+        while (File.Exists(outputPath))
         {
-            var fileName = "Receipt Image " + fileCount;
-            var fileNameWithExt = fileName + Path.GetExtension(result.FileName);
+            fileName += "1";
             outputPath = Path.Combine(saveDir, fileName + Path.GetExtension(result.FileName));
-            didFindUnique = !File.Exists(outputPath);
-            if (!didFindUnique)
-            {
-                fileCount++; // just increment by 1 until we get a unique name; shouldn't take long
-                // it will really only happen if they add then delete stuff...
-            }
         }
         using Stream sourceStream = await result.OpenReadAsync();
         using FileStream localFileStream = File.OpenWrite(outputPath);
