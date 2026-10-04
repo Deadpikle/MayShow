@@ -26,10 +26,12 @@ public partial class CreatePDFReportView : UserControl
 
     private void DataContext_Changed(object? sender, EventArgs e)
     {
+        #if IOS
         if (DataContext is CreatePDFReportViewModel vm)
         {
             vm.GetUILocation = this;
         }
+        #endif
     }
 
     private void LogBlock_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
