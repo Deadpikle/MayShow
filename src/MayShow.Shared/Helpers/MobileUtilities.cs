@@ -62,7 +62,21 @@ class MobileUtilities
         //      The FullPath property doesn't always return the physical path to the file. 
         //      To get the file, use the OpenReadAsync method.
         // So, make sure to always use OpenReadAsync() instead.
-        var outputPath = Path.Combine(saveDir, Guid.NewGuid().ToString() + Path.GetExtension(result.FileName));
+        var fileCount = Directory.EnumerateFiles(saveDir).Count();
+        var outputPath = "";
+        var didFindUnique = false;
+        while (!didFindUnique)
+        {
+            var fileName = "Receipt Image " + fileCount;
+            var fileNameWithExt = fileName + Path.GetExtension(result.FileName);
+            outputPath = Path.Combine(saveDir, fileName + Path.GetExtension(result.FileName));
+            didFindUnique = !File.Exists(outputPath);
+            if (!didFindUnique)
+            {
+                fileCount++; // just increment by 1 until we get a unique name; shouldn't take long
+                // it will really only happen if they add then delete stuff...
+            }
+        }
         using Stream sourceStream = await result.OpenReadAsync();
         using FileStream localFileStream = File.OpenWrite(outputPath);
         Console.WriteLine("Writing file result to {0}", outputPath);
