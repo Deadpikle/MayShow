@@ -267,7 +267,8 @@
                 Name="OpenLastGenPDF"
                 Classes=""
                 IsEnabled="{Binding !IsCreatingPDF}"
-                IsVisible="{Binding HasPrevGenReportPDF}">
+                IsVisible="{Binding HasPrevGenReportPDF}"
+                ToolTip.Tip="{Binding PrevGenReportDate}">
             <TextBlock><Run Text="&#xf07c;" FontFamily="{StaticResource FontAwesomeSolid}"/> Show Previously Generated Report</TextBlock>
         </Button>
         <Button Command="{Binding BuildPDF}"
