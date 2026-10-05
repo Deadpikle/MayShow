@@ -45,11 +45,11 @@ class ReportPDFCreator : ChangeNotifier
         var footerPar = new Paragraph();
         footerPar.Format.Alignment = ParagraphAlignment.Center;
         footerPar.Format.Font.Size = 10;
-        footerPar.AddText("--Page ");
+        footerPar.AddText("—Page ");
         footerPar.AddPageField();
         footerPar.AddText(" of ");
         footerPar.AddNumPagesField();
-        footerPar.AddText("--");
+        footerPar.AddText("—");
         footerPar.AddLineBreak();
         footerPar.AddText("Report generated on " + DateTime.Now.ToString("f") + " with MayShow v" + Constants.AppVersion);
         footerPar.Tag = "FooterPar";
