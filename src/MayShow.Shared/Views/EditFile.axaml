@@ -8,7 +8,8 @@
              x:Class="MayShow.Views.EditFile"
              xmlns:vm="clr-namespace:MayShow.ViewModels"
              x:DataType="vm:EditFileViewModel"
-             MaxWidth="350">
+             MaxWidth="350"
+             Width="350">
     <Grid RowDefinitions="Auto, *, Auto">
         <Label Content="Edit File Details"
                Grid.Row="0"
@@ -19,13 +20,15 @@
                       HorizontalScrollBarVisibility="Disabled"
                       Grid.Row="1">
             <StackPanel Orientation="Vertical"
+                        HorizontalAlignment="Center"
                         Spacing="4"
-                        Margin="12,4,12,0">
+                        Margin="12,0,12,0">
                 <Label Content="Title" />
                 <TextBox Watermark="Title"
                             Text="{Binding ClonedFile.Title}"
                             VerticalAlignment="Stretch"
-                            TextWrapping="Wrap" />
+                            TextWrapping="Wrap"
+                            Width="325" />
                 <Label Content="Notes" />
                 <TextBox Watermark="Notes"
                             Text="{Binding ClonedFile.Notes}"
@@ -35,7 +38,8 @@
                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                             HorizontalAlignment="Stretch"
                             TextWrapping="Wrap"
-                            Height="75" />
+                            Height="75"
+                            Width="325" />
                 <Label Content="Receipt Date" />
                 <Calendar SelectionMode="SingleDate"
                             SelectedDate="{Binding ClonedFile.ReceiptDateTime}" 
