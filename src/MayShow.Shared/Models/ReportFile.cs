@@ -11,6 +11,8 @@ class ReportFile : ChangeNotifier
     private DateTime _receiptDateTime;
     private string _notes;
     private string _filePath;
+    private int _indexInReport;
+    private bool _isLastInReport;
 
     public ReportFile() : base()
     {
@@ -18,6 +20,8 @@ class ReportFile : ChangeNotifier
         _receiptDateTime = DateTime.Now;
         _notes = "";
         _filePath = "";
+        _indexInReport = 0;
+        _isLastInReport = false;
     }
 
     public ReportFile(ReportFile other)
@@ -26,6 +30,8 @@ class ReportFile : ChangeNotifier
         ReceiptDateTime = _receiptDateTime = other.ReceiptDateTime ?? DateTime.Now;
         Notes = _notes = other.Notes;
         FilePath = _filePath = other.FilePath;
+        _indexInReport = other.IndexInReport;
+        _isLastInReport = other.IsLastInReport;
     }
 
     public string Title
@@ -88,5 +94,30 @@ class ReportFile : ChangeNotifier
             return File.Exists(FilePath);
             #endif
         }
+    }
+
+    [JsonIgnore]
+    public int IndexInReport
+    {
+        get => _indexInReport;
+        set 
+        { 
+            _indexInReport = value; 
+            NotifyPropertyChanged(); 
+            NotifyPropertyChanged(nameof(IsFirstInReport)); 
+        }
+    }
+
+    [JsonIgnore]
+    public bool IsFirstInReport
+    {
+        get => _indexInReport == 0;
+    }
+
+    [JsonIgnore]
+    public bool IsLastInReport // ...this is not pretty code, but oh well.
+    {
+        get => _isLastInReport;
+        set { _isLastInReport = value; NotifyPropertyChanged(); }
     }
 }

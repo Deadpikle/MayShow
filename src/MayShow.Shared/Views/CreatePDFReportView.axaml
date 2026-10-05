@@ -12,6 +12,7 @@
              x:DataType="vm:CreatePDFReportViewModel">
   <UserControl.Resources>
     <helpers:DateFormatConverter x:Key="DateFormatter" />
+    <helpers:AllTrueConverter x:Key="AllTrueConv" />
   </UserControl.Resources>
   <Grid ColumnDefinitions="*"
         RowDefinitions="Auto, 2*, Auto, Auto, *">
@@ -37,7 +38,6 @@
         </TextBox>
     </StackPanel>
     <DataGrid x:Name="FilesGrid"
-              Classes="DragAndDrop ItemsDragAndDrop"
               Grid.Row="1"
               Grid.Column="0"
               Grid.ColumnSpan="2"
@@ -68,6 +68,53 @@
             </Style>
         </DataGrid.Styles>
         <DataGrid.Columns>
+            <DataGridTemplateColumn Header="Sort"
+                                    IsReadOnly="True"
+                                    Width="70">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Focusable="False"
+                                    Spacing="4"
+                                    Margin="2">
+                            <Button Command="{Binding $parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).MoveItemUp}"
+                                    CommandParameter="{Binding}"
+                                    Padding="4"
+                                    FontSize="14"
+                                    Content="&#xf30c;"
+                                    VerticalContentAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    ToolTip.Tip="Move Up"
+                                    FontFamily="{StaticResource FontAwesomeSolid}">
+                                <Button.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource AllTrueConv}">
+                                        <Binding Path="!IsFirstInReport" />
+                                        <Binding Path="!$parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF" />
+                                    </MultiBinding>
+                                </Button.IsEnabled>
+                            </Button>
+                            <Button Command="{Binding $parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).MoveItemDown}"
+                                    CommandParameter="{Binding}"
+                                    Padding="4"
+                                    FontSize="14"
+                                    Content="&#xf309;"
+                                    VerticalContentAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    ToolTip.Tip="Move Down"
+                                    FontFamily="{StaticResource FontAwesomeSolid}">
+                                <Button.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource AllTrueConv}">
+                                        <Binding Path="!IsLastInReport" />
+                                        <Binding Path="!$parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF" />
+                                    </MultiBinding>
+                                </Button.IsEnabled>
+                            </Button>
+                        </StackPanel>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
             <DataGridTemplateColumn Header="Title"
                                     IsReadOnly="False"
                                     Width="*">
@@ -161,7 +208,7 @@
                                     CommandParameter="{Binding}"
                                     Classes="accent"
                                     Margin="2"
-                                    FontSize="12"
+                                    FontSize="14"
                                     IsEnabled="{Binding !$parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF}">
                                 <Button.Content>
                                     <TextBlock><Run Text="&#xf044;" FontFamily="{StaticResource FontAwesomeSolid}"/> Edit</TextBlock>
@@ -171,7 +218,7 @@
                                     CommandParameter="{Binding}"
                                     Classes="Danger"
                                     Margin="2"
-                                    FontSize="12"
+                                    FontSize="14"
                                     IsEnabled="{Binding !$parent[UserControl].((vm:CreatePDFReportViewModel)DataContext).IsCreatingPDF}">
                                 <Button.Content>
                                     <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove</TextBlock>
@@ -219,7 +266,7 @@
                 Grid.Row="2"
                 Margin="4">
         <StackPanel Orientation="Horizontal"
-                    Spacing="4">
+                    Spacing="6">
             <OnPlatform>
                 <OnPlatform.Default>
                     <Button Command="{Binding AddItem}"
@@ -252,7 +299,7 @@
             </Button>
             <Button Command="{Binding ResortPDFItemsByDate}"
                     IsEnabled="{Binding IsCreatePDFButtonEnabled}">
-                <TextBlock><Run Text="&#xf162;" FontFamily="{StaticResource FontAwesomeSolid}"/> Re-sort PDF Items</TextBlock>
+                <TextBlock><Run Text="&#xf162;" FontFamily="{StaticResource FontAwesomeSolid}"/> Auto-sort PDF Items</TextBlock>
             </Button>
             <Button Command="{Binding SaveInterimReportInfo}"
                     Classes.accent="{Binding IsSaveButtonAccentOn}"

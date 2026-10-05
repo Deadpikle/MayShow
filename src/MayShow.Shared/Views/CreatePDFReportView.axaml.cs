@@ -11,9 +11,9 @@ using MayShow.ViewModels;
 namespace MayShow.Views;
 
 #if IOS
-public partial class CreatePDFReportView : UserControl, IGetUILocation
+public partial class CreatePDFReportView : UserControl, IGetUILocation, IHandleAddRemoveOps
 #else
-public partial class CreatePDFReportView : UserControl
+public partial class CreatePDFReportView : UserControl, IHandleAddRemoveOps
 #endif
 {
     public CreatePDFReportView()
@@ -26,12 +26,13 @@ public partial class CreatePDFReportView : UserControl
 
     private void DataContext_Changed(object? sender, EventArgs e)
     {
-        #if IOS
         if (DataContext is CreatePDFReportViewModel vm)
         {
+            #if IOS
             vm.GetUILocation = this;
+            #endif
+            vm.HandleAddRemoveOpsDelegate = this;
         }
-        #endif
     }
 
     private void LogBlock_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
@@ -73,4 +74,13 @@ public partial class CreatePDFReportView : UserControl
         return Microsoft.Maui.Graphics.Rect.Zero;
     }
     #endif
+
+    public void DidStartModifyingList()
+    {
+    }
+
+    public void FinishedModifyingList()
+    {
+        FilesGrid.SelectedItem = null; // keeps row from expanding on sorting item
+    }
 }

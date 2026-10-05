@@ -63,6 +63,8 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
 
     public IUpdateRecentlyUsed? UpdateRecentlyUsed { get; set; }
 
+    public IHandleAddRemoveOps? HandleAddRemoveOpsDelegate { get; set; }
+
     public PDFReport PDFReport
     {
         get => _pdfReport;
@@ -75,6 +77,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             NotifyPropertyChanged(nameof(HasPrevGenReportPDF));
             NotifyPropertyChanged(nameof(PrevGenReportDate));
             SetupFileCollectionChangedWatcher();
+            UpdateReportFileIndices();
         }
     }
 
@@ -170,6 +173,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             _pdfReport.Files = value;
             NotifyPropertyChanged();
             SetupFileCollectionChangedWatcher();
+            UpdateReportFileIndices();
         }
     }
 
@@ -195,6 +199,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     private void ProcessFilesCollectionChanges(object? sender, NotifyCollectionChangedEventArgs e)
     {
         NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
+        UpdateReportFileIndices();
         HasUnsavedWork = true;
     }
 
@@ -267,7 +272,9 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                 ReceiptDateTime = File.GetCreationTime(filePath),
                 Notes = "",
                 FilePath = Path.GetFileName(filePath), // on iOS, just store the file name.
+                IndexInReport = ReportFiles.Count,
             });
+            UpdateReportFileIndices();
         }
         #endif
     }
@@ -286,7 +293,9 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                     ReceiptDateTime = File.GetCreationTime(filePath),
                     Notes = "",
                     FilePath = Path.GetFileName(filePath), // on iOS, just store the file name. the base part could change!
+                    IndexInReport = ReportFiles.Count,
                 });
+                UpdateReportFileIndices();
             }
         }
         else
@@ -357,7 +366,9 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                     #else
                     FilePath = filePath,
                     #endif
+                    IndexInReport = ReportFiles.Count,
                 });
+                UpdateReportFileIndices();
                 HasUnsavedWork = true;
             }
         }
@@ -376,6 +387,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                 NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
                 _deletedFiles.Add(file);
                 HasUnsavedWork = true;
+                UpdateReportFileIndices();
             }
         }
     }
@@ -396,6 +408,15 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             ReportFiles.Clear();
             HasUnsavedWork = true;
             NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
+        }
+    }
+
+    private void UpdateReportFileIndices()
+    {
+        for (var i = 0; i < ReportFiles.Count; i++)
+        {
+            ReportFiles[i].IndexInReport = i;
+            ReportFiles[i].IsLastInReport = i == ReportFiles.Count - 1;
         }
     }
 
@@ -695,6 +716,38 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                 launcher.LaunchUriAsync(new Uri(lastGenPathDir));
             }
         }
+    }
+
+    public void MoveItemUp(object f) => MoveItemUpImpl((ReportFile)f);
+    public void MoveItemUpImpl(ReportFile file)
+    {
+        if (!file.IsFirstInReport)
+        {
+            HandleAddRemoveOpsDelegate?.DidStartModifyingList();
+            // get index, move one up
+            var idx = ReportFiles.IndexOf(file);
+            ReportFiles.RemoveAt(idx);
+            ReportFiles.Insert(idx - 1, file);
+            HasUnsavedWork = true;
+            HandleAddRemoveOpsDelegate?.FinishedModifyingList();
+        }
+        UpdateReportFileIndices();
+    }
+    
+    public void MoveItemDown(object f) => MoveItemDownImpl((ReportFile)f);
+    public void MoveItemDownImpl(ReportFile file)
+    {
+        if (!file.IsLastInReport)
+        {
+            HandleAddRemoveOpsDelegate?.DidStartModifyingList();
+            // get index, move one down
+            var idx = ReportFiles.IndexOf(file);
+            ReportFiles.RemoveAt(idx);
+            ReportFiles.Insert(idx + 1, file);
+            HasUnsavedWork = true;
+            HandleAddRemoveOpsDelegate?.FinishedModifyingList();
+        }
+        UpdateReportFileIndices();
     }
 
     public async void ReturnToMainMenu()
