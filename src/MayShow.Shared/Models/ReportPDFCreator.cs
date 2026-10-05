@@ -388,6 +388,15 @@ class ReportPDFCreator : ChangeNotifier
                         {
                             section.AddPageBreak();
                             paragraph = section.AddParagraph();
+                            if (pgCount > 1)
+                            {
+                                paragraph.AddText("(Multi-page PDF — Page " + (j + 1) + " of " + pgCount + ")");
+                                paragraph.AddLineBreak();
+                                paragraph.AddLineBreak();
+                                paragraph.Format.Alignment = ParagraphAlignment.Center;
+                            }
+                            // now the paragraph for the image
+                            paragraph = section.AddParagraph();
                             paragraph.Format.Alignment = ParagraphAlignment.Center;
                             #if IOS
                             convertedPdfImagePath = RenderPdfPageToImage(filePath, j, convertedDir, info.Name);
