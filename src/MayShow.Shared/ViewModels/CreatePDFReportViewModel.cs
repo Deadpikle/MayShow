@@ -281,6 +281,14 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
         #endif        
     }
 
+    private void CreateBaseReportDirIfNeeded()
+    {
+        if (!Directory.Exists(_pdfReport.BaseFolder))
+        {
+            Directory.CreateDirectory(_pdfReport.BaseFolder);
+        }
+    }
+
     private void AddFileBasedOnPath(string? filePath)
     {
         if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath) && !filePath.EndsWith(".DS_Store"))
@@ -314,10 +322,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                     var fileNameNoExt = Path.GetFileNameWithoutExtension(filePath);
                     var extension = Path.GetExtension(filePath);
                     var copyToPath = Path.Combine(_pdfReport.BaseFolder, fileName);
-                    if (!Directory.Exists(_pdfReport.BaseFolder))
-                    {
-                        Directory.CreateDirectory(_pdfReport.BaseFolder);
-                    }
+                    CreateBaseReportDirIfNeeded();
                     var rnd = new Random();
                     while (File.Exists(copyToPath))
                     {
@@ -617,6 +622,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     private async Task CreatePDF(string outputFilePath)
     {
         IsCreatingPDF = true;
+        CreateBaseReportDirIfNeeded(); // just in case folder hasn't been made yet...cached PDF will go here so we need the folder
         var reportCreator = new ReportPDFCreator(this);
         var outputPdfFile = await reportCreator.CreatePDF(_pdfReport, ReportTitle, outputFilePath, new PDFFontResolver(_processDir, this), _settings);
         if (!string.IsNullOrWhiteSpace(outputPdfFile))
