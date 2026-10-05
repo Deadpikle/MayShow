@@ -73,6 +73,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
             NotifyPropertyChanged(nameof(ReportFiles));
             NotifyPropertyChanged(nameof(HasPrevGenReportPDF));
+            NotifyPropertyChanged(nameof(PrevGenReportDate));
             SetupFileCollectionChangedWatcher();
         }
     }
@@ -95,6 +96,13 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
     {
         get => _pdfReport.HasLastGenerated &&
             File.Exists(_pdfReport.LastGeneratedBackupPath);
+    }
+
+    public string PrevGenReportDate
+    {
+        get => _pdfReport.LastGenerated != null 
+            ? "Last generated on: " + _pdfReport.LastGenerated?.ToString("yyyy-MM-dd \\a\\t HH:mm:ss") 
+            : "";
     }
 
     public bool CanAddItem
@@ -655,6 +663,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             #else
             _pdfReport.LastGeneratedBackupPath = backupFilePathAndName;
             #endif
+            _pdfReport.LastGenerated = DateTime.Now;
             // save report data automatically for user
             await CreateAndSaveReportObjectAfterReportCreation();
             #if IOS
@@ -669,6 +678,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             OpenFolderForFileInFileViewer(outputPdfFile);
             #endif
             NotifyPropertyChanged(nameof(HasPrevGenReportPDF));
+            NotifyPropertyChanged(nameof(PrevGenReportDate));
         }
         IsCreatingPDF = false;
     }
