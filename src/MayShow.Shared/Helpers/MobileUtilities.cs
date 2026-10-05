@@ -58,18 +58,17 @@ class MobileUtilities
 
     private static async Task<string> SaveFileResultToDir(FileResult result, string saveDir)
     {
-        // note: docs say the following --
-        //      The FullPath property doesn't always return the physical path to the file. 
-        //      To get the file, use the OpenReadAsync method.
-        // So, make sure to always use OpenReadAsync() instead.
-        var fileCount = Directory.EnumerateFiles(saveDir).Count();
-        var fileName = "Receipt - Added " + (DateTime.Now.ToString("yy-dd-MM H-mm-ss-fffffff"));
+        var fileName = "Receipt - Added " + DateTime.Now.ToString("yy-dd-MM H-mm-ss-fffffff");
         var outputPath = Path.Combine(saveDir, fileName + Path.GetExtension(result.FileName));
         while (File.Exists(outputPath))
         {
             fileName += "1";
             outputPath = Path.Combine(saveDir, fileName + Path.GetExtension(result.FileName));
         }
+        // note: docs say the following --
+        //      The FullPath property doesn't always return the physical path to the file. 
+        //      To get the file, use the OpenReadAsync method.
+        // So, make sure to always use OpenReadAsync() instead.
         using Stream sourceStream = await result.OpenReadAsync();
         using FileStream localFileStream = File.OpenWrite(outputPath);
         Console.WriteLine("Writing file result to {0}", outputPath);
