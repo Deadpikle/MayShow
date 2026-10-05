@@ -263,6 +263,13 @@
       <StackPanel Orientation="Horizontal"
                   Spacing="6"
                   HorizontalAlignment="Center">
+        <Button Command="{Binding OpenPrevGenReport}"
+                Name="OpenLastGenPDF"
+                Classes=""
+                IsEnabled="{Binding !IsCreatingPDF}"
+                IsVisible="{Binding HasPrevGenReportPDF}">
+            <TextBlock><Run Text="&#xf07c;" FontFamily="{StaticResource FontAwesomeSolid}"/> Show Previously Generated Report</TextBlock>
+        </Button>
         <Button Command="{Binding BuildPDF}"
                 Name="BuildPDFButton"
                 Classes="accent"

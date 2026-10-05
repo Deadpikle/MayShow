@@ -72,6 +72,7 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             NotifyPropertyChanged(nameof(ReportTitle));
             NotifyPropertyChanged(nameof(IsCreatePDFButtonEnabled));
             NotifyPropertyChanged(nameof(ReportFiles));
+            NotifyPropertyChanged(nameof(HasPrevGenReportPDF));
             SetupFileCollectionChangedWatcher();
         }
     }
@@ -88,6 +89,12 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
                 HasUnsavedWork = true;
             }
         }
+    }
+
+    public bool HasPrevGenReportPDF
+    {
+        get => _pdfReport.HasLastGenerated &&
+            File.Exists(_pdfReport.LastGeneratedBackupPath);
     }
 
     public bool CanAddItem
@@ -661,8 +668,23 @@ class CreatePDFReportViewModel : BaseViewModel, ICanCheckShutdown, ILogger
             #else
             OpenFolderForFileInFileViewer(outputPdfFile);
             #endif
+            NotifyPropertyChanged(nameof(HasPrevGenReportPDF));
         }
         IsCreatingPDF = false;
+    }
+
+    public void OpenPrevGenReport()
+    {
+        var topLevel = TopLevelGrabber?.GetTopLevel();
+        if (topLevel != null && HasPrevGenReportPDF)
+        {
+            var lastGenPathDir = Path.GetDirectoryName(_pdfReport.LastGeneratedBackupPath);
+            if (!string.IsNullOrWhiteSpace(lastGenPathDir))
+            {
+                var launcher = topLevel.Launcher;
+                launcher.LaunchUriAsync(new Uri(lastGenPathDir));
+            }
+        }
     }
 
     public async void ReturnToMainMenu()
