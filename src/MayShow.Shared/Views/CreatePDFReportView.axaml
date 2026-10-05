@@ -298,7 +298,8 @@
                 <TextBlock><Run Text="&#xf1f8;" FontFamily="{StaticResource FontAwesomeSolid}"/> Remove All Items</TextBlock>
             </Button>
             <Button Command="{Binding ResortPDFItemsByDate}"
-                    IsEnabled="{Binding IsCreatePDFButtonEnabled}">
+                    IsEnabled="{Binding IsCreatePDFButtonEnabled}"
+                    Margin="16,0,0,0">
                 <TextBlock><Run Text="&#xf162;" FontFamily="{StaticResource FontAwesomeSolid}"/> Auto-sort PDF Items</TextBlock>
             </Button>
             <Button Command="{Binding SaveInterimReportInfo}"
