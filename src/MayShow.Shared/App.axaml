@@ -1,0 +1,69 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="MayShow.App"
+             xmlns:viewModels="clr-namespace:MayShow.ViewModels"
+             xmlns:views="clr-namespace:MayShow.Views"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:helpers="clr-namespace:MayShow.Helpers"
+             RequestedThemeVariant="Default"
+             Name="MayShow">
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <dialogHostAvalonia:DialogHostStyles />
+
+        <Style Selector="Button.Danger">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#b00202"/>
+            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="#bd0000"/>
+            </Style>
+            <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="#820202"/>
+            </Style>
+        </Style>
+    </Application.Styles>
+    <Application.DataTemplates>
+        <DataTemplate DataType="{x:Type viewModels:CreatePDFReportViewModel}">
+            <views:CreatePDFReportView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:WarningDeleteItemViewModel}">
+            <views:WarningDeleteItem/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:EditFileViewModel}">
+            <views:EditFile/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:AboutViewModel}">
+            <views:AboutView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:WarningViewModel}">
+            <views:WarningView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ShutdownCheckViewModel}">
+            <views:ShutdownCheckView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ConfirmViewModel}">
+            <views:ConfirmView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
+            <views:SettingsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:StartNewChooseReportViewModel}">
+            <views:StartNewChooseReport/>
+        </DataTemplate>
+    </Application.DataTemplates>
+    <Application.Resources>
+        <ResourceDictionary>
+            <FontFamily x:Key="FontAwesomeRegular">avares://MayShow/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Regular-400.otf#Font Awesome 7 Free Regular</FontFamily>
+            <FontFamily x:Key="FontAwesomeSolid">avares://MayShow/Assets/Fonts/FontAwesome/Font Awesome 7 Free-Solid-900.otf#Font Awesome 7 Free Solid</FontFamily>
+        </ResourceDictionary>
+    </Application.Resources>
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="About MayShow" Click="AboutOnClick" />
+        </NativeMenu>
+    </NativeMenu.Menu>
+</Application>

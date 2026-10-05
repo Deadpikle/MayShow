@@ -1,0 +1,13 @@
+
+Three ways to get started with a report:
+
+1. Pick a folder on disk
+    -> No title, empty list, have base folder to work in
+    -> Generate UUID, make sure it's unique among all reports that we have
+    -> on first save or add file (if copying to local), only create internal folder if needed (we know UUID is unique so we are OK if the setting changes later)
+2. Pick an already-saved report (that is either in local dir or somewhere else on disk)
+    -> Have title (presumably), have file list already, have UUID already with internal folder if saved locally, etc. everything basically ready to go
+3. Start new, empty report with title
+    -> Have title, empty list
+    -> Generate UUID, make sure it's unique among all reports that we have
+    -> on first save or add file (if copying to local), create folder -> save data

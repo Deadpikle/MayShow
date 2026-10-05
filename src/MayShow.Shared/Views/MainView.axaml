@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MayShow.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MayShow.Views.MainView"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             x:DataType="vm:MainViewModel">
+  <dialogHost:DialogHost CloseOnClickAway="False" 
+                          Identifier="DialogHost"
+                          x:Name="WindowDialogHost">
+      <dialogHost:DialogHost.DialogContent>
+          <StackPanel/>
+      </dialogHost:DialogHost.DialogContent>
+      <!-- put the content over which the dialog is shown here (e.g. your main window grid)-->
+      <ContentControl Content="{Binding CurrentViewModel}"/>
+  </dialogHost:DialogHost>
+</UserControl>
