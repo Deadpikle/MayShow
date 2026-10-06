@@ -13,7 +13,5 @@ Most contributions are welcome; however, no contributions made from AI tools or 
 ## Screenshots
 
 ![Main Menu](graphics/AppScreenshot-MainMenu.png)
-
 ![Build Report](graphics/AppScreenshot-BuildReport.png)
-
 ![Edit Item](graphics/AppScreenshot-EditItem.png)
