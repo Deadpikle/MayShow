@@ -19,13 +19,20 @@
     <StackPanel Orientation="Vertical"
                 Spacing="2"
                 Margin="0,4,0,0">
-        <Button Command="{Binding ReturnToMainMenu}"
-                Grid.Row="0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Margin="4,4,0,4">
-            <TextBlock><Run Text="&#xf060;" FontFamily="{StaticResource FontAwesomeSolid}"/> Return to Main Menu</TextBlock>
-        </Button>
+        <Grid>
+            <Button Command="{Binding ReturnToMainMenu}"
+                    Grid.Row="0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="4,4,0,4">
+                <TextBlock><Run Text="&#xf060;" FontFamily="{StaticResource FontAwesomeSolid}"/> Return to Main Menu</TextBlock>
+            </Button>
+            <Label Content="Edit Report"
+                   FontSize="16"
+                   FontWeight="Bold" 
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center" />
+        </Grid>
         <Label Content="Report Title" />
         <TextBox Text="{Binding ReportTitle, UpdateSourceTrigger=LostFocus}"
                  Watermark="Receipts December 2024"
@@ -300,7 +307,7 @@
             <Button Command="{Binding ResortPDFItemsByDate}"
                     IsEnabled="{Binding IsCreatePDFButtonEnabled}"
                     Margin="16,0,0,0">
-                <TextBlock><Run Text="&#xf162;" FontFamily="{StaticResource FontAwesomeSolid}"/> Auto-sort PDF Items</TextBlock>
+                <TextBlock><Run Text="&#xf162;" FontFamily="{StaticResource FontAwesomeSolid}"/> Re-sort PDF Items</TextBlock>
             </Button>
             <Button Command="{Binding SaveInterimReportInfo}"
                     Classes.accent="{Binding IsSaveButtonAccentOn}"
