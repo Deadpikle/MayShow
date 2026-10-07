@@ -53,6 +53,9 @@ Source: "..\src\MayShow.Desktop\bin\Release\net10.0\win-x64\publish\pdfium.dll";
 Source: "..\src\MayShow.Desktop\bin\Release\net10.0\win-x64\publish\Assets\*"; DestDir: "{app}\Assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
+[InstallDelete]
+Type: files; Name: "{app}\Magick.Native-Q16-x64.dll"
+
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
