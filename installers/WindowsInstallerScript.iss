@@ -5,7 +5,8 @@
 #define MyAppName "MayShow"
 #define MyAppVersion "1.5.0"
 #define MyAppPublisher "Quickity Quack Productions"
-#define MyAppExeName "MayShow.exe"
+#define MyAppExeName "MayShow.exe"              
+#define MyAppExeBuildName "MayShow.Desktop.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -31,8 +32,9 @@ DisableProgramGroupPage=yes
 OutputBaseFilename=Install {#MyAppName} {#MyAppVersion}
 SolidCompression=yes
 WizardStyle=modern dynamic
-SetupIconFile=../src/MayShow-icon.ico
+SetupIconFile=../src/MayShow.Shared/MayShow-icon.ico
 OutputDir=..\src\bin
+VersionInfoVersion={#MyAppVersion}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -41,14 +43,14 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\src\bin\Release\net10.0\win-x64\publish\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\src\bin\Release\net10.0\win-x64\publish\av_libglesv2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\src\bin\Release\net10.0\win-x64\publish\libHarfBuzzSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\src\bin\Release\net10.0\win-x64\publish\libSkiaSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\src\bin\Release\net10.0\win-x64\publish\LICENSE"; DestDir: "{app}"; DestName: "PDFium-license.txt"; Flags: ignoreversion 
-Source: "..\src\bin\Release\net10.0\win-x64\publish\Magick.Native-Q8-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\src\bin\Release\net10.0\win-x64\publish\pdfium.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\src\bin\Release\net10.0\win-x64\publish\Assets\*"; DestDir: "{app}\Assets"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\src\MayShow.Desktop\bin\Release\net10.0\win-x64\publish\{#MyAppExeBuildName}"; DestDir: "{app}"; Flags: ignoreversion; DestName: "{#MyAppExeName}"
+Source: "..\src\MayShow.Desktop\bin\Release\net10.0\win-x64\publish\av_libglesv2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\MayShow.Desktop\bin\Release\net10.0\win-x64\publish\libHarfBuzzSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\MayShow.Desktop\bin\Release\net10.0\win-x64\publish\libSkiaSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\MayShow.Desktop\bin\Release\net10.0\win-x64\publish\LICENSE"; DestDir: "{app}"; DestName: "PDFium-license.txt"; Flags: ignoreversion 
+Source: "..\src\MayShow.Desktop\bin\Release\net10.0\win-x64\publish\Magick.Native-Q8-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\MayShow.Desktop\bin\Release\net10.0\win-x64\publish\pdfium.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\src\MayShow.Desktop\bin\Release\net10.0\win-x64\publish\Assets\*"; DestDir: "{app}\Assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
