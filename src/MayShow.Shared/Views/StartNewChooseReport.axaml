@@ -11,7 +11,7 @@
              xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:DataType="vm:StartNewChooseReportViewModel">
     <Grid ColumnDefinitions="100, *, 100"
-          RowDefinitions="Auto, Auto, Auto, Auto, Auto, *">
+          RowDefinitions="Auto, Auto, Auto, Auto, Auto, *, Auto">
         <Button Command="{Binding ShowSettings}"
                 Grid.Row="0"
                 Grid.Column="0"
@@ -137,5 +137,16 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+        <Button Command="{Binding ImportExisting}"
+                CommandParameter="{Binding}"
+                Grid.Column="1"
+                Grid.Row="6"
+                FontSize="10"
+                Margin="0,8,0,8"
+                ToolTip.Tip="This will only work on the same computer that the report was initially created on.">
+            <TextBlock>
+                <Run Text="&#xf56f;"
+                    FontFamily="{StaticResource FontAwesomeSolid}" /> Import report via report_data.json created with MayShow &lt;=1.4.x ...</TextBlock>
+        </Button>
     </Grid>
 </UserControl>

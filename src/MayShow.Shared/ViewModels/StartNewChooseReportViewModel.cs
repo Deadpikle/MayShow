@@ -9,6 +9,7 @@ using MayShow.Helpers;
 using System.Threading.Tasks;
 using System.IO;
 using System;
+using Avalonia.Platform.Storage;
 
 namespace MayShow.ViewModels;
 
@@ -161,8 +162,49 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
         {
             _settings.AllReportInfo.Add(report);
         }
+        await ResortAndSaveSaveReports();
+    }
+
+    private async Task ResortAndSaveSaveReports()
+    {
         // ... this sort and save is slow, technically, but we're not going to have millions of items here, so...
         SavedReports = new ObservableCollection<PDFReport>(_settings.AllReportInfo.OrderBy(x => x.Title));
         await _settings.SaveSettingsAsync();
+    }
+
+    public async void ImportExisting()
+    {
+        var topLevel = TopLevelGrabber?.GetTopLevel();
+        if (topLevel is not null)
+        {
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
+            {
+                Title = "Choose report_data.json file...",
+                AllowMultiple = false,
+                FileTypeFilter = [
+                    new FilePickerFileType("All Types")
+                    {
+                        Patterns = ["*.json"],
+                        AppleUniformTypeIdentifiers = [ "public.json" ],
+                        MimeTypes = ["application/json"],
+                    },
+                ],
+            });
+            if (files.Count > 0)
+            {
+                var file = files[0];
+                // read in file and import data as needed
+                var reportInfo = Utilities.ImportReportDataJson(file.Path.LocalPath);
+                if (reportInfo != null)
+                {
+                    _settings.AllReportInfo.Add(reportInfo);
+                    await ResortAndSaveSaveReports();
+                }
+                else
+                {
+                    await DialogHost.Show(new WarningViewModel("Report file could not be imported. Was it created with a prior version of MayShow (v1.4.x or less)?"));
+                }
+            }
+        }
     }
 }
