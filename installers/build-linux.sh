@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="1.5.0"
+VERSION="1.5.1"
 SRC_DIR="src/MayShow.Desktop" # user ran script from main folder
 if [ ! -d "$SRC_DIR" ]; then
     SRC_DIR= "../src/MayShow.Desktop" # try 
