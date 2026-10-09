@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System;
 using Avalonia.Platform.Storage;
+using System.Collections.Generic;
 
 namespace MayShow.ViewModels;
 
@@ -17,14 +18,19 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
 {
     private string _creatingReportTitle;
     private ObservableCollection<PDFReport> _savedReports;
+    private List<PDFReport> _savedReportsSearchResults;
     private Settings _settings;
+    private string _previouslySavedSearchString;
 
     public StartNewChooseReportViewModel(IChangeViewModel viewModelChanger) : base(viewModelChanger)
     {
         _creatingReportTitle = "";
+        _previouslySavedSearchString = "";
         _settings = Settings.LoadSettings();
         _settings.CleanupAbandonedFolders();
-        _savedReports = new ObservableCollection<PDFReport>(_settings.AllReportInfo.OrderBy(x => x.Title));
+        _savedReports = 
+            new ObservableCollection<PDFReport>(_settings.AllReportInfo.OrderBy(x => x.Title));
+        _savedReportsSearchResults = _savedReports.ToList();
         #if IOS
         Console.WriteLine("Our internal data dir is: {0}", Utilities.GetInternalDataPath());
         #endif
@@ -41,10 +47,41 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
         set { _creatingReportTitle = value; NotifyPropertyChanged(); }
     }
 
+    public string PreviouslySavedSearchString
+    {
+        get => _previouslySavedSearchString;
+        set 
+        { 
+            _previouslySavedSearchString = value; 
+            NotifyPropertyChanged(); 
+            UpdateSearchResults();
+        }
+    }
+
     public ObservableCollection<PDFReport> SavedReports
     {
         get => _savedReports;
-        set { _savedReports = value; NotifyPropertyChanged(); }
+        set 
+        { 
+            _savedReports = value;
+            NotifyPropertyChanged();
+            UpdateSearchResults();
+        }
+    }
+
+    public List<PDFReport> SavedReportsSearchResults
+    {
+        get => _savedReportsSearchResults;
+        set { _savedReportsSearchResults = value; NotifyPropertyChanged(); }
+    }
+
+    private void UpdateSearchResults()
+    {
+        SavedReportsSearchResults = _savedReports
+            .Where(x => x.Title.Contains(_previouslySavedSearchString, StringComparison.CurrentCultureIgnoreCase) || 
+                (x.LastSaved?.ToString("yyyy-MM-dd")?.Contains(_previouslySavedSearchString, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
+                (x.LastGenerated?.ToString("yyyy-MM-dd")?.Contains(_previouslySavedSearchString, StringComparison.CurrentCultureIgnoreCase) ?? false))
+            .ToList();
     }
 
     public async void StartReport() // start a new report based on a title alone
@@ -114,6 +151,7 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
         if (result != null && (bool)result)
         {
             SavedReports.Remove(reportInfo);
+            UpdateSearchResults();
             _settings.AllReportInfo.Remove(reportInfo);
             reportInfo.DeleteInternalFolderFromDisk(); // delete internal data if available
             await _settings.SaveSettingsAsync(); // update saved items list
@@ -169,6 +207,7 @@ class StartNewChooseReportViewModel : BaseViewModel, ICanCheckShutdown, IUpdateR
     {
         // ... this sort and save is slow, technically, but we're not going to have millions of items here, so...
         SavedReports = new ObservableCollection<PDFReport>(_settings.AllReportInfo.OrderBy(x => x.Title));
+        UpdateSearchResults();
         await _settings.SaveSettingsAsync();
     }
 

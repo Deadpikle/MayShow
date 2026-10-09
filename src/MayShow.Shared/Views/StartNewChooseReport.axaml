@@ -11,7 +11,7 @@
              xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:DataType="vm:StartNewChooseReportViewModel">
     <Grid ColumnDefinitions="100, *, 100"
-          RowDefinitions="Auto, Auto, Auto, Auto, Auto, *, Auto">
+          RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, *, Auto">
         <Button Command="{Binding ShowSettings}"
                 Grid.Row="0"
                 Grid.Column="0"
@@ -77,13 +77,25 @@
                Margin="0,16,0,0"
                Grid.Column="1"
                Grid.Row="4"/>
-        <ScrollViewer Margin="0,8,0,32"
+        <StackPanel Orientation="Horizontal"
+                    Spacing="4"
+                    Grid.Row="5"
+                    Grid.Column="1"
+                    Margin="12,6,0,6">
+            <Label Content="Search"
+                   VerticalAlignment="Center" />
+            <TextBox Watermark="Search names and dates..."
+                     Classes="clearButton"
+                     Width="250"
+                     Text="{Binding PreviouslySavedSearchString}" />
+        </StackPanel>
+        <ScrollViewer Margin="0,8,0,8"
                       Grid.Column="1"
-                      Grid.Row="5"
+                      Grid.Row="6"
                       VerticalScrollBarVisibility="Visible"
                       AllowAutoHide="False"
                       HorizontalScrollBarVisibility="Disabled">
-            <ItemsControl ItemsSource="{Binding SavedReports}">
+            <ItemsControl ItemsSource="{Binding SavedReportsSearchResults}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="models:PDFReport">
                         <StackPanel Orientation="Vertical"
@@ -140,8 +152,8 @@
         <Button Command="{Binding ImportExisting}"
                 CommandParameter="{Binding}"
                 Grid.Column="1"
-                Grid.Row="6"
-                FontSize="10"
+                Grid.Row="7"
+                FontSize="12"
                 Margin="0,8,0,8"
                 ToolTip.Tip="This will only work on the same computer that the report was initially created on.">
             <TextBlock>
