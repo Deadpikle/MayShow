@@ -13,6 +13,7 @@ cd "$SRC_DIR"
 echo "Building release for linux-x64..."
 echo "Running clean..."
 rm -rf obj
+rm -rf bin/Release/net10.0/linux-x64
 dotnet clean -c Release
 echo "Running restore"
 dotnet restore -r linux-x64 -p:UseMonoRuntime=false
@@ -26,6 +27,7 @@ cd ../../../../../
 echo "Building release for linux-arm64..."
 echo "Running clean..."
 rm -rf obj
+rm -rf bin/Release/net10.0/linux-arm64
 dotnet clean -c Release
 echo "Running restore..."
 dotnet restore -r linux-arm64 -p:UseMonoRuntime=false
