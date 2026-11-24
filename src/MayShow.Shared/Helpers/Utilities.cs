@@ -197,8 +197,19 @@ class Utilities
         ];
     }
 
+    /// <summary>
+    /// if file does not exist returns null.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="uuid"></param>
+    /// <param name="baseFolder"></param>
+    /// <returns></returns>
     public static PDFReport? ImportReportDataJson(string path, string? uuid = null, string? baseFolder = null)
     {
+        if (!File.Exists(path))
+        {
+            return null;
+        }
         var internalPath = Utilities.GetInternalDataPath();
         uuid ??= Guid.NewGuid().ToString();
         var json = File.ReadAllText(path);
